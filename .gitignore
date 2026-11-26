@@ -1,0 +1,17 @@
+# Third-party archives and extracted tools (fetched by hand, see config/versions.json)
+third_party/tools/
+third_party/quickjs-ng.tar.gz
+third_party/webview2/*.nupkg
+third_party/webview2/pkg/
+
+# Build output and per-profile LibreOffice data
+build/
+dist/
+logs/
+profile-A/
+profile-B/
+
+# Local secrets and editor state
+.claude/settings.local.json
+*.user
+.vs/

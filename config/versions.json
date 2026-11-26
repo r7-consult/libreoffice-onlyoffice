@@ -1,0 +1,16 @@
+{
+  "_note": "Filled on stage 0. install_path and sdk_path stay null until LibreOffice is installed (see docs/BLOCKED.md). Do not guess paths.",
+  "chosen_on": "2026-11-26",
+  "tools": {
+    "cmake": { "version": "4.5.1", "url": "https://github.com/Kitware/CMake/releases/download/v4.5.1/cmake-4.5.1-windows-x86_64.zip", "local": "third_party/tools/cmake" },
+    "ninja": { "version": "1.13.2", "url": "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip", "local": "third_party/tools/ninja" }
+  },
+  "third_party": {
+    "quickjs_ng": { "version": "0.18.0", "url": "https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.18.0.tar.gz", "local": "third_party/quickjs-ng", "license": "MIT" },
+    "webview2_sdk": { "version": "1.0.4370.26", "url": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.4370.26/microsoft.web.webview2.1.0.4370.26.nupkg", "local": "third_party/webview2" }
+  },
+  "libreoffice": {
+    "A": { "version": null, "install_path": null, "sdk_path": null, "note": "Not downloadable from this machine: download.documentfoundation.org unreachable (HTTP 000)." },
+    "B": { "version": null, "install_path": null, "sdk_path": null, "note": "Same as A. Pick a second supported branch when the first one is installed." }
+  }
+}
