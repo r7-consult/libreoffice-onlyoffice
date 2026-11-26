@@ -15,3 +15,6 @@ profile-B/
 .claude/settings.local.json
 *.user
 .vs/
+
+# Python bytecode
+__pycache__/
