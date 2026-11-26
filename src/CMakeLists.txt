@@ -50,6 +50,7 @@ set(PH_SOURCES
   command_engine.cxx
   api_bridge.cxx
   context_menu.cxx
+  menu_dispatch.cxx
   panel_factory.cxx
   plugin_panel.cxx
 )

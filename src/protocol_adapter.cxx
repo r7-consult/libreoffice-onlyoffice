@@ -142,6 +142,11 @@ void ProtocolAdapter::sendResult(const std::string& pluginId, const char* type, 
     sendRaw(pluginId, out);
 }
 
+void ProtocolAdapter::sendEvent(const std::string& pluginId, const std::string& name, const std::string& dataJson)
+{
+    sendRaw(pluginId, "{\"type\":\"event\",\"name\":\"" + jsonEscape(name) + "\",\"data\":" + dataJson + "}");
+}
+
 void ProtocolAdapter::sendRaw(const std::string& pluginId, const std::string& json)
 {
     if (WebHost* web = HostService::instance().find(pluginId))

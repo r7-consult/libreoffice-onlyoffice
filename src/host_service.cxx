@@ -29,6 +29,7 @@ WebHost* HostService::createSession(const std::string& pluginId, Session& s, voi
         HostService::instance().markFailed(pluginId);
     });
     s.web->addDocumentScript(ProtocolAdapter::runtimeScriptPath());
+    s.web->mapFolder(pluginId + ".plugin.invalid", s.installDir);
     s.web->navigate(s.pageUrl);
     s.web->setBounds(0, 0, width, height);
     s.web->setVisible(true);
@@ -37,7 +38,7 @@ WebHost* HostService::createSession(const std::string& pluginId, Session& s, voi
 }
 
 WebHost* HostService::acquire(const std::string& pluginId, void* parentHandle, const std::string& pageUrl,
-                              const std::string& dataDir, int width, int height)
+                              const std::string& dataDir, const std::string& installDir, int width, int height)
 {
     auto it = m_sessions.find(pluginId);
     if (it == m_sessions.end())
@@ -45,6 +46,7 @@ WebHost* HostService::acquire(const std::string& pluginId, void* parentHandle, c
         Session s;
         s.pageUrl = pageUrl;
         s.dataDir = dataDir;
+        s.installDir = installDir;
         it = m_sessions.emplace(pluginId, std::move(s)).first;
         return createSession(pluginId, it->second, parentHandle, width, height);
     }

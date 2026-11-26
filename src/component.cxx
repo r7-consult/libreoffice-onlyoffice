@@ -1,6 +1,7 @@
 // UNO component entry points for pluginhost.dll.
 // Structure follows odk/examples/cpp/custompanel/ctp_services.cxx.
 
+#include "menu_dispatch.hxx"
 #include "panel_factory.hxx"
 
 #include <cppuhelper/implementationentry.hxx>
@@ -16,6 +17,14 @@ cppu::ImplementationEntry s_aServiceEntries[] =
         pluginhost::PanelFactory::Create,
         pluginhost::PanelFactory::getImplementationName_static,
         pluginhost::PanelFactory::getSupportedServiceNames_static,
+        ::cppu::createSingleComponentFactory,
+        nullptr,
+        0
+    },
+    {
+        pluginhost::MenuDispatch::Create,
+        pluginhost::MenuDispatch::getImplementationName_static,
+        pluginhost::MenuDispatch::getSupportedServiceNames_static,
         ::cppu::createSingleComponentFactory,
         nullptr,
         0

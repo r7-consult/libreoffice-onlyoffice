@@ -110,6 +110,9 @@ WebHostWin::WebHostWin(HWND parent, std::string userDataDir)
     const HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(nullptr, dataDir.c_str(), nullptr, onEnv);
     onEnv->Release();
     logEvent("webhost", "env_requested", "hr=" + std::to_string(static_cast<long>(hr)));
+    if (FAILED(hr))
+        logEvent("webhost", "runtime_missing",
+                 "WebView2 Runtime not found or not usable; install the Evergreen Runtime from Microsoft");
 }
 
 WebHostWin::~WebHostWin()
@@ -200,6 +203,9 @@ void WebHostWin::onControllerCreated(HRESULT hr, ICoreWebView2Controller* contro
     onFailed->Release();
 
     logEvent("webhost", "ready");
+    for (const auto& m : m_pendingMappings)
+        applyMapping(m.first, m.second);
+    m_pendingMappings.clear();
     for (const std::string& script : m_documentScripts)
         registerDocumentScript(script);
     flushPending();
@@ -319,6 +325,28 @@ void WebHostWin::addDocumentScript(const std::string& scriptPath)
     m_documentScripts.push_back(source);
     if (m_web)
         registerDocumentScript(source);
+}
+
+void WebHostWin::mapFolder(const std::string& hostName, const std::string& folder)
+{
+    if (m_web)
+        applyMapping(hostName, folder);
+    else
+        m_pendingMappings.emplace_back(hostName, folder); // applied when the engine is ready
+}
+
+void WebHostWin::applyMapping(const std::string& hostName, const std::string& folder)
+{
+    ICoreWebView2_3* web3 = nullptr;
+    if (FAILED(m_web->QueryInterface(IID_PPV_ARGS(&web3))) || !web3)
+    {
+        logEvent("webhost", "error", "virtual host mapping needs WebView2 runtime >= 1.0.774");
+        return;
+    }
+    const HRESULT hr = web3->SetVirtualHostNameToFolderMapping(
+        toWide(hostName).c_str(), toWide(folder).c_str(), COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY_CORS);
+    web3->Release();
+    logEvent("webhost", "mapped", hostName + "|hr=" + std::to_string(static_cast<long>(hr)));
 }
 
 void WebHostWin::registerDocumentScript(const std::string& source)

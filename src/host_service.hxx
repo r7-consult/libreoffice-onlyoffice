@@ -27,12 +27,10 @@ public:
     // Returns the session browser for pluginId, creating it on first use.
     // parentHandle is the native handle of the panel's child window (HWND on Windows).
     WebHost* acquire(const std::string& pluginId, void* parentHandle, const std::string& pageUrl,
-                     const std::string& dataDir, int width, int height);
+                     const std::string& dataDir, const std::string& installDir, int width, int height);
 
-    // Hides the browser and detaches it from its parent. The page keeps running.
+    // Hides the browser and parks it in a hidden window. The page keeps running.
     void release(const std::string& pluginId);
-
-    // Recreates the browser after a renderer failure (stage 7). Page state is lost.
 
     WebHost* find(const std::string& pluginId);
 
@@ -50,6 +48,7 @@ private:
         std::unique_ptr<WebHost> web;
         std::string pageUrl;
         std::string dataDir;
+        std::string installDir; // served at https://<id>.plugin.invalid/ when the host supports it
         bool failed = false;
         int createCount = 0;
     };

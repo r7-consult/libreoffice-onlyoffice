@@ -19,6 +19,9 @@ public:
     // Handles one JSON message from the page of pluginId. Runs on the main thread.
     void onPageMessage(const std::string& pluginId, const std::string& json);
 
+    // Sends {type:"event", name, data} to the page; dataJson must be valid JSON.
+    void sendEvent(const std::string& pluginId, const std::string& name, const std::string& dataJson);
+
 private:
     ProtocolAdapter() = default;
 

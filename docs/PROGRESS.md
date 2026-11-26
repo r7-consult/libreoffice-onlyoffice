@@ -28,7 +28,8 @@ Build machine checklist (first run, in this order): `scripts\env.ps1`, `scripts\
 - `cppumaker` arguments in `scripts/gen_uno_headers.ps1` are assumed (see `BLOCKED.md`).
 - `ContextMenuInterceptorAction_EXECUTE_MODIFIED`, `ActionTrigger` property names and `XUndoManager::getAllUndoActionTitles` are assumed from the IDL; confirm in `offapi`.
 - `rtl_getGlobalProcessId` and `XSystemDependentWindowPeer::getWindowHandle` usage: confirm the byte layout on Windows.
-- Callbacks hold a raw `this` (WebHostWin). Destroying a host while WebView2 still has pending completions is unsafe; fix before stage 3 gate.
-- Undo limit: `undoActionCount` stops increasing at the undo limit (default 100), so rollback could be skipped in very long sessions.
+- FIXED in draft (still uncompiled): raw `this` in callbacks (alive flag); undo limit (unique undo context title); browser dying with the panel window (parking window); renderer failure handling by kind; panel resize; WebView2 runtime missing is logged as `webhost|runtime_missing`.
+- Plugin pages now load from `https://<plugin-folder>.plugin.invalid/` (virtual host mapping, needs WebView2 Runtime >= 1.0.774). Plugin folder names must be valid host labels (letters, digits, `-`); `test_stage*` use `hello`, which qualifies.
+- Context menu click: `src/menu_dispatch.cxx` + `extension/ProtocolHandler.xcu` deliver `onContextMenuClick {id}` to the page. DRAFT; the `ProtocolHandler.xcu` schema and `XDispatchProvider` registration are assumed, verify in the SDK.
 - Plugin install: `scripts\install.ps1` installs the OXT only; plugin packages are copied to `%LOCALAPPDATA%\PluginHost\plugins` (or `PLUGINHOST_PLUGINS_DIR`) by hand. No installer yet.
-- Not implemented: click on context menu items, multi-document context menu attachment, panel "stopped" view, UNO service registration of HostService (it is a C++ singleton in the prototype).
+- Not implemented: multi-document context menu attachment, panel "stopped" view, UNO service registration of HostService (it is a C++ singleton in the prototype).

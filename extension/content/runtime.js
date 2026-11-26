@@ -8,7 +8,7 @@
  *   {type:"init", data}                             -- data for the plugin's init()
  *   {type:"method_result", id, result, error}       -- answer to executeMethod
  *   {type:"command_result", id, result, error}      -- answer to callCommand
- *   {type:"event", name, data}                      -- editor event (e.g. onTargetPositionChanged)
+ *   {type:"event", name, data}                      -- editor event (e.g. onContextMenuClick {id})
  *
  * Page -> host messages (window.chrome.webview.postMessage(string of JSON)):
  *   {type:"ready"}

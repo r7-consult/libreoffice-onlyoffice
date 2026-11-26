@@ -181,7 +181,8 @@ void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width
         return;
     }
     m_pluginId = folderName(cfg.installDir);
-    const std::string pageUrl = fileUrl(cfg.installDir + "\\" + cfg.variationUrls.front());
+    // Served from a virtual https host mapped to the plugin folder (see WebHost::mapFolder).
+    const std::string pageUrl = "https://" + m_pluginId + ".plugin.invalid/" + cfg.variationUrls.front();
 
     void* hwnd = nativeWindowHandle(xChild);
     if (!hwnd)
@@ -190,7 +191,7 @@ void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width
         return;
     }
     m_attached = true;
-    HostService::instance().acquire(m_pluginId, hwnd, pageUrl, pluginDataDir(m_pluginId), width, height);
+    HostService::instance().acquire(m_pluginId, hwnd, pageUrl, pluginDataDir(m_pluginId), cfg.installDir, width, height);
     m_xResizeListener = new ResizeListener(m_pluginId);
     xChild->addWindowListener(m_xResizeListener);
 }

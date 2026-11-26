@@ -35,6 +35,7 @@ public:
     void setMessageHandler(MessageHandler handler) override;
     void setFailureHandler(FailureHandler handler) override;
     void addDocumentScript(const std::string& scriptPath) override;
+    void mapFolder(const std::string& hostName, const std::string& folder) override;
     bool isReady() const override { return m_web != nullptr; }
 
 private:
@@ -53,6 +54,8 @@ private:
     ICoreWebView2Controller* m_controller = nullptr;
     ICoreWebView2* m_web = nullptr;
     std::deque<std::string> m_pendingPosts;
+    std::vector<std::pair<std::string, std::string>> m_pendingMappings; // host name -> folder
+    void applyMapping(const std::string& hostName, const std::string& folder);
     std::string m_pendingUrl;
     bool m_webMessageHooked = false;
     unsigned long m_messageCount = 0;

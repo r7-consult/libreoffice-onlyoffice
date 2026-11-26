@@ -36,6 +36,15 @@ public:
     using FailureHandler = std::function<void()>;
     virtual void setFailureHandler(FailureHandler handler) = 0;
 
+    // Serves folder at https://<hostName>/ (read-only, deny cross-origin). Plugin pages are then
+    // loaded from an https origin instead of file://, so plugins cannot read each other's files.
+    // Must be called before navigate(). Default: no mapping (use file URLs).
+    virtual void mapFolder(const std::string& hostName, const std::string& folder)
+    {
+        (void)hostName;
+        (void)folder;
+    }
+
     // Script run before each document's own scripts (the plugin runtime).
     virtual void addDocumentScript(const std::string& scriptPath) = 0;
 
