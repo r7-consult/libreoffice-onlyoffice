@@ -15,6 +15,7 @@
  *   {type:"executeMethod", id, name, args}
  *   {type:"callCommand", id, source}
  *   {type:"resize", width, height}
+ *   {type:"contextMenu", items:[{id, text}]}
  *
  * Plain JavaScript, no dependencies. Written from the public description of
  * the ONLYOFFICE plugin protocol; no code copied from AGPL-licensed sources.
@@ -101,6 +102,11 @@
     // The command is sent as source text and evaluated by the host's CommandEngine.
     var source = typeof fn === "function" ? "(" + fn.toString() + ")()" : String(fn);
     return request("callCommand", { source: source, isModal: !!isModal });
+  };
+
+  // items: [{id: "...", text: "..."}]. Replaces the plugin's entries in the editor context menu.
+  Asc.plugin.setContextMenuItems = function (items) {
+    send({ type: "contextMenu", items: items || [] });
   };
 
   Asc.plugin.attachEvent = function (name, handler) {

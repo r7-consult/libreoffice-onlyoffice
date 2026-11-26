@@ -32,6 +32,13 @@ public:
 
     virtual void setMessageHandler(MessageHandler handler) = 0;
 
+    // Called when the renderer process fails (stage 7). Runs on the LibreOffice main thread.
+    using FailureHandler = std::function<void()>;
+    virtual void setFailureHandler(FailureHandler handler) = 0;
+
+    // Script run before each document's own scripts (the plugin runtime).
+    virtual void addDocumentScript(const std::string& scriptPath) = 0;
+
     // True when the engine has finished initialising and the page is loaded.
     virtual bool isReady() const = 0;
 };

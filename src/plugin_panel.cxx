@@ -1,6 +1,10 @@
 #include "plugin_panel.hxx"
 
+#include "context_menu.hxx"
+#include "host_service.hxx"
 #include "log.hxx"
+#include "paths.hxx"
+#include "plugin_config.hxx"
 
 #include <com/sun/star/awt/Toolkit.hpp>
 #include <com/sun/star/awt/WindowClass.hpp>
@@ -8,11 +12,14 @@
 #include <com/sun/star/awt/WindowAttribute.hpp>
 #include <com/sun/star/awt/XToolkit.hpp>
 #include <com/sun/star/awt/XWindowPeer.hpp>
+#include <com/sun/star/awt/XSystemDependentWindowPeer.hpp>
+#include <com/sun/star/awt/PosSize.hpp>
+#include <com/sun/star/frame/Desktop.hpp>
+#include <com/sun/star/frame/XDesktop.hpp>
+#include <com/sun/star/frame/XModel.hpp>
+#include <com/sun/star/lang/SystemDependent.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/ui/UIElementType.hpp>
-#include <com/sun/star/awt/PosSize.hpp>
-#include <com/sun/star/awt/XSystemDependentWindowPeer.hpp>
-#include <com/sun/star/lang/SystemDependent.hpp>
 #include <rtl/process.h>
 
 #include <cstdlib>
@@ -52,12 +59,9 @@ Reference<XWindow> createChildWindow(const Reference<XComponentContext>& ctx, co
     aDesc.WindowAttributes = css::awt::WindowAttribute::BORDER;
     return Reference<XWindow>(xToolkit->createWindow(aDesc), css::uno::UNO_QUERY);
 }
-}
 
-namespace
-{
-#ifdef _WIN32
-// HWND of a systemchildwindow, obtained through XSystemDependentWindowPeer (Windows: HWND bytes).
+// Native handle of a systemchildwindow via XSystemDependentWindowPeer.
+// On Windows the handle is an HWND stored in the returned byte sequence.
 void* nativeWindowHandle(const Reference<XWindow>& xWindow)
 {
     Reference<css::awt::XSystemDependentWindowPeer> xDep(xWindow, css::uno::UNO_QUERY);
@@ -67,50 +71,57 @@ void* nativeWindowHandle(const Reference<XWindow>& xWindow)
     rtl_getGlobalProcessId(reinterpret_cast<sal_uInt8*>(aProcessId.getArray()));
     const css::uno::Sequence<sal_Int8> aHandle =
         xDep->getWindowHandle(aProcessId, css::lang::SystemDependent::SYSTEM_WIN32);
-    if (aHandle.getLength() < static_cast<sal_Int32>(sizeof(HWND)))
+    if (aHandle.getLength() < static_cast<sal_Int32>(sizeof(void*)))
         return nullptr;
-    HWND hwnd = nullptr;
-    std::memcpy(&hwnd, aHandle.getConstArray(), sizeof(HWND));
-    return hwnd;
+    void* handle = nullptr;
+    std::memcpy(&handle, aHandle.getConstArray(), sizeof(void*));
+    return handle;
 }
 
-// Directory of pluginhost.dll (the unpacked extension root).
-std::string moduleDirectory()
+// Plugin shown by this prototype panel: PLUGINHOST_PLUGIN (folder name) if set,
+// otherwise the first valid package under pluginsRoot().
+bool choosePlugin(PluginConfig& out)
 {
-    HMODULE module = nullptr;
-    GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                       reinterpret_cast<LPCWSTR>(&moduleDirectory), &module);
-    wchar_t path[MAX_PATH] = {};
-    GetModuleFileNameW(module, path, MAX_PATH);
-    std::wstring w(path);
-    const size_t slash = w.find_last_of(L'\\');
-    w = (slash == std::wstring::npos) ? std::wstring() : w.substr(0, slash + 1);
-    std::string utf8(w.size() * 3, '\0');
-    const int n = WideCharToMultiByte(CP_UTF8, 0, w.c_str(), static_cast<int>(w.size()), &utf8[0],
-                                      static_cast<int>(utf8.size()), nullptr, nullptr);
-    utf8.resize(n > 0 ? static_cast<size_t>(n) : 0);
-    return utf8;
+    const char* forced = std::getenv("PLUGINHOST_PLUGIN");
+    const std::vector<PluginConfig> all = scanPlugins(pluginsRoot());
+    for (const PluginConfig& cfg : all)
+    {
+        if (forced && *forced)
+        {
+            const std::string folder = cfg.installDir.substr(cfg.installDir.find_last_of('\\') + 1);
+            if (folder != forced)
+                continue;
+        }
+        out = cfg;
+        return true;
+    }
+    return false;
 }
 
-// Per-plugin WebView2 user data folder, under %LOCALAPPDATA%\PluginHost.
-std::string pluginDataDirectory()
+std::string folderName(const std::string& installDir)
 {
-    const char* base = std::getenv("LOCALAPPDATA");
-    std::string dir = base ? std::string(base) : std::string(".");
-    dir += "\\PluginHost\\webview2-probe";
-    return dir;
+    return installDir.substr(installDir.find_last_of('\\') + 1);
 }
 
-// Stage 2 probe page shipped in the extension's content folder.
-std::string probePageUrl()
+// Attaches the context menu interceptor to the document active when the panel is created.
+void attachContextMenuToActiveDocument()
 {
-    std::string dir = moduleDirectory();
-    for (char& c : dir)
-        if (c == '\\')
-            c = '/';
-    return "file:///" + dir + "content/probe.html";
+    try
+    {
+        const auto& ctx = HostService::instance().context();
+        if (!ctx.is())
+            return;
+        Reference<css::frame::XDesktop> desktop(
+            ctx->getServiceManager()->createInstanceWithContext("com.sun.star.frame.Desktop", ctx), css::uno::UNO_QUERY);
+        Reference<css::frame::XModel> model(desktop->getCurrentComponent(), css::uno::UNO_QUERY);
+        if (model.is() && model->getCurrentController().is())
+            attachContextMenu(model->getCurrentController());
+    }
+    catch (...)
+    {
+        logEvent("panel", "error", "context menu attach failed");
+    }
 }
-#endif
 }
 
 PluginPanel::PluginPanel(const Reference<XComponentContext>& ctx,
@@ -122,41 +133,39 @@ PluginPanel::PluginPanel(const Reference<XComponentContext>& ctx,
     , m_sResourceURL(resourceURL)
 {
     m_xWindow = createChildWindow(ctx, xParentWindow);
-    if (m_xWindow.is())
-    {
-        const css::awt::Rectangle aSize = xParentWindow->getPosSize();
-        m_xWindow->setPosSize(0, 0, aSize.Width, aSize.Height, css::awt::PosSize::POSSIZE);
-        m_xWindow->setVisible(true);
-        logEvent("panel", "created", m_sResourceURL.toUtf8().getStr());
-        attachWebHost(m_xWindow, aSize.Width, aSize.Height);
-    }
-    else
+    if (!m_xWindow.is())
     {
         logEvent("panel", "error", "systemchildwindow was not created");
+        return;
     }
+    const css::awt::Rectangle aSize = xParentWindow->getPosSize();
+    m_xWindow->setPosSize(0, 0, aSize.Width, aSize.Height, css::awt::PosSize::POSSIZE);
+    m_xWindow->setVisible(true);
+    logEvent("panel", "created", m_sResourceURL.toUtf8().getStr());
+
+    attachPlugin(m_xWindow, aSize.Width, aSize.Height);
+    attachContextMenuToActiveDocument();
 }
 
-void PluginPanel::attachWebHost(const Reference<XWindow>& xChild, sal_Int32 width, sal_Int32 height)
+void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width, sal_Int32 height)
 {
-#ifdef _WIN32
+    PluginConfig cfg;
+    if (!choosePlugin(cfg))
+    {
+        logEvent("panel", "error", "no plugin package under " + pluginsRoot());
+        return;
+    }
+    m_pluginId = folderName(cfg.installDir);
+    const std::string pageUrl = fileUrl(cfg.installDir + "\\" + cfg.variationUrls.front());
+
     void* hwnd = nativeWindowHandle(xChild);
     if (!hwnd)
     {
-        logEvent("panel", "error", "no native window handle");
+        logEvent("panel", "error", "no native window handle (stage 2 is Windows-only)");
         return;
     }
-    const std::string dataDir = pluginDataDirectory();
-    m_webHost.reset(createWebHost(hwnd, dataDir));
-    if (!m_webHost)
-        return;
-    m_webHost->navigate(probePageUrl());
-    m_webHost->setBounds(0, 0, width, height);
-#else
-    (void)xChild;
-    (void)width;
-    (void)height;
-    logEvent("panel", "skipped", "web host is implemented for Windows only (stage 2)");
-#endif
+    m_attached = true;
+    HostService::instance().acquire(m_pluginId, hwnd, pageUrl, pluginDataDir(m_pluginId), width, height);
 }
 
 css::uno::Reference<css::frame::XFrame> SAL_CALL PluginPanel::getFrame()
@@ -207,7 +216,10 @@ void SAL_CALL PluginPanel::disposing()
 {
     osl::MutexGuard guard(m_aMutex);
     logEvent("panel", "disposed", m_sResourceURL.toUtf8().getStr());
-    m_webHost.reset();
+    // Stage 3: the session stays alive; only the view is hidden and detached.
+    if (m_attached)
+        HostService::instance().release(m_pluginId);
+    m_attached = false;
     Reference<css::lang::XComponent> xComp(m_xWindow, css::uno::UNO_QUERY);
     m_xWindow.clear();
     if (xComp.is())

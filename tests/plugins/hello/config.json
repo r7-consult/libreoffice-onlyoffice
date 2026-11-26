@@ -1,0 +1,13 @@
+{
+  "guid": "asc.{7C1A2E4B-0000-4000-8000-000000000001}",
+  "name": "Hello (test fixture)",
+  "version": "0.1.0",
+  "isVisual": true,
+  "isSystem": false,
+  "variations": [
+    {
+      "url": "index.html",
+      "description": "Test fixture for the Plugin Host prototype (P-1)"
+    }
+  ]
+}

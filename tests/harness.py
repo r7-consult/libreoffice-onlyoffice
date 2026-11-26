@@ -83,6 +83,19 @@ class Office:
             self.proc = None
 
 
+def select_all_text(doc):
+    """Writer helper: replaces the body with text and selects it all through the view cursor."""
+    doc.getText().setString("abc")
+    cursor = doc.getCurrentController().getViewCursor()
+    cursor.gotoStart(False)
+    cursor.gotoEnd(True)
+
+
+def cell_string(doc, sheet_index, address):
+    sheet = doc.getSheets().getByIndex(sheet_index)
+    return sheet.getCellRangeByName(address).getString()
+
+
 def read_log_lines():
     path = os.environ.get("PLUGINHOST_LOG")
     if not path or not os.path.exists(path):

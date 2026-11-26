@@ -1,10 +1,21 @@
 # Runs every stage test against the profile given by -Profile (A or B).
 # Usage: . scripts\env.ps1 -Profile A ; powershell -File scripts\run_all.ps1 -Profile A
+# DRAFT: not run yet. Needs an interactive desktop session (sidebar and WebView2 need a window).
 param([ValidateSet('A', 'B')] [string]$Profile = 'A')
 $ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
 $py = Join-Path $env:LO_PROGRAM 'python.exe'
+
+# Isolated plugin folder for this profile, filled with the test fixture.
+$pluginsDir = Join-Path $root ("profile-" + $Profile + "\plugins")
+New-Item -ItemType Directory -Force -Path $pluginsDir | Out-Null
+Copy-Item -Recurse -Force (Join-Path $root 'tests\plugins\hello') $pluginsDir
+
+$env:PLUGINHOST_PLUGINS_DIR = $pluginsDir
+$env:PLUGINHOST_PLUGIN = 'hello'
+$env:PLUGINHOST_TEST_MODE = '1'
 $env:PLUGINHOST_LOG = Join-Path $root ("logs\run-" + $Profile + "-" + (Get-Date -Format 'yyyyMMdd-HHmmss') + ".log")
+
 $summary = @()
 foreach ($t in Get-ChildItem (Join-Path $root 'tests') -Filter 'test_stage*.py' | Sort-Object Name) {
     & $py $t.FullName

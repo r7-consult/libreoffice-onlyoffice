@@ -6,7 +6,9 @@
 
 #include <WebView2.h>
 #include <objbase.h>
+#include <fstream>
 #include <functional>
+#include <sstream>
 #include <utility>
 
 // Loader entry point from WebView2LoaderStatic.lib (no runtime DLL load).
@@ -111,6 +113,8 @@ WebHostWin::~WebHostWin()
 {
     if (m_web && m_webMessageHooked)
         m_web->remove_WebMessageReceived(m_webMessageToken);
+    if (m_web && m_processFailedToken)
+        m_web->remove_ProcessFailed(m_processFailedToken);
     if (m_controller)
         m_controller->Close();
     if (m_web)
@@ -172,7 +176,18 @@ void WebHostWin::onControllerCreated(HRESULT hr, ICoreWebView2Controller* contro
     m_webMessageHooked = true;
     onMsg->Release();
 
+    // Renderer crash or hang: WebView2 reports ProcessFailed on the same thread.
+    auto onFailed = makeCallback<ICoreWebView2ProcessFailedEventHandler, ICoreWebView2*, ICoreWebView2ProcessFailedEventArgs*>(
+        [this](ICoreWebView2*, ICoreWebView2ProcessFailedEventArgs*) -> HRESULT {
+            onProcessFailed();
+            return S_OK;
+        });
+    m_web->add_ProcessFailed(onFailed, &m_processFailedToken);
+    onFailed->Release();
+
     logEvent("webhost", "ready");
+    for (const std::string& script : m_documentScripts)
+        registerDocumentScript(script);
     flushPending();
 }
 
@@ -253,6 +268,46 @@ void WebHostWin::reparent(void* newParentNativeHandle)
 void WebHostWin::setMessageHandler(MessageHandler handler)
 {
     m_onMessage = std::move(handler);
+}
+
+void WebHostWin::setFailureHandler(FailureHandler handler)
+{
+    m_onFailure = std::move(handler);
+}
+
+void WebHostWin::addDocumentScript(const std::string& scriptPath)
+{
+    std::ifstream in(scriptPath, std::ios::binary);
+    if (!in)
+    {
+        logEvent("webhost", "error", "script not found: " + scriptPath);
+        return;
+    }
+    std::stringstream buf;
+    buf << in.rdbuf();
+    const std::string source = buf.str();
+    m_documentScripts.push_back(source);
+    if (m_web)
+        registerDocumentScript(source);
+}
+
+void WebHostWin::registerDocumentScript(const std::string& source)
+{
+    const std::wstring w = toWide(source);
+    auto onAdded = makeCallback<ICoreWebView2AddScriptToExecuteOnDocumentCreatedCompletedHandler, HRESULT, LPCWSTR>(
+        [](HRESULT hr, LPCWSTR) -> HRESULT {
+            logEvent("webhost", "script_added", "hr=" + std::to_string(static_cast<long>(hr)));
+            return S_OK;
+        });
+    m_web->AddScriptToExecuteOnDocumentCreated(w.c_str(), onAdded);
+    onAdded->Release();
+}
+
+void WebHostWin::onProcessFailed()
+{
+    logEvent("webhost", "renderer_failed");
+    if (m_onFailure)
+        m_onFailure();
 }
 
 WebHost* createWebHost(void* nativeParentHandle, const std::string& userDataDir)

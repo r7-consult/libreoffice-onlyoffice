@@ -11,14 +11,12 @@
 #include <cppuhelper/compbase.hxx>
 #include <osl/mutex.hxx>
 
-#include "webhost.hxx"
-
-#include <memory>
+#include <string>
 
 namespace pluginhost
 {
-// A sidebar panel that owns one native child window (systemchildwindow).
-// Stage 1: the window is empty. Stage 2 attaches a WebHost to its handle.
+// A sidebar panel with one native child window (systemchildwindow).
+// The window hosts the plugin browser owned by HostService (stage 2-3).
 class PluginPanel : private cppu::BaseMutex,
                     public cppu::WeakComponentImplHelper<css::ui::XUIElement, css::ui::XToolPanel, css::ui::XSidebarPanel>
 {
@@ -46,11 +44,12 @@ protected:
     void SAL_CALL disposing() override;
 
 private:
-    void attachWebHost(const css::uno::Reference<css::awt::XWindow>& xChild, sal_Int32 width, sal_Int32 height);
+    void attachPlugin(const css::uno::Reference<css::awt::XWindow>& xChild, sal_Int32 width, sal_Int32 height);
 
     css::uno::Reference<css::uno::XComponentContext> m_xContext;
     css::uno::Reference<css::awt::XWindow> m_xWindow;
     OUString m_sResourceURL;
-    std::unique_ptr<WebHost> m_webHost;
+    std::string m_pluginId;
+    bool m_attached = false;
 };
 }

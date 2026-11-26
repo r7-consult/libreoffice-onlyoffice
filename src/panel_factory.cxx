@@ -1,5 +1,6 @@
 #include "panel_factory.hxx"
 
+#include "host_service.hxx"
 #include "log.hxx"
 #include "plugin_panel.hxx"
 
@@ -29,6 +30,7 @@ const char* const kUrlPrefix = "private:resource/toolpanel/org.example.pluginhos
 PanelFactory::PanelFactory(const Reference<XComponentContext>& ctx)
     : m_xContext(ctx)
 {
+    HostService::instance().setContext(ctx);
 }
 
 Reference<XUIElement> SAL_CALL PanelFactory::createUIElement(

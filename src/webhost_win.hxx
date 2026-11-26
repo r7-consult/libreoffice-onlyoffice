@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <deque>
 #include <string>
+#include <vector>
 
 struct ICoreWebView2Environment;
 struct ICoreWebView2Controller;
@@ -30,12 +31,16 @@ public:
     void setVisible(bool visible) override;
     void reparent(void* newParentNativeHandle) override;
     void setMessageHandler(MessageHandler handler) override;
+    void setFailureHandler(FailureHandler handler) override;
+    void addDocumentScript(const std::string& scriptPath) override;
     bool isReady() const override { return m_web != nullptr; }
 
 private:
     void onEnvironmentCreated(HRESULT hr, ICoreWebView2Environment* env);
     void onControllerCreated(HRESULT hr, ICoreWebView2Controller* controller);
     void onWebMessage(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args);
+    void onProcessFailed();
+    void registerDocumentScript(const std::string& source);
     void flushPending();
 
     HWND m_parent;
@@ -48,6 +53,9 @@ private:
     std::string m_pendingUrl;
     bool m_webMessageHooked = false;
     unsigned long m_messageCount = 0;
+    FailureHandler m_onFailure;
+    std::vector<std::string> m_documentScripts; // sources, registered once the engine is ready
+    long long m_processFailedToken = 0;
     long long m_webMessageToken = 0;
 };
 }
