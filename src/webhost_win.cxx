@@ -95,12 +95,15 @@ std::string toUtf8(const std::wstring& w)
 }
 
 WebHostWin::WebHostWin(HWND parent, std::string userDataDir)
-    : m_parent(parent)
+    : m_alive(std::make_shared<bool>(true))
+    , m_parent(parent)
     , m_userDataDir(std::move(userDataDir))
 {
     const std::wstring dataDir = toWide(m_userDataDir);
     auto onEnv = makeCallback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler, HRESULT, ICoreWebView2Environment*>(
-        [this](HRESULT hr, ICoreWebView2Environment* env) -> HRESULT {
+        [this, alive = m_alive](HRESULT hr, ICoreWebView2Environment* env) -> HRESULT {
+            if (!*alive)
+                return S_OK; // host already destroyed
             onEnvironmentCreated(hr, env);
             return S_OK;
         });
@@ -111,6 +114,7 @@ WebHostWin::WebHostWin(HWND parent, std::string userDataDir)
 
 WebHostWin::~WebHostWin()
 {
+    *m_alive = false; // pending COM callbacks become no-ops
     if (m_web && m_webMessageHooked)
         m_web->remove_WebMessageReceived(m_webMessageToken);
     if (m_web && m_processFailedToken)
@@ -137,7 +141,13 @@ void WebHostWin::onEnvironmentCreated(HRESULT hr, ICoreWebView2Environment* env)
     m_env->AddRef();
 
     auto onCtrl = makeCallback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler, HRESULT, ICoreWebView2Controller*>(
-        [this](HRESULT h, ICoreWebView2Controller* c) -> HRESULT {
+        [this, alive = m_alive](HRESULT h, ICoreWebView2Controller* c) -> HRESULT {
+            if (!*alive)
+            {
+                if (c)
+                    c->Close(); // host destroyed while the controller was being created
+                return S_OK;
+            }
             onControllerCreated(h, c);
             return S_OK;
         });
@@ -168,7 +178,9 @@ void WebHostWin::onControllerCreated(HRESULT hr, ICoreWebView2Controller* contro
 
     // Messages from the page: window.chrome.webview.postMessage(string)
     auto onMsg = makeCallback<ICoreWebView2WebMessageReceivedEventHandler, ICoreWebView2*, ICoreWebView2WebMessageReceivedEventArgs*>(
-        [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+        [this, alive = m_alive](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+            if (!*alive)
+                return S_OK;
             onWebMessage(sender, args);
             return S_OK;
         });
@@ -178,8 +190,10 @@ void WebHostWin::onControllerCreated(HRESULT hr, ICoreWebView2Controller* contro
 
     // Renderer crash or hang: WebView2 reports ProcessFailed on the same thread.
     auto onFailed = makeCallback<ICoreWebView2ProcessFailedEventHandler, ICoreWebView2*, ICoreWebView2ProcessFailedEventArgs*>(
-        [this](ICoreWebView2*, ICoreWebView2ProcessFailedEventArgs*) -> HRESULT {
-            onProcessFailed();
+        [this, alive = m_alive](ICoreWebView2*, ICoreWebView2ProcessFailedEventArgs* args) -> HRESULT {
+            if (!*alive)
+                return S_OK;
+            onProcessFailed(args);
             return S_OK;
         });
     m_web->add_ProcessFailed(onFailed, &m_processFailedToken);
@@ -258,11 +272,27 @@ void WebHostWin::setVisible(bool visible)
         m_controller->put_IsVisible(visible ? TRUE : FALSE);
 }
 
+namespace
+{
+// Hidden window that keeps the browser alive while no panel exists. A sidebar panel window
+// is destroyed with its deck; without parking, WebView2 (a child of that window) dies with it.
+HWND parkingWindow()
+{
+    static HWND hwnd = CreateWindowExW(0, L"STATIC", L"PluginHostParking", WS_POPUP, 0, 0, 1, 1,
+                                       nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+    return hwnd;
+}
+}
+
 void WebHostWin::reparent(void* newParentNativeHandle)
 {
-    // Stage 3 measures this; the first prototype only records the request.
-    m_parent = static_cast<HWND>(newParentNativeHandle);
-    logEvent("webhost", "reparent_requested");
+    // nullptr = park (panel going away). Otherwise move under the new panel window.
+    m_parent = newParentNativeHandle ? static_cast<HWND>(newParentNativeHandle) : parkingWindow();
+    if (m_controller)
+    {
+        const HRESULT hr = m_controller->put_ParentWindow(m_parent);
+        logEvent("webhost", "reparent", "hr=" + std::to_string(static_cast<long>(hr)));
+    }
 }
 
 void WebHostWin::setMessageHandler(MessageHandler handler)
@@ -303,11 +333,30 @@ void WebHostWin::registerDocumentScript(const std::string& source)
     onAdded->Release();
 }
 
-void WebHostWin::onProcessFailed()
+void WebHostWin::onProcessFailed(ICoreWebView2ProcessFailedEventArgs* args)
 {
-    logEvent("webhost", "renderer_failed");
-    if (m_onFailure)
-        m_onFailure();
+    COREWEBVIEW2_PROCESS_FAILED_KIND kind = COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED;
+    if (args)
+        args->get_ProcessFailedKind(&kind);
+    logEvent("webhost", "process_failed", "kind=" + std::to_string(static_cast<int>(kind)));
+    switch (kind)
+    {
+    case COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED:
+    case COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE:
+        // Documented recovery: the browser process is fine, only reload the page. No session restart.
+        logEvent("webhost", "renderer_failed");
+        if (m_web)
+            m_web->Reload();
+        break;
+    case COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED:
+        // The whole browser is gone: the controller is unusable; re-created on next attach.
+        logEvent("webhost", "renderer_failed");
+        if (m_onFailure)
+            m_onFailure();
+        break;
+    default:
+        break; // utility/GPU process: WebView2 recovers by itself
+    }
 }
 
 WebHost* createWebHost(void* nativeParentHandle, const std::string& userDataDir)

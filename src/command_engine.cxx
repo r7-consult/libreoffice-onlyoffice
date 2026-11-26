@@ -15,8 +15,8 @@
 namespace pluginhost
 {
 std::string nativeCall(const std::string& name, const std::string& argsJson);
-void undoLastAction();
-int undoActionCount();
+void beginUndoContext();
+void endUndoContext(bool rollback);
 void lockActiveDocument(bool lock);
 void recalculateActiveDocument();
 }
@@ -153,9 +153,9 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
     // The page sends a function expression; JSON.stringify keeps the result transferable.
     const std::string wrapped = "JSON.stringify((" + source + "))";
 
-    const int undoBefore = undoActionCount();
     {
         CommandScope scope;
+        beginUndoContext();
         JSValue v = JS_Eval(e.ctx, wrapped.data(), wrapped.size(), "command.js", JS_EVAL_TYPE_GLOBAL);
         if (JS_IsException(v))
         {
@@ -168,8 +168,7 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
             JS_FreeValue(e.ctx, exc);
             JS_FreeValue(e.ctx, v);
             // The whole command is one Undo step: roll it back if it changed anything.
-            if (undoActionCount() > undoBefore)
-                undoLastAction();
+            endUndoContext(true);
             logEvent("command", e.watchdogFired ? "timeout" : "error", pluginId + "|" + out.error);
             return out;
         }
@@ -178,6 +177,7 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
         if (text)
             JS_FreeCString(e.ctx, text);
         JS_FreeValue(e.ctx, v);
+        endUndoContext(false);
         recalculateActiveDocument();
     }
     out.ok = true;

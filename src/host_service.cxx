@@ -67,17 +67,8 @@ void HostService::release(const std::string& pluginId)
     if (it == m_sessions.end() || !it->second.web)
         return;
     it->second.web->setVisible(false);
+    it->second.web->reparent(nullptr); // park before the panel window is destroyed
     logEvent("webhost", "hidden", pluginId);
-}
-
-WebHost* HostService::restart(const std::string& pluginId, void* parentHandle)
-{
-    auto it = m_sessions.find(pluginId);
-    if (it == m_sessions.end())
-        return nullptr;
-    it->second.web.reset();
-    logEvent("webhost", "restart", pluginId);
-    return createSession(pluginId, it->second, parentHandle, 0, 0);
 }
 
 WebHost* HostService::find(const std::string& pluginId)

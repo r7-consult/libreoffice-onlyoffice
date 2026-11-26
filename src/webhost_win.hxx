@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <deque>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -13,6 +14,7 @@ struct ICoreWebView2Environment;
 struct ICoreWebView2Controller;
 struct ICoreWebView2;
 struct ICoreWebView2WebMessageReceivedEventArgs;
+struct ICoreWebView2ProcessFailedEventArgs;
 
 namespace pluginhost
 {
@@ -39,10 +41,11 @@ private:
     void onEnvironmentCreated(HRESULT hr, ICoreWebView2Environment* env);
     void onControllerCreated(HRESULT hr, ICoreWebView2Controller* controller);
     void onWebMessage(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args);
-    void onProcessFailed();
+    void onProcessFailed(ICoreWebView2ProcessFailedEventArgs* args);
     void registerDocumentScript(const std::string& source);
     void flushPending();
 
+    std::shared_ptr<bool> m_alive; // callbacks check this instead of trusting a raw this
     HWND m_parent;
     std::string m_userDataDir;
     MessageHandler m_onMessage;

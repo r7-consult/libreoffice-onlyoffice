@@ -33,7 +33,6 @@ public:
     void release(const std::string& pluginId);
 
     // Recreates the browser after a renderer failure (stage 7). Page state is lost.
-    WebHost* restart(const std::string& pluginId, void* parentHandle);
 
     WebHost* find(const std::string& pluginId);
 

@@ -2,6 +2,7 @@
 
 #include <com/sun/star/awt/XWindow.hpp>
 #include <com/sun/star/awt/XWindowPeer.hpp>
+#include <com/sun/star/awt/XWindowListener.hpp>
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/ui/XSidebarPanel.hpp>
 #include <com/sun/star/ui/XToolPanel.hpp>
@@ -49,6 +50,7 @@ private:
     css::uno::Reference<css::uno::XComponentContext> m_xContext;
     css::uno::Reference<css::awt::XWindow> m_xWindow;
     OUString m_sResourceURL;
+    css::uno::Reference<css::awt::XWindowListener> m_xResizeListener;
     std::string m_pluginId;
     bool m_attached = false;
 };

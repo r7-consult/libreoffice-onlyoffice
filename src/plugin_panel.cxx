@@ -22,7 +22,10 @@
 #include <com/sun/star/ui/UIElementType.hpp>
 #include <rtl/process.h>
 
+#include <com/sun/star/awt/XWindowListener.hpp>
+#include <cppuhelper/implbase.hxx>
 #include <cstdlib>
+#include <utility>
 #include <cstring>
 #include <string>
 
@@ -77,6 +80,28 @@ void* nativeWindowHandle(const Reference<XWindow>& xWindow)
     std::memcpy(&handle, aHandle.getConstArray(), sizeof(void*));
     return handle;
 }
+
+// Keeps the browser the size of the panel window when the sidebar is resized.
+class ResizeListener : public cppu::WeakImplHelper<css::awt::XWindowListener>
+{
+public:
+    explicit ResizeListener(std::string pluginId)
+        : m_pluginId(std::move(pluginId))
+    {
+    }
+    void SAL_CALL windowResized(const css::awt::WindowEvent& e) override
+    {
+        if (WebHost* web = HostService::instance().find(m_pluginId))
+            web->setBounds(0, 0, e.Width, e.Height);
+    }
+    void SAL_CALL windowMoved(const css::awt::WindowEvent&) override {}
+    void SAL_CALL windowShown(const css::lang::EventObject&) override {}
+    void SAL_CALL windowHidden(const css::lang::EventObject&) override {}
+    void SAL_CALL disposing(const css::lang::EventObject&) override {}
+
+private:
+    std::string m_pluginId;
+};
 
 // Plugin shown by this prototype panel: PLUGINHOST_PLUGIN (folder name) if set,
 // otherwise the first valid package under pluginsRoot().
@@ -166,6 +191,8 @@ void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width
     }
     m_attached = true;
     HostService::instance().acquire(m_pluginId, hwnd, pageUrl, pluginDataDir(m_pluginId), width, height);
+    m_xResizeListener = new ResizeListener(m_pluginId);
+    xChild->addWindowListener(m_xResizeListener);
 }
 
 css::uno::Reference<css::frame::XFrame> SAL_CALL PluginPanel::getFrame()
@@ -217,8 +244,11 @@ void SAL_CALL PluginPanel::disposing()
     osl::MutexGuard guard(m_aMutex);
     logEvent("panel", "disposed", m_sResourceURL.toUtf8().getStr());
     // Stage 3: the session stays alive; only the view is hidden and detached.
+    if (m_xWindow.is() && m_xResizeListener.is())
+        m_xWindow->removeWindowListener(m_xResizeListener);
+    m_xResizeListener.clear();
     if (m_attached)
-        HostService::instance().release(m_pluginId);
+        HostService::instance().release(m_pluginId); // parks the browser before the window dies
     m_attached = false;
     Reference<css::lang::XComponent> xComp(m_xWindow, css::uno::UNO_QUERY);
     m_xWindow.clear();

@@ -221,33 +221,50 @@ std::string nativeCall(const std::string& name, const std::string& argsJson)
     throw std::runtime_error("unknown native operation: " + name);
 }
 
-// Undo and locking helpers used by CommandEngine.
-void undoLastAction()
+// Undo helpers used by CommandEngine. One command = one undo context with a unique title,
+// so any number of native calls inside it revert with a single Undo. The unique title also
+// removes the need to count undo actions (which stops growing at the undo limit).
+namespace
 {
+int g_commandSeq = 0;
+std::string g_commandTitle;
+}
+
+void beginUndoContext()
+{
+    g_commandTitle = "Plugin command #" + std::to_string(++g_commandSeq);
     try
     {
         Reference<css::document::XUndoManagerSupplier> supplier(activeModel(), UNO_QUERY);
         if (supplier.is())
-            supplier->getUndoManager()->undo();
+            supplier->getUndoManager()->enterUndoContext(rtl::OUString::fromUtf8(g_commandTitle));
     }
     catch (...)
     {
-        // Nothing to undo, or no document: the command already failed.
+        g_commandTitle.clear();
     }
 }
 
-int undoActionCount()
+// rollback = true: the command failed, revert whatever it changed (if it changed anything).
+void endUndoContext(bool rollback)
 {
+    if (g_commandTitle.empty())
+        return;
     try
     {
         Reference<css::document::XUndoManagerSupplier> supplier(activeModel(), UNO_QUERY);
-        if (supplier.is())
-            return supplier->getUndoManager()->getAllUndoActionTitles().getLength();
+        if (!supplier.is())
+            return;
+        Reference<css::document::XUndoManager> um = supplier->getUndoManager();
+        um->leaveUndoContext(); // an empty context is dropped by LibreOffice
+        if (rollback && um->isUndoPossible()
+            && um->getCurrentUndoActionTitle() == rtl::OUString::fromUtf8(g_commandTitle))
+            um->undo();
     }
     catch (...)
     {
     }
-    return 0;
+    g_commandTitle.clear();
 }
 
 void lockActiveDocument(bool lock)
