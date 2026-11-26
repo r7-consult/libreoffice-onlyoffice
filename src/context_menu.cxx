@@ -16,6 +16,7 @@
 #include <chrono>
 #include <map>
 #include <mutex>
+#include <set>
 
 namespace pluginhost
 {
@@ -95,6 +96,12 @@ void attachContextMenu(const Reference<css::frame::XController>& controller)
 {
     Reference<css::ui::XContextMenuInterception> interception(controller, UNO_QUERY);
     if (!interception.is())
+        return;
+    // A panel is re-created on every deck switch; register once per controller or entries multiply.
+    // (Address of the controller's XInterface; a recycled address is a draft-level risk.)
+    static std::set<css::uno::XInterface*> attached;
+    css::uno::XInterface* key = Reference<css::uno::XInterface>(controller, UNO_QUERY).get();
+    if (!attached.insert(key).second)
         return;
     interception->registerContextMenuInterceptor(new Interceptor());
     logEvent("ctxmenu", "attached");

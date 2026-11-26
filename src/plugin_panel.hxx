@@ -24,6 +24,7 @@ class PluginPanel : private cppu::BaseMutex,
 public:
     PluginPanel(const css::uno::Reference<css::uno::XComponentContext>& ctx,
                 const css::uno::Reference<css::awt::XWindow>& xParentWindow,
+                const css::uno::Reference<css::frame::XFrame>& xFrame,
                 const OUString& resourceURL);
 
     // XUIElement
@@ -49,6 +50,7 @@ private:
 
     css::uno::Reference<css::uno::XComponentContext> m_xContext;
     css::uno::Reference<css::awt::XWindow> m_xWindow;
+    css::uno::Reference<css::frame::XFrame> m_xFrame;
     OUString m_sResourceURL;
     css::uno::Reference<css::awt::XWindowListener> m_xResizeListener;
     std::string m_pluginId;

@@ -42,13 +42,13 @@ Reference<XUIElement> SAL_CALL PanelFactory::createUIElement(
         throw NoSuchElementException(rResourceURL, *this);
 
     Reference<XWindow> xParentWindow;
+    Reference<css::frame::XFrame> xFrame; // frame of the document that shows this sidebar
     for (const PropertyValue& arg : rArgs)
     {
         if (arg.Name == "ParentWindow")
-        {
             xParentWindow.set(arg.Value, css::uno::UNO_QUERY);
-            break;
-        }
+        else if (arg.Name == "Frame")
+            xFrame.set(arg.Value, css::uno::UNO_QUERY);
     }
     if (!xParentWindow.is())
     {
@@ -57,7 +57,7 @@ Reference<XUIElement> SAL_CALL PanelFactory::createUIElement(
     }
 
     logEvent("factory", "createUIElement", rResourceURL.toUtf8().getStr());
-    return new PluginPanel(m_xContext, xParentWindow, rResourceURL);
+    return new PluginPanel(m_xContext, xParentWindow, xFrame, rResourceURL);
 }
 
 OUString SAL_CALL PanelFactory::getImplementationName()

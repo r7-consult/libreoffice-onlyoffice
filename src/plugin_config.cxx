@@ -60,6 +60,11 @@ bool loadPluginConfig(const std::string& installDir, PluginConfig& out, std::str
         if (isSystem->kind == JsonValue::Kind::Bool)
             out.isSystem = isSystem->boolean;
 
+    if (const JsonValue* perms = root.get("hostPermissions"))
+        for (const JsonValue& p : perms->array)
+            if (p.isString())
+                out.permissions.push_back(p.str);
+
     // variations[].url is the entry page; the prototype uses the first one.
     if (const JsonValue* variations = root.get("variations"))
     {

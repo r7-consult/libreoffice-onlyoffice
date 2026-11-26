@@ -23,7 +23,7 @@ Code navigation used lean-ctx / Grep: no tool named `ontoindex` exists in this s
 - `ProcessFailed` handler runs inside WebView2 callbacks; a Panel "stopped" view and automatic re-create are missing.
 - Uninstall/cleanup of the user data folder, DPI, IME, accessibility.
 
-Second pass (same day) closed: missing-runtime log line, context menu click (protocol handler), virtual https host per plugin instead of `file://`. Still open: permission list for `callCommand`, multi-document menu attach, "stopped" panel view.
+Second pass (same day) closed: missing-runtime log line, context menu click (protocol handler), virtual https host per plugin instead of `file://`. Third pass closed: `hostPermissions` gate, multi-document menu attach. Still open: "stopped" panel view, JSON parser replacement, and a user-facing permission prompt for ONLYOFFICE plugins that declare nothing.
 
 ## 4. Overengineering
 | Item | Verdict |

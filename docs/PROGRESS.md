@@ -32,4 +32,6 @@ Build machine checklist (first run, in this order): `scripts\env.ps1`, `scripts\
 - Plugin pages now load from `https://<plugin-folder>.plugin.invalid/` (virtual host mapping, needs WebView2 Runtime >= 1.0.774). Plugin folder names must be valid host labels (letters, digits, `-`); `test_stage*` use `hello`, which qualifies.
 - Context menu click: `src/menu_dispatch.cxx` + `extension/ProtocolHandler.xcu` deliver `onContextMenuClick {id}` to the page. DRAFT; the `ProtocolHandler.xcu` schema and `XDispatchProvider` registration are assumed, verify in the SDK.
 - Plugin install: `scripts\install.ps1` installs the OXT only; plugin packages are copied to `%LOCALAPPDATA%\PluginHost\plugins` (or `PLUGINHOST_PLUGINS_DIR`) by hand. No installer yet.
-- Not implemented: multi-document context menu attachment, panel "stopped" view, UNO service registration of HostService (it is a C++ singleton in the prototype).
+- Permissions (draft): `config.json` field `hostPermissions` (`document.read`, `document.edit`, `menu`) gates executeMethod, callCommand and contextMenu; denied calls log `protocol|denied` and return `PermissionDenied`. Real ONLYOFFICE plugins have no such field, so a host-side policy/prompt is needed before running third-party plugins.
+- Context menu is attached through the `Frame` argument of the panel, once per controller (multi-document). Not tested.
+- Not implemented: panel "stopped" view, UNO service registration of HostService (it is a C++ singleton in the prototype).

@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "isVisual": true,
   "isSystem": false,
+  "hostPermissions": ["document.read", "document.edit", "menu"],
   "variations": [
     {
       "url": "index.html",

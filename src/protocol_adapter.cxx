@@ -28,6 +28,21 @@ std::string ProtocolAdapter::runtimeScriptPath()
     return dir.empty() ? std::string() : dir + "content\\runtime.js";
 }
 
+namespace
+{
+bool hasPermission(const std::string& pluginId, const std::string& permission)
+{
+    PluginConfig cfg;
+    std::string err;
+    if (!loadPluginConfig(pluginsRoot() + "\\" + pluginId, cfg, err))
+        return false;
+    for (const std::string& p : cfg.permissions)
+        if (p == permission)
+            return true;
+    return false;
+}
+}
+
 void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::string& json)
 {
     JsonValue msg;
@@ -39,6 +54,19 @@ void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::stri
     const std::string type = msg.getString("type");
     const JsonValue* idValue = msg.get("id");
     const long long id = (idValue && idValue->kind == JsonValue::Kind::Number) ? static_cast<long long>(idValue->number) : 0;
+
+    const char* needed = type == "executeMethod" ? "document.read"
+                         : type == "callCommand" ? "document.edit"
+                         : type == "contextMenu" ? "menu"
+                                                 : nullptr;
+    if (needed && !hasPermission(pluginId, needed))
+    {
+        logEvent("protocol", "denied", pluginId + "|" + type + "|needs " + needed);
+        if (type == "executeMethod" || type == "callCommand")
+            sendResult(pluginId, type == "executeMethod" ? "method_result" : "command_result", id, "null",
+                       std::string("PermissionDenied: plugin lacks ") + needed);
+        return;
+    }
 
     if (type == "ready")
         handleReady(pluginId);

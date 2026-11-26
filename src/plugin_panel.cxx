@@ -128,19 +128,16 @@ std::string folderName(const std::string& installDir)
     return installDir.substr(installDir.find_last_of('\\') + 1);
 }
 
-// Attaches the context menu interceptor to the document active when the panel is created.
-void attachContextMenuToActiveDocument()
+// Attaches the context menu interceptor to the document of the frame that owns this panel.
+// Each document window has its own sidebar and so its own panel: every document gets the entry.
+void attachContextMenuToFrame(const Reference<css::frame::XFrame>& frame)
 {
     try
     {
-        const auto& ctx = HostService::instance().context();
-        if (!ctx.is())
-            return;
-        Reference<css::frame::XDesktop> desktop(
-            ctx->getServiceManager()->createInstanceWithContext("com.sun.star.frame.Desktop", ctx), css::uno::UNO_QUERY);
-        Reference<css::frame::XModel> model(desktop->getCurrentComponent(), css::uno::UNO_QUERY);
-        if (model.is() && model->getCurrentController().is())
-            attachContextMenu(model->getCurrentController());
+        if (frame.is() && frame->getController().is())
+            attachContextMenu(frame->getController());
+        else
+            logEvent("panel", "error", "no frame controller; context menu not attached");
     }
     catch (...)
     {
@@ -151,10 +148,12 @@ void attachContextMenuToActiveDocument()
 
 PluginPanel::PluginPanel(const Reference<XComponentContext>& ctx,
                          const Reference<XWindow>& xParentWindow,
+                         const Reference<css::frame::XFrame>& xFrame,
                          const OUString& resourceURL)
     : cppu::BaseMutex()
     , WeakComponentImplHelper(m_aMutex)
     , m_xContext(ctx)
+    , m_xFrame(xFrame)
     , m_sResourceURL(resourceURL)
 {
     m_xWindow = createChildWindow(ctx, xParentWindow);
@@ -169,7 +168,7 @@ PluginPanel::PluginPanel(const Reference<XComponentContext>& ctx,
     logEvent("panel", "created", m_sResourceURL.toUtf8().getStr());
 
     attachPlugin(m_xWindow, aSize.Width, aSize.Height);
-    attachContextMenuToActiveDocument();
+    attachContextMenuToFrame(m_xFrame);
 }
 
 void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width, sal_Int32 height)
@@ -198,7 +197,7 @@ void PluginPanel::attachPlugin(const Reference<XWindow>& xChild, sal_Int32 width
 
 css::uno::Reference<css::frame::XFrame> SAL_CALL PluginPanel::getFrame()
 {
-    return {};
+    return m_xFrame;
 }
 
 OUString SAL_CALL PluginPanel::getResourceURL()
