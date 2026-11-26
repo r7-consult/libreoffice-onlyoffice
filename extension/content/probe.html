@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROBE</title>
+<style>
+  body { font-family: sans-serif; margin: 12px; }
+  #n { font-size: 2em; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<p>Plugin Host probe</p>
+<div id="n">0</div>
+<script>
+  // Stage 2 probe: counter moves once per second and is sent to the host.
+  // The host logs "webhost|tick|n=..." every 5 ticks (see webhost_win.cxx, stage 2 follow-up).
+  var n = 0;
+  setInterval(function () {
+    n += 1;
+    document.getElementById("n").textContent = String(n);
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(JSON.stringify({ type: "tick", n: n }));
+    }
+  }, 1000);
+</script>
+</body>
+</html>
