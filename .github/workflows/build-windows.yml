@@ -67,12 +67,12 @@ jobs:
           $ErrorActionPreference = 'Continue'
           try { & scripts/build.ps1 *>&1 | Tee-Object -FilePath build.log } catch { "SCRIPT THROW: $_" | Tee-Object -FilePath build.log -Append }
           if (-not (Test-Path build/bin/pluginhost.dll)) {
-            $lines = @(Select-String -Path build.log -Pattern 'error|CMake Error|FAILED|LNK\d+|fatal|THROW' | ForEach-Object { $_.Line })
-            if ($lines.Count -eq 0) { $lines = @(Get-Content build.log -Tail 30) }
-            $lines | Select-Object -First 50 | ForEach-Object {
-              $m = ($_ -replace '%', '%25' -replace "`r", '')
-              Write-Output "::error::$m"
-            }
+            # GitHub keeps 10 annotations per step: send the errors as ONE multi-line annotation.
+            $lines = @(Select-String -Path build.log -Pattern ': error |: fatal error|CMake Error|error LNK|LNK\d{4}|^FAILED:|THROW|cannot open' |
+                       ForEach-Object { $_.Line } | Select-Object -Unique)
+            if ($lines.Count -eq 0) { $lines = @(Get-Content build.log -Tail 40) }
+            $text = (($lines | Select-Object -First 80) -join "`n") -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A'
+            Write-Output "::error title=build::$text"
             exit 1
           }
 
