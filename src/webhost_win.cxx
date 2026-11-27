@@ -117,7 +117,7 @@ WebHostWin::~WebHostWin()
     *m_alive = false; // pending COM callbacks become no-ops
     if (m_web && m_webMessageHooked)
         m_web->remove_WebMessageReceived(m_webMessageToken);
-    if (m_web && m_processFailedToken)
+    if (m_web && m_processFailedHooked)
         m_web->remove_ProcessFailed(m_processFailedToken);
     if (m_controller)
         m_controller->Close();
@@ -197,6 +197,7 @@ void WebHostWin::onControllerCreated(HRESULT hr, ICoreWebView2Controller* contro
             return S_OK;
         });
     m_web->add_ProcessFailed(onFailed, &m_processFailedToken);
+    m_processFailedHooked = true;
     onFailed->Release();
 
     logEvent("webhost", "ready");

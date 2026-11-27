@@ -11,6 +11,10 @@
         <prop oor:name="Id" oor:type="xs:string">
           <value>PluginHostDeck</value>
         </prop>
+        <!-- Built-in icon until the extension ships its own; without IconURL the tab is blank. -->
+        <prop oor:name="IconURL" oor:type="xs:string">
+          <value>private:graphicrepository/cmd/lc_adddirect.png</value>
+        </prop>
         <prop oor:name="ContextList">
           <value oor:separator=";">
             any, any, visible ;

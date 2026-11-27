@@ -35,13 +35,13 @@ cppu::ImplementationEntry s_aServiceEntries[] =
 
 extern "C"
 {
-__declspec(dllexport) void* SAL_CALL component_getFactory(const char* pImplName, void* pServiceManager, void* pRegistryKey)
+SAL_DLLPUBLIC_EXPORT void* SAL_CALL component_getFactory(const char* pImplName, void* pServiceManager, void* pRegistryKey)
 {
     (void)kFactoryImpl;
     return ::cppu::component_getFactoryHelper(pImplName, pServiceManager, pRegistryKey, s_aServiceEntries);
 }
 
-__declspec(dllexport) void SAL_CALL component_getImplementationEnvironment(char const** ppEnvTypeName, uno_Environment**)
+SAL_DLLPUBLIC_EXPORT void SAL_CALL component_getImplementationEnvironment(char const** ppEnvTypeName, uno_Environment**)
 {
     *ppEnvTypeName = CPPU_CURRENT_LANGUAGE_BINDING_NAME;
 }

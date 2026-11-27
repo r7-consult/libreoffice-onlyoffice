@@ -5,6 +5,7 @@
 #include "webhost.hxx"
 
 #include <windows.h>
+#include <eventtoken.h> // EventRegistrationToken (Windows SDK)
 #include <deque>
 #include <memory>
 #include <string>
@@ -61,8 +62,9 @@ private:
     unsigned long m_messageCount = 0;
     FailureHandler m_onFailure;
     std::vector<std::string> m_documentScripts; // sources, registered once the engine is ready
-    long long m_processFailedToken = 0;
-    long long m_webMessageToken = 0;
+    EventRegistrationToken m_processFailedToken{};
+    bool m_processFailedHooked = false;
+    EventRegistrationToken m_webMessageToken{};
 };
 }
 

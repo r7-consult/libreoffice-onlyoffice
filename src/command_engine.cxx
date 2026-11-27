@@ -40,7 +40,7 @@ std::map<std::string, Engine>& engines()
     return m;
 }
 
-int interruptCallback(JSRuntime* /*rt*/, void* opaque)
+int interruptCallback(JSContext* /*ctx*/, void* opaque) // JSInterruptHandler in quickjs-ng 0.18
 {
     auto* e = static_cast<Engine*>(opaque);
     if (std::chrono::steady_clock::now() > e->deadline)

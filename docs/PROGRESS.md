@@ -28,6 +28,7 @@ Build machine checklist (first run, in this order): `scripts\env.ps1`, `scripts\
 - `cppumaker` arguments in `scripts/gen_uno_headers.ps1` are assumed (see `BLOCKED.md`).
 - `ContextMenuInterceptorAction_EXECUTE_MODIFIED`, `ActionTrigger` property names and `XUndoManager::getAllUndoActionTitles` are assumed from the IDL; confirm in `offapi`.
 - `rtl_getGlobalProcessId` and `XSystemDependentWindowPeer::getWindowHandle` usage: confirm the byte layout on Windows.
+- Review 3 (see REVIEW_AND_PLAN.md): 8 defects fixed after checking against LibreOffice source, quickjs.h and WebView2.h (window handle Any, LayoutSize, ActionTrigger factory, QuickJS interrupt signature, EventRegistrationToken, Writer tables, deck icon, export macro).
 - Review 2 (see REVIEW_AND_PLAN.md): build chain fixed (QuickJS via upstream CMake, mscx ABI, i-prefixed libs, passive registration, cppumaker from office program dir); ONLYOFFICE-compatible runtime (callbacks, Asc.scope, AddContextMenuItem).
 - FIXED in draft (still uncompiled): raw `this` in callbacks (alive flag); undo limit (unique undo context title); browser dying with the panel window (parking window); renderer failure handling by kind; panel resize; WebView2 runtime missing is logged as `webhost|runtime_missing`.
 - Plugin pages now load from `https://<plugin-folder>.plugin.invalid/` (virtual host mapping, needs WebView2 Runtime >= 1.0.774). Plugin folder names must be valid host labels (letters, digits, `-`); `test_stage*` use `hello`, which qualifies.

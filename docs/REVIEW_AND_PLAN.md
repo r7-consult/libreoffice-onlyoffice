@@ -96,3 +96,37 @@ Also: duplicate declaration of `CreateCoreWebView2EnvironmentWithOptions` (alrea
 2. Stages 1-2 on a machine with LibreOffice; then stage 3, 4, 5, 7 gates into `RESULTS.md`.
 3. Run 3 real ONLYOFFICE sample plugins unmodified (hello world, a callCommand one, a context menu one); list what breaks.
 4. Shared WebView2 environment (option B), then `json_mini` removal, then Linux/macOS.
+
+---
+
+# Review 3 (2026-11-27): draft checked against LibreOffice source and SDK headers
+
+No compiler. Every UNO name, config schema and third-party signature the draft uses was checked against the
+LibreOffice source in `C:\Oracle\lo`, `quickjs.h` 0.18.0 and `WebView2.h` 1.0.4370.26.
+
+## Defects found and fixed
+| # | Where | Defect | Source of truth |
+|---|---|---|---|
+| 1 | `plugin_panel.cxx` | `getWindowHandle` returns `any` (a `sal_IntPtr`), not a byte sequence: no HWND, no browser | `toolkit/source/awt/vclxsystemdependentwindow.cxx` |
+| 2 | `plugin_panel.cxx` | `LayoutSize(-1,-1,-1)` breaks `0 <= Min <= Pref <= Max`: negative panel height | `sfx2/source/sidebar/DeckLayouter.cxx:356` |
+| 3 | `context_menu.cxx` | `ActionTrigger` created via the global service manager; it is only creatable from the menu's container: menu items never appeared | `framework/.../rootactiontriggercontainer.cxx:54` |
+| 4 | `command_engine.cxx` | interrupt handler took `JSRuntime*`; 0.18 `JSInterruptHandler` takes `JSContext*` (compile error) | `quickjs.h:1192` |
+| 5 | `webhost_win.*` | event tokens stored as `long long`; API takes `EventRegistrationToken*` (compile error) | `WebView2.h:3053` |
+| 6 | `api_bridge.cxx` | Writer body enumeration also yields tables; null `XTextRange` dereferenced | paragraph/table enumeration |
+| 7 | `Sidebar.xcu` | deck without `IconURL`: blank tab button | `officecfg/.../UI/Sidebar.xcu` built-in decks |
+| 8 | `component.cxx`, manifest | `__declspec(dllexport)`, no platform on the components entry | `odk/examples/cpp/custompanel` (`SAL_DLLPUBLIC_EXPORT`, `uno-components;platform=`) |
+
+## Confirmed correct (no change)
+Sidebar creation arguments `Frame`, `ParentWindow`, `Controller` (`SidebarController.cxx:1031`); resource URL parsing
+gives factory name `org.example.pluginhost` (`framework/inc/helper/mischelper.hxx`); `systemchildwindow` creates
+`VCLXSystemDependentWindow`; `WantsAWT` defaults to true for extension panels; `ProtocolHandler.xcu` schema
+(`HandlerSet/<impl>/Protocols`), handler created by implementation name and initialized with the frame
+(`dispatchprovider.cxx:450`); `ContextMenuInterceptorAction_EXECUTE_MODIFIED`; `XUndoManager` methods; `ActionTrigger`
+property names `Text`/`CommandURL`; LibreOffice main thread is COM STA (`vcl/win/app/salinst.cxx:213`), as WebView2 requires;
+QuickJS `JS_Eval`, `JS_ParseJSON`, `JS_SetMaxStackSize`, `JS_SetMemoryLimit`; WebView2 members used.
+
+## Remaining risks for the build machine
+- MSVC-specific: `Callback<Iface, Args...>::Invoke` must match each handler's exact signature; `__uuidof` on WebView2 interfaces.
+- Generated headers: `cppumaker` output path layout (`build/gen/com/sun/star/...`) assumed.
+- Linux: `SYSTEM_XWINDOW` returns a `SystemDependentXWindow` struct, not an integer (handled as "no handle" for now).
+- `tests/check_xml.py` checks well-formedness only, not schema validity.

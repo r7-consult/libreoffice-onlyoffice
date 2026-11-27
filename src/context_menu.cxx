@@ -54,11 +54,19 @@ public:
         css::ui::ContextMenuInterceptorAction action = css::ui::ContextMenuInterceptorAction_IGNORED;
         try
         {
-            Reference<css::lang::XMultiServiceFactory> factory(HostService::instance().context()->getServiceManager(), UNO_QUERY);
+            // ActionTrigger is NOT a global service: only the menu's own container creates it
+            // (framework/source/fwe/classes/rootactiontriggercontainer.cxx).
+            Reference<css::lang::XMultiServiceFactory> factory(rEvent.ActionTriggerContainer, UNO_QUERY);
             Reference<css::container::XIndexContainer> container(rEvent.ActionTriggerContainer, UNO_QUERY);
-            if (factory.is() && container.is())
+            bool hasItems = false;
+            for (const auto& kv : itemCache())
+                hasItems = hasItems || !kv.second.empty();
+            if (factory.is() && container.is() && hasItems)
             {
                 sal_Int32 pos = container->getCount();
+                Reference<css::uno::XInterface> separator(factory->createInstance("com.sun.star.ui.ActionTriggerSeparator"));
+                if (separator.is())
+                    container->insertByIndex(pos++, Any(separator));
                 for (const auto& kv : itemCache())
                 {
                     for (const auto& item : kv.second)

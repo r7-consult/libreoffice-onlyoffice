@@ -37,6 +37,7 @@
 #include <com/sun/star/document/XUndoManagerSupplier.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/util/XModifiable.hpp>
+#include <com/sun/star/lang/XServiceInfo.hpp>
 #include <rtl/ustring.hxx>
 #include <sstream>
 #include <stdexcept>
@@ -128,7 +129,12 @@ std::vector<Reference<css::text::XTextRange>> writerParagraphs()
     Reference<css::container::XEnumerationAccess> access(writerBody(), UNO_QUERY_THROW);
     Reference<css::container::XEnumeration> en = access->createEnumeration();
     while (en->hasMoreElements())
-        out.push_back(Reference<css::text::XTextRange>(en->nextElement(), UNO_QUERY));
+    {
+        // The body enumeration also yields text tables, which are not paragraphs (null deref before).
+        Reference<css::lang::XServiceInfo> info(en->nextElement(), UNO_QUERY);
+        if (info.is() && info->supportsService("com.sun.star.text.Paragraph"))
+            out.push_back(Reference<css::text::XTextRange>(info, UNO_QUERY));
+    }
     return out;
 }
 }

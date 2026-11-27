@@ -64,7 +64,8 @@ Reference<XWindow> createChildWindow(const Reference<XComponentContext>& ctx, co
 }
 
 // Native handle of a systemchildwindow via XSystemDependentWindowPeer.
-// On Windows the handle is an HWND stored in the returned byte sequence.
+// getWindowHandle returns an Any. Verified in toolkit/source/awt/vclxsystemdependentwindow.cxx:
+// Windows: sal_IntPtr(HWND); macOS: sal_IntPtr(NSView*); X11: css::awt::SystemDependentXWindow (not handled yet).
 void* nativeWindowHandle(const Reference<XWindow>& xWindow)
 {
     Reference<css::awt::XSystemDependentWindowPeer> xDep(xWindow, css::uno::UNO_QUERY);
@@ -72,13 +73,18 @@ void* nativeWindowHandle(const Reference<XWindow>& xWindow)
         return nullptr;
     css::uno::Sequence<sal_Int8> aProcessId(16);
     rtl_getGlobalProcessId(reinterpret_cast<sal_uInt8*>(aProcessId.getArray()));
-    const css::uno::Sequence<sal_Int8> aHandle =
-        xDep->getWindowHandle(aProcessId, css::lang::SystemDependent::SYSTEM_WIN32);
-    if (aHandle.getLength() < static_cast<sal_Int32>(sizeof(void*)))
+#if defined(_WIN32)
+    const sal_Int16 nType = css::lang::SystemDependent::SYSTEM_WIN32;
+#elif defined(__APPLE__)
+    const sal_Int16 nType = css::lang::SystemDependent::SYSTEM_MAC;
+#else
+    const sal_Int16 nType = css::lang::SystemDependent::SYSTEM_XWINDOW;
+#endif
+    const css::uno::Any aHandle = xDep->getWindowHandle(aProcessId, nType);
+    sal_Int64 nHandle = 0; // sal_IntPtr is 64-bit on x64; >>= widens a 32-bit value too
+    if (!(aHandle >>= nHandle) || nHandle == 0)
         return nullptr;
-    void* handle = nullptr;
-    std::memcpy(&handle, aHandle.getConstArray(), sizeof(void*));
-    return handle;
+    return reinterpret_cast<void*>(static_cast<sal_IntPtr>(nHandle));
 }
 
 // Keeps the browser the size of the panel window when the sidebar is resized.
@@ -230,8 +236,9 @@ Reference<css::accessibility::XAccessible> SAL_CALL PluginPanel::createAccessibl
 
 LayoutSize SAL_CALL PluginPanel::getHeightForWidth(sal_Int32)
 {
-    // Fill the whole deck height; the sidebar decides the final size.
-    return LayoutSize(-1, -1, -1);
+    // DeckLayouter requires 0 <= Minimum <= Preferred <= Maximum (sfx2/source/sidebar/DeckLayouter.cxx).
+    // A large Maximum lets the deck give the plugin all spare height.
+    return LayoutSize(300, 600, 100000);
 }
 
 sal_Int32 SAL_CALL PluginPanel::getMinimalWidth()
