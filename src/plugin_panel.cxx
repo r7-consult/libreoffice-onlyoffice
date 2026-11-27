@@ -13,6 +13,7 @@
 #include <com/sun/star/awt/XToolkit.hpp>
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <com/sun/star/awt/XSystemDependentWindowPeer.hpp>
+#include <com/sun/star/awt/SystemDependentXWindow.hpp>
 #include <com/sun/star/awt/PosSize.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XDesktop.hpp>
@@ -65,7 +66,7 @@ Reference<XWindow> createChildWindow(const Reference<XComponentContext>& ctx, co
 
 // Native handle of a systemchildwindow via XSystemDependentWindowPeer.
 // getWindowHandle returns an Any. Verified in toolkit/source/awt/vclxsystemdependentwindow.cxx:
-// Windows: sal_IntPtr(HWND); macOS: sal_IntPtr(NSView*); X11: css::awt::SystemDependentXWindow (not handled yet).
+// Windows: sal_IntPtr(HWND); macOS: sal_IntPtr(NSView*); X11: css::awt::SystemDependentXWindow, its XID is used.
 void* nativeWindowHandle(const Reference<XWindow>& xWindow)
 {
     Reference<css::awt::XSystemDependentWindowPeer> xDep(xWindow, css::uno::UNO_QUERY);
@@ -82,7 +83,12 @@ void* nativeWindowHandle(const Reference<XWindow>& xWindow)
 #endif
     const css::uno::Any aHandle = xDep->getWindowHandle(aProcessId, nType);
     sal_Int64 nHandle = 0; // sal_IntPtr is 64-bit on x64; >>= widens a 32-bit value too
-    if (!(aHandle >>= nHandle) || nHandle == 0)
+    css::awt::SystemDependentXWindow aX11; // X11: {WindowHandle = XID, DisplayPointer}
+    if (aHandle >>= aX11)
+        nHandle = aX11.WindowHandle; // the XID is what CEF / WebKitGTK embedding needs
+    else if (!(aHandle >>= nHandle))
+        return nullptr;
+    if (nHandle == 0)
         return nullptr;
     return reinterpret_cast<void*>(static_cast<sal_IntPtr>(nHandle));
 }

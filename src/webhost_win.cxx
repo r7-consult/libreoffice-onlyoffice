@@ -64,10 +64,12 @@ private:
     std::function<HRESULT(Args...)> m_fn;
 };
 
-template <class Iface, class... Args>
-Iface* makeCallback(std::function<HRESULT(Args...)> fn)
+// F is deduced from the lambda; Args are given explicitly. A std::function<HRESULT(Args...)>
+// parameter would not work: deduction would try to extend the pack from a lambda and fail.
+template <class Iface, class... Args, class F>
+Iface* makeCallback(F&& fn)
 {
-    return new Callback<Iface, Args...>(std::move(fn));
+    return new Callback<Iface, Args...>(std::function<HRESULT(Args...)>(std::forward<F>(fn)));
 }
 
 std::wstring toWide(const std::string& s)

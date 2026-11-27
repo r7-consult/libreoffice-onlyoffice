@@ -130,3 +130,14 @@ QuickJS `JS_Eval`, `JS_ParseJSON`, `JS_SetMaxStackSize`, `JS_SetMemoryLimit`; We
 - Generated headers: `cppumaker` output path layout (`build/gen/com/sun/star/...`) assumed.
 - Linux: `SYSTEM_XWINDOW` returns a `SystemDependentXWindow` struct, not an integer (handled as "no handle" for now).
 - `tests/check_xml.py` checks well-formedness only, not schema validity.
+
+## Review 3 follow-up: remaining risks closed
+- WebView2 callbacks: all five `Invoke` signatures match `WebView2.h` (environment, controller, web message,
+  process failed, add-script). Found and fixed: `makeCallback(std::function<HRESULT(Args...)>)` cannot take a lambda
+  when `Args` is given explicitly (deduction tries to extend the pack); it now takes `F&&`.
+- `cppumaker` output layout is `<out>/com/sun/star/...` (`codemaker/source/codemaker/global.cxx:66`), as the include path assumes.
+- X11: `SystemDependentXWindow.WindowHandle` (the XID) is now extracted; Linux browser embedding is still not written.
+- `tests/check_xml.py` now also checks every prop of `Sidebar.xcu`, `Factories.xcu`, `ProtocolHandler.xcu`
+  against the LibreOffice schema templates (name and type): 16 props, all valid.
+
+Left for the build machine: MSVC warnings/errors not visible without a compiler; runtime behaviour (stages 1-7).
