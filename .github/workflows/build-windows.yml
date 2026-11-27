@@ -2,11 +2,10 @@
 # Uses the latest LibreOffice "stable" release: the office MSI gives types.rdb/offapi.rdb and the
 # URE DLLs that cppumaker needs; the SDK MSI gives headers, import libs and cppumaker.
 # Both are unpacked with an administrative extract (msiexec /a), nothing is installed.
+# Manual only (Actions > Run workflow): pushes do not start a remote build.
 name: build-windows
 on:
   workflow_dispatch:
-  push:
-    branches: [ main, plugin-host-draft, 'draft/**' ]
 
 env:
   QUICKJS_VERSION: "0.18.0"

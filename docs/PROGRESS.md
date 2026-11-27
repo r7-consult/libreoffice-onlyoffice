@@ -37,3 +37,5 @@ Build machine checklist (first run, in this order): `scripts\env.ps1`, `scripts\
 - Permissions (draft): `config.json` field `hostPermissions` (`document.read`, `document.edit`, `menu`) gates executeMethod, callCommand and contextMenu; denied calls log `protocol|denied` and return `PermissionDenied`. Real ONLYOFFICE plugins have no such field, so a host-side policy/prompt is needed before running third-party plugins.
 - Context menu is attached through the `Frame` argument of the panel, once per controller (multi-document). Not tested.
 - Not implemented: panel "stopped" view, UNO service registration of HostService (it is a C++ singleton in the prototype).
+
+- 2026-11-27: detailed plan for the remaining work in `docs/PLAN_NEXT.md`; CI build is now manual-only (workflow_dispatch).
