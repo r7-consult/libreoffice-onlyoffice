@@ -62,7 +62,19 @@ jobs:
 
       - name: Build
         shell: pwsh
-        run: scripts/build.ps1
+        run: |
+          # Errors are also published as annotations (readable through the API without log access).
+          $ErrorActionPreference = 'Continue'
+          & scripts/build.ps1 *>&1 | Tee-Object -FilePath build.log
+          $failed = -not $?  -or -not (Test-Path build/bin/pluginhost.dll)
+          if ($failed) {
+            Select-String -Path build.log -Pattern 'error|CMake Error|FAILED|LNK\d+|fatal' |
+              Select-Object -First 50 | ForEach-Object {
+                $m = $_.Line -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A'
+                Write-Output "::error::$m"
+              }
+            exit 1
+          }
 
       - name: Pack OXT
         shell: pwsh
