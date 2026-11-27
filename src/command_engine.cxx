@@ -29,7 +29,7 @@ struct Engine
 {
     JSRuntime* rt = nullptr;
     JSContext* ctx = nullptr;
-    // max() disables the watchdog while the shim loads; run() sets the real deadline.
+    // max() disables the watchdog while the shim loads; run() sets the real deadline and resets it after.
     std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::time_point::max();
     bool watchdogFired = false;
 };
@@ -101,6 +101,10 @@ Engine& engineFor(const std::string& pluginId)
     // std::map nodes do not move, so the pointer given to the interrupt handler stays valid.
     auto& stored = engines()[pluginId];
     stored.rt = JS_NewRuntime();
+    // The engine runs on the LibreOffice main thread: a runaway plugin must get a JS exception,
+    // never exhaust the process stack or heap.
+    JS_SetMaxStackSize(stored.rt, 256 * 1024);
+    JS_SetMemoryLimit(stored.rt, 256 * 1024 * 1024);
     stored.ctx = JS_NewContext(stored.rt);
     JS_SetInterruptHandler(stored.rt, interruptCallback, &stored);
 
@@ -143,10 +147,28 @@ CommandEngine& CommandEngine::instance()
     return s;
 }
 
-CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string& source)
+CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string& source, const std::string& scopeJson)
 {
     CommandOutcome out;
     Engine& e = engineFor(pluginId);
+    e.deadline = std::chrono::steady_clock::time_point::max(); // stale deadline from the last run must not fire here
+
+    // Asc.scope: parsed as JSON by the engine itself (no string splicing into code).
+    {
+        const std::string text = scopeJson.empty() ? std::string("{}") : scopeJson;
+        JSValue scope = JS_ParseJSON(e.ctx, text.data(), text.size(), "scope.json");
+        if (JS_IsException(scope))
+        {
+            JS_FreeValue(e.ctx, JS_GetException(e.ctx));
+            scope = JS_NewObject(e.ctx);
+        }
+        JSValue global = JS_GetGlobalObject(e.ctx);
+        JSValue asc = JS_NewObject(e.ctx);
+        JS_SetPropertyStr(e.ctx, asc, "scope", scope); // takes ownership of scope
+        JS_SetPropertyStr(e.ctx, global, "Asc", asc);  // takes ownership of asc
+        JS_FreeValue(e.ctx, global);
+    }
+
     e.watchdogFired = false;
     e.deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(m_timeoutMs);
 
@@ -172,10 +194,17 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
             logEvent("command", e.watchdogFired ? "timeout" : "error", pluginId + "|" + out.error);
             return out;
         }
-        const char* text = JS_ToCString(e.ctx, v);
-        out.resultJson = text ? text : "null";
-        if (text)
-            JS_FreeCString(e.ctx, text);
+        // JSON.stringify(undefined) is undefined (not a string): a command that returns nothing
+        // must still produce valid JSON, or the reply message to the page is malformed.
+        if (JS_IsString(v))
+        {
+            const char* text = JS_ToCString(e.ctx, v);
+            out.resultJson = text ? text : "null";
+            if (text)
+                JS_FreeCString(e.ctx, text);
+        }
+        else
+            out.resultJson = "null";
         JS_FreeValue(e.ctx, v);
         endUndoContext(false);
         recalculateActiveDocument();

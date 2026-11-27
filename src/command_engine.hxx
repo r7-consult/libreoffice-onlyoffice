@@ -23,7 +23,8 @@ public:
 
     // source: JavaScript expression that evaluates to a function, e.g. "(function(){ return 1; })()".
     // Runs with an Undo context and locked controllers; one Undo step reverts all of it.
-    CommandOutcome run(const std::string& pluginId, const std::string& source);
+    // scopeJson: JSON text of the page's Asc.scope, exposed to the command as Asc.scope ("{}" if none).
+    CommandOutcome run(const std::string& pluginId, const std::string& source, const std::string& scopeJson);
 
     // Watchdog limit in milliseconds (default 5000). Not changed by plugins.
     void setTimeoutMs(long long ms) { m_timeoutMs = ms; }

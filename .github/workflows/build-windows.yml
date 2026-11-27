@@ -1,13 +1,14 @@
-# DRAFT, never run. Purpose: compile-check the host on a GitHub runner, because MSVC is preinstalled there
-# and no admin rights are needed. Adjust LO_VERSION to a release that exists on download.documentfoundation.org.
+# Compile check on a GitHub runner (MSVC preinstalled, no admin needed locally).
+# Uses the latest LibreOffice "stable" release: the office MSI gives types.rdb/offapi.rdb and the
+# URE DLLs that cppumaker needs; the SDK MSI gives headers, import libs and cppumaker.
+# Both are unpacked with an administrative extract (msiexec /a), nothing is installed.
 name: build-windows
 on:
   workflow_dispatch:
   push:
-    branches: [ main, 'draft/**' ]
+    branches: [ main, plugin-host-draft, 'draft/**' ]
 
 env:
-  LO_VERSION: "25.8.0"
   QUICKJS_VERSION: "0.18.0"
   WEBVIEW2_VERSION: "1.0.4370.26"
 
@@ -22,13 +23,24 @@ jobs:
           node tests/test_runtime.js
           node tests/test_api_shim.js
 
-      - name: Fetch LibreOffice SDK (administrative extract, no install)
+      - name: Fetch LibreOffice and SDK (latest stable, administrative extract)
         shell: pwsh
         run: |
-          $base = "https://download.documentfoundation.org/libreoffice/stable/$env:LO_VERSION/win/x86_64"
-          Invoke-WebRequest "$base/LibreOffice_${env:LO_VERSION}_Win_x86-64_sdk.msi" -OutFile sdk.msi
-          Start-Process msiexec -ArgumentList '/a sdk.msi /qn TARGETDIR=C:\lo-sdk' -Wait
-          "LO_SDK=" + (Get-ChildItem C:\lo-sdk -Directory -Recurse -Filter sdk | Select-Object -First 1).FullName | Out-File $env:GITHUB_ENV -Append
+          $index = (Invoke-WebRequest https://download.documentfoundation.org/libreoffice/stable/).Content
+          $ver = ([regex]::Matches($index, 'href="(\d+\.\d+\.\d+)/"') | ForEach-Object { $_.Groups[1].Value } |
+                  Sort-Object { [version]$_ } | Select-Object -Last 1)
+          Write-Output "LibreOffice $ver"
+          $base = "https://download.documentfoundation.org/libreoffice/stable/$ver/win/x86_64"
+          Invoke-WebRequest "$base/LibreOffice_${ver}_Win_x86-64.msi" -OutFile lo.msi
+          Invoke-WebRequest "$base/LibreOffice_${ver}_Win_x86-64_sdk.msi" -OutFile sdk.msi
+          Start-Process msiexec -ArgumentList '/a lo.msi /qn TARGETDIR=C:\lo' -Wait
+          Start-Process msiexec -ArgumentList '/a sdk.msi /qn TARGETDIR=C:\lo' -Wait
+          $program = (Get-ChildItem C:\lo -Recurse -Filter types.rdb | Select-Object -First 1).DirectoryName
+          $sdk = (Get-ChildItem C:\lo -Recurse -Filter cppumaker.exe | Select-Object -First 1).Directory.Parent.FullName
+          Write-Output "LO_PROGRAM=$program"; Write-Output "LO_SDK=$sdk"
+          "LO_PROGRAM=$program" | Out-File $env:GITHUB_ENV -Append
+          "LO_SDK=$sdk" | Out-File $env:GITHUB_ENV -Append
+          "LO_VERSION=$ver" | Out-File $env:GITHUB_ENV -Append
 
       - name: Fetch third_party
         shell: pwsh
@@ -44,12 +56,23 @@ jobs:
         shell: pwsh
         run: scripts/gen_uno_headers.ps1
 
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Build
         shell: pwsh
         run: scripts/build.ps1
 
+      - name: Pack OXT
+        shell: pwsh
+        run: scripts/pack.ps1
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: build-output
-          path: build/**/*.dll
+          name: pluginhost-${{ env.LO_VERSION }}
+          path: |
+            build/bin/*.dll
+            dist/*.oxt
+            build/.ninja_log

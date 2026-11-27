@@ -10,6 +10,7 @@
 #include "plugin_config.hxx"
 
 #include <cstdlib>
+#include <map>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -30,13 +31,30 @@ std::string ProtocolAdapter::runtimeScriptPath()
 
 namespace
 {
+// config.json is read once per plugin per process (it was read from disk on every message).
+// A changed package needs a LibreOffice restart; fine for the prototype.
+const PluginConfig* configOf(const std::string& pluginId)
+{
+    static std::map<std::string, std::pair<bool, PluginConfig>> cache;
+    auto it = cache.find(pluginId);
+    if (it == cache.end())
+    {
+        PluginConfig cfg;
+        std::string err;
+        const bool ok = loadPluginConfig(pluginsRoot() + "\\" + pluginId, cfg, err);
+        if (!ok)
+            logEvent("protocol", "config_error", pluginId + "|" + err);
+        it = cache.emplace(pluginId, std::make_pair(ok, cfg)).first;
+    }
+    return it->second.first ? &it->second.second : nullptr;
+}
+
 bool hasPermission(const std::string& pluginId, const std::string& permission)
 {
-    PluginConfig cfg;
-    std::string err;
-    if (!loadPluginConfig(pluginsRoot() + "\\" + pluginId, cfg, err))
+    const PluginConfig* cfg = configOf(pluginId);
+    if (!cfg)
         return false;
-    for (const std::string& p : cfg.permissions)
+    for (const std::string& p : cfg->permissions)
         if (p == permission)
             return true;
     return false;
@@ -94,7 +112,7 @@ void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::stri
             return out + "]";
         }());
     else if (type == "callCommand")
-        handleCallCommand(pluginId, id, msg.getString("source"));
+        handleCallCommand(pluginId, id, msg.getString("source"), msg.getString("scope"));
     else if (type == "contextMenu")
     {
         std::vector<std::pair<std::string, std::string>> items;
@@ -106,6 +124,13 @@ void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::stri
     }
     else if (type == "resize")
         logEvent("protocol", "resize", pluginId);
+    else if (type == "close")
+    {
+        // ONLYOFFICE executeCommand("close"): hide the plugin; the session stays (no reload on reopen).
+        logEvent("protocol", "close", pluginId);
+        if (WebHost* web = HostService::instance().find(pluginId))
+            web->setVisible(false);
+    }
     else
         logEvent("protocol", "unknown", type);
 }
@@ -116,13 +141,11 @@ void ProtocolAdapter::handleReady(const std::string& pluginId)
     std::string guid = pluginId;
     std::string name;
     std::string version;
-    PluginConfig cfg;
-    std::string err;
-    if (loadPluginConfig(pluginsRoot() + "\\" + pluginId, cfg, err))
+    if (const PluginConfig* cfg = configOf(pluginId))
     {
-        guid = cfg.guid;
-        name = cfg.name;
-        version = cfg.version;
+        guid = cfg->guid;
+        name = cfg->name;
+        version = cfg->version;
     }
     // testMode lets the test plugin run its scripted checks (set by PLUGINHOST_TEST_MODE=1).
     const char* testMode = std::getenv("PLUGINHOST_TEST_MODE");
@@ -131,7 +154,7 @@ void ProtocolAdapter::handleReady(const std::string& pluginId)
                           jsonEscape(name) + "\",\"version\":\"" + jsonEscape(version) +
                           "\",\"testMode\":" + (isTest ? "true" : "false") + "}");
     sendRaw(pluginId, "{\"type\":\"plugin_init\",\"data\":{}}");
-    sendRaw(pluginId, "{\"type\":\"init\",\"data\":{}}");
+    sendRaw(pluginId, "{\"type\":\"init\",\"data\":\"\"}"); // ONLYOFFICE init(text): empty text
     logEvent("protocol", "handshake", pluginId);
 }
 
@@ -149,9 +172,10 @@ void ProtocolAdapter::handleExecuteMethod(const std::string& pluginId, long long
     }
 }
 
-void ProtocolAdapter::handleCallCommand(const std::string& pluginId, long long id, const std::string& source)
+void ProtocolAdapter::handleCallCommand(const std::string& pluginId, long long id, const std::string& source,
+                                        const std::string& scopeJson)
 {
-    const CommandOutcome outcome = CommandEngine::instance().run(pluginId, source);
+    const CommandOutcome outcome = CommandEngine::instance().run(pluginId, source, scopeJson);
     if (outcome.ok)
         sendResult(pluginId, "command_result", id, outcome.resultJson, std::string());
     else

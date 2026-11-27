@@ -24,18 +24,14 @@ set(PH_WEBVIEW2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/webview2/pkg/bui
 set(PH_QUICKJS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/quickjs-ng" CACHE PATH
     "quickjs-ng 0.18.0 source tree")
 
-# --- QuickJS-ng (static, built from source) -------------------------------
-# Source list follows the quickjs-ng core files. Check against
-# ${PH_QUICKJS_DIR}/CMakeLists.txt on the first build and adjust.
-add_library(quickjs-ng STATIC
-  ${PH_QUICKJS_DIR}/quickjs.c
-  ${PH_QUICKJS_DIR}/libregexp.c
-  ${PH_QUICKJS_DIR}/libunicode.c
-  ${PH_QUICKJS_DIR}/cutils.c
-  ${PH_QUICKJS_DIR}/dtoa.c
-)
-target_include_directories(quickjs-ng PUBLIC ${PH_QUICKJS_DIR})
-target_compile_definitions(quickjs-ng PRIVATE _CRT_SECURE_NO_WARNINGS)
+# --- QuickJS-ng (static) ----------------------------------------------------
+# Use upstream's own CMake: it carries the MSVC flags QuickJS needs (/experimental:c11atomics,
+# _GNU_SOURCE, warning suppressions). A hand-written source list drifted already (0.18.0 has no cutils.c).
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(QJS_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(QJS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(QJS_BUILD_LIBC OFF CACHE BOOL "" FORCE)
+add_subdirectory(${PH_QUICKJS_DIR} ${CMAKE_BINARY_DIR}/quickjs-ng EXCLUDE_FROM_ALL)
 
 # --- pluginhost.dll --------------------------------------------------------
 set(PH_SOURCES
@@ -69,19 +65,22 @@ target_include_directories(pluginhost PRIVATE
   "${PH_WEBVIEW2_DIR}/include"
 )
 
-target_compile_definitions(pluginhost PRIVATE
-  CPPU_ENV=msci
-  WIN32_LEAN_AND_MEAN
-  NOMINMAX
-)
+if(WIN32)
+  # Same as sdk/settings/settings.mk for 64-bit MSVC: the UNO bridge ABI is "mscx" (msci = 32-bit).
+  target_compile_definitions(pluginhost PRIVATE WIN32 WNT CPPU_ENV=mscx WIN32_LEAN_AND_MEAN NOMINMAX)
+  target_compile_options(pluginhost PRIVATE /EHsc /Zc:__cplusplus /utf-8)
+else()
+  target_compile_definitions(pluginhost PRIVATE UNX CPPU_ENV=gcc3)
+endif()
 
 target_link_directories(pluginhost PRIVATE "${LO_SDK}/lib" "${PH_WEBVIEW2_DIR}/x64")
-target_link_libraries(pluginhost PRIVATE
-  quickjs-ng
-  sal cppu cppuhelper salhelper
-)
+target_link_libraries(pluginhost PRIVATE qjs)
 if(WIN32)
-  target_link_libraries(pluginhost PRIVATE WebView2LoaderStatic user32 ole32 shlwapi)
+  # Windows import libraries in sdk/lib carry an "i" prefix.
+  target_link_libraries(pluginhost PRIVATE isal icppu icppuhelper isalhelper
+                        WebView2LoaderStatic user32 ole32 shlwapi version advapi32)
+else()
+  target_link_libraries(pluginhost PRIVATE uno_sal uno_cppu uno_cppuhelpergcc3 uno_salhelpergcc3)
 endif()
 
 set_target_properties(pluginhost PROPERTIES

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Passive UNO registration (LibreOffice >= 3.4). Must list every implementation that
+     component_getFactory in src/component.cxx can create. -->
+<components xmlns="http://openoffice.org/2010/uno-components">
+  <component loader="com.sun.star.loader.SharedLibrary" uri="pluginhost.dll">
+    <implementation name="org.example.pluginhost.PanelFactory">
+      <service name="org.example.pluginhost.PanelFactory"/>
+    </implementation>
+    <implementation name="org.example.pluginhost.MenuDispatch">
+      <service name="com.sun.star.frame.ProtocolHandler"/>
+    </implementation>
+  </component>
+</components>

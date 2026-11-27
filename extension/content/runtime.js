@@ -1,24 +1,26 @@
 /*
- * Plugin Host runtime (stage 4). Injected into every plugin page before its own scripts.
- * Provides a minimal Asc.plugin surface and the message protocol to the host.
+ * Plugin Host runtime. Injected into every plugin page before its own scripts.
+ * Provides the ONLYOFFICE-compatible Asc.plugin surface on top of the host message protocol.
  *
- * Host -> page messages (window.chrome.webview "message" event, data is an object):
- *   {type:"initialize", guid, variations, ...}     -- handshake start
- *   {type:"plugin_init", data}                      -- plugin may start
- *   {type:"init", data}                             -- data for the plugin's init()
- *   {type:"method_result", id, result, error}       -- answer to executeMethod
- *   {type:"command_result", id, result, error}      -- answer to callCommand
- *   {type:"event", name, data}                      -- editor event (e.g. onContextMenuClick {id})
+ * ONLYOFFICE-compatible surface (what existing plugins call):
+ *   Asc.plugin.init(data)                                  -- called once with the init data
+ *   Asc.plugin.executeMethod(name, params, callback)       -- callback(result); also returns a Promise
+ *   Asc.plugin.callCommand(func, isClose, isCalc, callback)-- func runs in the host engine; Asc.scope is copied
+ *   Asc.scope                                              -- plain data passed to callCommand
+ *   Asc.plugin.attachEvent(name, fn) / Asc.plugin.event_<name> = fn
+ *   Asc.plugin.executeMethod("AddContextMenuItem", [{items:[{id, text, items?}]}])
+ *   Asc.plugin.attachContextMenuClickEvent(id, fn)
+ *   Asc.plugin.executeCommand("close", ...) / Asc.plugin.button(id)
  *
- * Page -> host messages (window.chrome.webview.postMessage(string of JSON)):
- *   {type:"ready"}
- *   {type:"executeMethod", id, name, args}
- *   {type:"callCommand", id, source}
- *   {type:"resize", width, height}
- *   {type:"contextMenu", items:[{id, text}]}
+ * Host -> page: initialize, plugin_init, init, method_result, command_result, event
+ * Page -> host: ready, executeMethod, callCommand {source, scope}, contextMenu {items}, close, resize
  *
- * Plain JavaScript, no dependencies. Written from the public description of
- * the ONLYOFFICE plugin protocol; no code copied from AGPL-licensed sources.
+ * Limitation: context menu items are a static cache in the host (the menu must open within 300 ms,
+ * no round trip to the page). onContextMenuShow is raised once after init so plugins that add items
+ * "on show" fill the cache; per-selection dynamic items are not supported.
+ *
+ * Plain JavaScript, no dependencies. Written from the public description of the ONLYOFFICE plugin API;
+ * no code copied from AGPL-licensed sources.
  */
 (function () {
   "use strict";
@@ -26,6 +28,7 @@
   var pending = {};
   var nextId = 1;
   var listeners = {};
+  var menuClickHandlers = {};
 
   function send(message) {
     try {
@@ -37,13 +40,42 @@
     }
   }
 
-  function request(kind, payload) {
-    return new Promise(function (resolve, reject) {
+  function request(kind, payload, callback) {
+    var promise = new Promise(function (resolve, reject) {
       var id = nextId++;
       pending[id] = { resolve: resolve, reject: reject };
       var msg = Object.assign({ type: kind, id: id }, payload);
       send(msg);
     });
+    if (typeof callback === "function") {
+      // ONLYOFFICE style: callback(result); errors give undefined and must not reject unhandled.
+      promise.then(function (r) { callback(r); }, function () { callback(undefined); });
+    }
+    return promise;
+  }
+
+  function fireEvent(name, data) {
+    var list = (listeners[name] || []).slice();
+    var direct = Asc.plugin["event_" + name];
+    if (typeof direct === "function") list.push(direct);
+    for (var i = 0; i < list.length; i++) {
+      try {
+        list[i](data);
+      } catch (e) {
+        /* one failing listener must not stop the others */
+      }
+    }
+  }
+
+  // Flattens ONLYOFFICE menu items (with nested items) into the host's [{id, text}].
+  function flattenMenu(items, out) {
+    for (var i = 0; i < (items || []).length; i++) {
+      var it = items[i];
+      if (!it) continue;
+      if (it.items && it.items.length) flattenMenu(it.items, out);
+      else if (it.id !== undefined) out.push({ id: String(it.id), text: String(it.text || it.id) });
+    }
+    return out;
   }
 
   function dispatch(message) {
@@ -53,13 +85,14 @@
     switch (message.type) {
       case "initialize":
         Asc.plugin.info = message;
-        Asc.plugin.init && Asc.plugin.init();
         break;
       case "plugin_init":
         Asc.plugin.onPluginInit && Asc.plugin.onPluginInit(message.data);
         break;
       case "init":
+        Asc.plugin.init && Asc.plugin.init(message.data);
         Asc.plugin.onInit && Asc.plugin.onInit(message.data);
+        fireEvent("onContextMenuShow", { type: "Selection" });
         break;
       case "method_result":
       case "command_result": {
@@ -75,17 +108,15 @@
         }
         break;
       }
-      case "event": {
-        var list = listeners[message.name] || [];
-        for (var i = 0; i < list.length; i++) {
-          try {
-            list[i](message.data);
-          } catch (e) {
-            /* one failing listener must not stop the others */
+      case "event":
+        if (message.name === "onContextMenuClick" && message.data) {
+          var h = menuClickHandlers[message.data.id];
+          if (h) {
+            try { h(message.data); } catch (e) { /* plugin error */ }
           }
         }
+        fireEvent(message.name, message.data);
         break;
-      }
       default:
         break;
     }
@@ -93,20 +124,46 @@
 
   var Asc = (window.Asc = window.Asc || {});
   Asc.plugin = Asc.plugin || {};
+  Asc.scope = Asc.scope || {};
 
-  Asc.plugin.executeMethod = function (name, args) {
-    return request("executeMethod", { name: name, args: args || [] });
+  Asc.plugin.executeMethod = function (name, params, callback) {
+    if (name === "AddContextMenuItem") {
+      var arg = (params || [])[0] || {};
+      Asc.plugin.setContextMenuItems(flattenMenu(arg.items, []));
+      var done = Promise.resolve(true);
+      if (typeof callback === "function") done.then(callback);
+      return done;
+    }
+    return request("executeMethod", { name: name, args: params || [] }, callback);
   };
 
-  Asc.plugin.callCommand = function (fn, isModal) {
+  Asc.plugin.callCommand = function (fn, isClose, isCalc, callback) {
     // The command is sent as source text and evaluated by the host's CommandEngine.
     var source = typeof fn === "function" ? "(" + fn.toString() + ")()" : String(fn);
-    return request("callCommand", { source: source, isModal: !!isModal });
+    var scope;
+    try {
+      scope = JSON.stringify(Asc.scope || {});
+    } catch (e) {
+      scope = "{}"; // non-serialisable scope: same as ONLYOFFICE, functions are dropped
+    }
+    var p = request("callCommand", { source: source, scope: scope, isCalc: isCalc !== false }, callback);
+    if (isClose) {
+      p.then(function () { Asc.plugin.executeCommand("close", ""); }, function () {});
+    }
+    return p;
   };
 
-  // items: [{id: "...", text: "..."}]. Replaces the plugin's entries in the editor context menu.
+  // Host-level API (also used by AddContextMenuItem). items: [{id, text}].
   Asc.plugin.setContextMenuItems = function (items) {
     send({ type: "contextMenu", items: items || [] });
+  };
+
+  Asc.plugin.attachContextMenuClickEvent = function (id, handler) {
+    menuClickHandlers[String(id)] = handler;
+  };
+
+  Asc.plugin.executeCommand = function (command, data) {
+    if (command === "close") send({ type: "close" });
   };
 
   Asc.plugin.attachEvent = function (name, handler) {

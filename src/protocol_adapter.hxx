@@ -27,7 +27,7 @@ private:
 
     void handleReady(const std::string& pluginId);
     void handleExecuteMethod(const std::string& pluginId, long long id, const std::string& name, const std::string& argsJson);
-    void handleCallCommand(const std::string& pluginId, long long id, const std::string& source);
+    void handleCallCommand(const std::string& pluginId, long long id, const std::string& source, const std::string& scopeJson);
 
     // Sends a complete JSON object to the page. resultJson must already be valid JSON.
     void sendResult(const std::string& pluginId, const char* type, long long id, const std::string& resultJson, const std::string& error);

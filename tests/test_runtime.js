@@ -18,7 +18,7 @@ const windowStub = {
 };
 
 const src = fs.readFileSync(path.join(__dirname, "..", "extension", "content", "runtime.js"), "utf8");
-vm.runInNewContext(src, { window: windowStub, Promise, Error, JSON, Object, console });
+vm.runInNewContext(src, { window: windowStub, Promise, Error, JSON, Object, String, console });
 
 const Asc = windowStub.Asc;
 assert.ok(Asc && Asc.plugin, "Asc.plugin must exist");
@@ -54,15 +54,54 @@ function deliver(obj) { listener({ data: JSON.stringify(obj) }); }
   deliver({ type: "event", name: "onX", data: {} });
   assert.strictEqual(hits, 1);
 
-  // handshake order: initialize -> plugin_init -> init
+  // handshake: initialize only stores info; ONLYOFFICE init(data) runs once, on "init", with the data
   const order = [];
-  Asc.plugin.init = function () { order.push("init-plugin"); };
+  Asc.plugin.init = function (data) { order.push("init:" + data); };
   Asc.plugin.onPluginInit = function () { order.push("plugin_init"); };
-  Asc.plugin.onInit = function () { order.push("init"); };
   deliver({ type: "initialize", guid: "g" });
+  assert.strictEqual(Asc.plugin.info.guid, "g");
   deliver({ type: "plugin_init", data: {} });
-  deliver({ type: "init", data: {} });
-  assert.deepStrictEqual(order, ["init-plugin", "plugin_init", "init"]);
+  deliver({ type: "init", data: "selected" });
+  assert.deepStrictEqual(order, ["plugin_init", "init:selected"]);
+
+  // ONLYOFFICE callback style for executeMethod (callback gets the result; errors give undefined)
+  let cbResult = "unset";
+  Asc.plugin.executeMethod("GetSelectedText", [], function (r) { cbResult = r; });
+  deliver({ type: "method_result", id: sent[sent.length - 1].id, result: "xyz" });
+  await new Promise((r) => setTimeout(r, 0));
+  assert.strictEqual(cbResult, "xyz");
+  Asc.plugin.executeMethod("Nope", [], function (r) { cbResult = r; });
+  deliver({ type: "method_result", id: sent[sent.length - 1].id, error: "unknown" });
+  await new Promise((r) => setTimeout(r, 0));
+  assert.strictEqual(cbResult, undefined);
+
+  // callCommand(func, isClose, isCalc, callback) carries Asc.scope and closes when asked
+  Asc.scope.n = 42;
+  let cmdResult = null;
+  Asc.plugin.callCommand(function () { return Asc.scope.n; }, true, true, function (r) { cmdResult = r; });
+  const req4 = sent[sent.length - 1];
+  assert.strictEqual(req4.type, "callCommand");
+  assert.deepStrictEqual(JSON.parse(req4.scope), { n: 42 });
+  deliver({ type: "command_result", id: req4.id, result: 42 });
+  await new Promise((r) => setTimeout(r, 0));
+  assert.strictEqual(cmdResult, 42);
+  assert.strictEqual(sent[sent.length - 1].type, "close", "isClose sends close after the command");
+
+  // AddContextMenuItem maps to the host cache (nested items flattened); click reaches the handler
+  Asc.plugin.executeMethod("AddContextMenuItem", [{ items: [{ id: "a", text: "A" }, { text: "Sub", items: [{ id: "b", text: "B" }] }] }]);
+  const menu = sent[sent.length - 1];
+  assert.strictEqual(menu.type, "contextMenu");
+  assert.deepStrictEqual(menu.items, [{ id: "a", text: "A" }, { id: "b", text: "B" }]);
+  let clicked = null;
+  Asc.plugin.attachContextMenuClickEvent("b", function (d) { clicked = d.id; });
+  deliver({ type: "event", name: "onContextMenuClick", data: { id: "b" } });
+  assert.strictEqual(clicked, "b");
+
+  // event_<name> handlers (ONLYOFFICE style) also receive events; onContextMenuShow fires after init
+  let shown = 0;
+  Asc.plugin.event_onContextMenuShow = function () { shown++; };
+  deliver({ type: "init", data: "" });
+  assert.strictEqual(shown, 1);
 
   console.log("test_runtime: PASS");
 })().catch(function (e) {

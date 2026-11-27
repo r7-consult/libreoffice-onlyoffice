@@ -11,11 +11,8 @@
 #include <sstream>
 #include <utility>
 
-// Loader entry point from WebView2LoaderStatic.lib (no runtime DLL load).
-extern "C" HRESULT WINAPI CreateCoreWebView2EnvironmentWithOptions(
-    PCWSTR browserExecutableFolder, PCWSTR userDataFolder,
-    ICoreWebView2EnvironmentOptions* environmentOptions,
-    ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler* handler);
+// CreateCoreWebView2EnvironmentWithOptions is declared in WebView2.h and resolved from
+// WebView2LoaderStatic.lib (no WebView2Loader.dll to ship).
 
 namespace pluginhost
 {
