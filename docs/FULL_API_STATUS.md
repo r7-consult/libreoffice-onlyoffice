@@ -7,8 +7,8 @@ or ONLYOFFICE build was run, and no UNO call was executed.
 
 | Item | Result | Where |
 |---|---|---|
-| F1 inventory | Names from call sites in the examples (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names. Signatures and read\|edit added from the `sdkjs` declarations for the 2,061 method rows with examples: 1,942 signatures; read 1,372, edit 582, UNCLASSIFIED 109 (99 with no declaration in sdkjs, 10 unclear). The last 155 decisions (64 read, 91 edit) and the 264 rows they cover come from a classification pass by three subagents; not yet checked by a person | `scripts/inventory.py`, `docs/API_INVENTORY.csv`, `docs/API_CLASSIFICATION_RULES.md` |
-| D1 decisions (proposed) | Permission policy: option B, first-use prompt per plugin. Acceptable differences: MLR-1 to MLR-15. Both wait for user sign-off | `docs/adr/ADR-002-permission-policy.md`, `docs/adr/ADR-003-mapped-limited-rules.md` |
+| F1 inventory | Names from call sites in the examples (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names. Signatures and read\|edit added from the `sdkjs` declarations for the 2,061 method rows with examples: 1,942 signatures; read 1,373, edit 580, UNCLASSIFIED 110 (recounted 2026-11-28 from `API_INVENTORY.csv`, after GroupDrawings and Ungroup were moved from read to edit; the earlier figures 1,372 / 582 / 109 did not match the file). Of the 110, 99 have no declaration in sdkjs and 10 are unclear. The 51 `executeMethod` names are all UNCLASSIFIED (0 read, 0 edit; recounted 2026-11-28). The last 155 decisions (64 read, 91 edit) and the 264 rows they cover come from a classification pass by three subagents; not yet checked by a person | `scripts/inventory.py`, `docs/API_INVENTORY.csv`, `docs/API_CLASSIFICATION_RULES.md` |
+| D1 decisions (accepted 2026-11-28) | Permission policy: option A (user decision, round 1): plugins without `hostPermissions` get `document.read`, `document.edit` and `menu`, no prompt. Acceptable differences: MLR-1 to MLR-15 | `docs/adr/ADR-002-permission-policy.md`, `docs/adr/ADR-003-mapped-limited-rules.md` |
 | F2 usage | 38 plugins from `sdkjs-plugins`, 139 names. 73 names are flagged `in_api_examples=no` (helpers bundled in plugins, such as `Tween` and `Decorate`) | `docs/API_USAGE.csv` |
 | F7 templates and generator | Five member kinds, five test kinds, `new_card.py` with refusals. Generated class and test files parse with `node --check` (checked in a sandbox copy) | `templates/`, `scripts/new_card.py` |
 | F9 card checker | Static checks: card fields, member limit, protected paths, tests unchanged vs HEAD, line limit, denied names. Tested on 4 failing cards and 1 clean card; the clean card returns BLOCKED because the runner is missing | `scripts/check_card.py` |
@@ -27,8 +27,8 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 | F5 headless runner `tests/run_member.py` | Written, not run. The `TestRunner` service (XInvocation, no IDL) is written, not compiled; see `docs/TEST_RUNNER.md`. Needs LibreOffice on the build machine. Test switches compile-time only (PH_TEST_HOOKS, OFF by default) Exit 2 when it cannot run. `PLUGINHOST_API_DIR` override read by the engine (`jsDirectory()`) | Build machine, then the TestRunner service |
 | F6 expectations from Document Builder | Running Document Builder (licence now answered: inherited AGPL-3.0, see `docs/LICENSING.md`) | A machine that can run Document Builder, then Sonnet |
 | F8 recipes | Each snippet must be tested | Sonnet, after F5 |
-| D1 sign-off (ADR-002, ADR-003 are Proposed) | Open questions listed in the ADRs, and the Document Builder licence | The user |
-| read\|edit for the 262 UNCLASSIFIED rows | Needs a judgement pass or a manual check | Sonnet, then spot-check; blocks the allowlist in F3 |
+| D1 sign-off (ADR-002, ADR-003 are Accepted 2026-11-28) | Open questions listed in the ADRs, and the Document Builder licence | The user |
+| read\|edit for the 161 UNCLASSIFIED rows (110 methods and 51 `executeMethod` names; recounted 2026-11-28; the earlier figure 262 did not match the file) | Needs a judgement pass or a manual check | Sonnet, then spot-check; blocks the allowlist in F3 |
 | Pilot (10 cards) | F5, F6, F8 | After the foundation |
 
 ## Deviations from the plan (record these in the decision log)
@@ -48,7 +48,7 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 ## Next steps, in order
 
 1. Commit the inventory, usage, templates and scripts (after review).
-2. Opus: decide the permission policy and the MAPPED-LIMITED rules (D1), and check the Document Builder licence.
+2. Done 2026-11-28: the permission policy (option A) and the MAPPED-LIMITED rules (D1) are accepted by the user; the Document Builder licence is answered (inherited AGPL-3.0).
 3. Sonnet, on the build machine: F3, F4, F5, then F6, F8, then the read|edit classification.
 4. Pilot (plan section 5), only after step 3.
 

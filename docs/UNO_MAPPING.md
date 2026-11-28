@@ -1,5 +1,7 @@
 # UNO mapping for the Api shim (first ten methods)
 
+Nothing in this table has been executed.
+
 Each row maps one public `Api` method of `extension/js/api_shim.js` to the UNO calls the generic bridge makes.
 Interface names are the **declaring** interface of the method, because `bridge_native.cxx` matches methods by
 declaring class. The file `extension/js/bridge_allowlist.json` is built from this table. `tests/test_allowlist.js`
@@ -7,16 +9,16 @@ checks every entry against the IDL files in the LibreOffice tree (`LO_SRC`, defa
 
 | Shim method | Bridge call chain (handle in, handle out) | Kind | Status |
 |---|---|---|---|
-| `Api.GetActiveSheet()` | root (model) `XModel.getCurrentController` → controller `XSpreadsheetView.getActiveSheet` | read, read | Works once handles and object results are wired |
-| `ApiWorksheet.GetName()` | sheet `XNamed.getName` | read | Works |
-| `ApiWorksheet.GetRange(addr)` | sheet `XCellRange.getCellRangeByName(addr)` | read | Works |
+| `Api.GetActiveSheet()` | root (model) `XModel.getCurrentController` → controller `XSpreadsheetView.getActiveSheet` | read, read | Written, not run once handles and object results are wired |
+| `ApiWorksheet.GetName()` | sheet `XNamed.getName` | read | Written, not run |
+| `ApiWorksheet.GetRange(addr)` | sheet `XCellRange.getCellRangeByName(addr)` | read | Written, not run |
 | `ApiRange.GetValue()` | range `XCellRangeData.getDataArray` | read | Needs sequence results (written in C++, not compiled) |
 | `ApiRange.SetValue(v)` | range `XCellRangeData.setDataArray(rows)` | edit | Needs sequence arguments (written in C++, not compiled) |
-| `Api.GetDocument()` | root (model) itself | read | Works (no call) |
-| `ApiDocument.GetElementsCount()` | text `XEnumerationAccess.createEnumeration`, then `XEnumeration.hasMoreElements` and `nextElement` in a loop | read | Works, but a loop of bridge calls |
-| `ApiDocument.GetElement(i)` | same enumeration, stop at index `i` | read | Works, same loop |
-| `ApiParagraph.GetText()` | paragraph `XTextRange.getString` | read | Works |
-| `ApiParagraph.AddText(t)` | text `XSimpleText.createTextCursorByRange(paragraph)` → cursor, then `XSimpleText.insertString(cursor, t, false)` | read, edit | Works |
+| `Api.GetDocument()` | root (model) itself | read | Written, not run (no call) |
+| `ApiDocument.GetElementsCount()` | text `XEnumerationAccess.createEnumeration`, then `XEnumeration.hasMoreElements` and `nextElement` in a loop | read | Written, not run, but a loop of bridge calls |
+| `ApiDocument.GetElement(i)` | same enumeration, stop at index `i` | read | Written, not run, same loop |
+| `ApiParagraph.GetText()` | paragraph `XTextRange.getString` | read | Written, not run |
+| `ApiParagraph.AddText(t)` | text `XSimpleText.createTextCursorByRange(paragraph)` → cursor, then `XSimpleText.insertString(cursor, t, false)` | read, edit | Written, not run |
 
 Writer's text object is reached from the model through `XTextDocument.getText` (read). It is not in the table
 above because the shim does not call it directly yet; it is needed in the chain for `ApiDocument` and `ApiParagraph`.

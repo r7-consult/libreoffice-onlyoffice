@@ -1,13 +1,13 @@
 # Test matrix: Linux and macOS (for a person to run)
 
-Status: DRAFT. No Linux or macOS browser implementation exists yet (`src/webhost_stub.cxx` returns no browser). Criteria 1 and 8 of plan P-1 stay NOT VERIFIED until someone runs the steps below and records the results.
+Status: DRAFT. Linux: a WebKitGTK 4.1 host is written but not compiled or run (`src/webhost_linux_webkitgtk.cxx`). macOS: no browser implementation exists yet (`src/webhost_stub.cxx` returns no browser); macOS is out of scope for now (`docs/DECISION_LOG.md`, item 8). Criteria 1 and 8 of plan P-1 stay NOT VERIFIED until someone runs the steps below and records the results.
 
 ## Preparation
 1. Two LibreOffice branches with SDK (same as Windows: `config/versions.json`).
 2. Build `pluginhost.so` / `pluginhost.dylib` with `src/CMakeLists.txt` (non-Windows branch). The C++ sources are portable except `plugin_panel.cxx` (uses `rtl_getGlobalProcessId` and the Windows window handle) and `paths.cxx` (returns empty paths until implemented).
 3. Pick one browser implementation per platform (plan section 5):
-   - Linux X11 / XWayland: CEF in windowed mode, parent XID (`webhost_linux_cef.cxx`, to be written).
-   - Linux gtk3 VCL plugin: alternatively wry on WebKitGTK (see A+ document, section 5.1).
+   - Linux X11 / XWayland: WebKitGTK 4.1 in a GtkPlug on the X11 window (`webhost_linux_webkitgtk.cxx`, written, not compiled). CEF is the fallback (`webhost_linux_cef.cxx`, not written), per `docs/DECISION_LOG.md` item 14.
+   - Linux gtk3 VCL plugin: the embedding is unverified and probably needs a core patch (`docs/DECISION_LOG.md` item 14).
    - macOS: WKWebView, parent NSView (`webhost_macos.mm`, to be written).
 
 ## Matrix
@@ -20,6 +20,8 @@ Status: DRAFT. No Linux or macOS browser implementation exists yet (`src/webhost
 | 4 | Ubuntu LTS | X11, gtk3 + CEF | branch B | 8 | | `Gtk` symbol clash? |
 | 5 | macOS x64 | WKWebView | branch A | 1 | | |
 | 6 | macOS arm64 | WKWebView | branch A | 1 | | |
+| 7 | Ubuntu LTS | X11, `SAL_USE_VCLPLUGIN=kf5` or `qt5`, WebKitGTK | branch A | 1 | NOT VERIFIED | Not run. Embedding under this VCL plugin is unverified |
+| 8 | Ubuntu LTS | Native Wayland (no XWayland), WebKitGTK | branch A | 1 | NOT VERIFIED | Not run. Native Wayland embedding is unverified |
 
 ## Steps for each row
 1. Install the extension into an isolated profile: `unopkg add --shared -env:UserInstallation=file:///<path>/profile-A pluginhost.oxt`.
@@ -28,6 +30,6 @@ Status: DRAFT. No Linux or macOS browser implementation exists yet (`src/webhost
 
 ## Manual checks on Windows (not automated)
 - Context menu (criterion 7): right-click in Writer; "Hello from plugin" appears; `ctxmenu|requested` -> `ctxmenu|returned` <= 300 ms over 20 runs (median).
-- Clicking the context menu item: not implemented in this draft (see `src/context_menu.hxx`).
+- Clicking the context menu item: click handling is in `src/menu_dispatch.cxx` (see `src/context_menu.hxx`). Not yet run.
 - Docking: drag the sidebar between left and right; the panel must not restart the plugin.
 - High DPI, IME, screen reader: measure and record in `RESULTS.md` under "additional measurements".

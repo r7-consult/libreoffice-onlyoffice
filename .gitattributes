@@ -1,0 +1,11 @@
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.cxx text eol=lf
+*.hxx text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+LICENSE text eol=lf

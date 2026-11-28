@@ -161,7 +161,7 @@ to administrators who switch the default back to B.
 
 1. **Default for plugins without `hostPermissions`: ANSWERED, option A** (see "User decisions" above).
 2. **Administrator policy**: still open. Should the shipped configuration allow pre-granting by GUID and disabling
-   the prompt? Which plugins, if any, ship pre-granted? Proposed answer: admin keys exist but ship empty.
+   the prompt? Which plugins, if any, ship pre-granted? Superseded: no administrator pre-approval (round 2).
 3. **Network access: ANSWERED, a separate permission**, named later by its own ADR. Not implemented yet.
 4. **"Allow read only": ANSWERED, offered per method** (see "User decisions" above).
 5. **Re-prompt trigger: ANSWERED, only when more is requested.** A version update with the same or smaller
@@ -171,6 +171,8 @@ to administrators who switch the default back to B.
 
 ## Decisions (round 2, 2026-11-28)
 
-- No administrator pre-approval in this version. Installation and use must stay easy. The first-use prompt is the only
-  approval path (see `docs/DECISION_LOG.md`, item 2).
-- Prompt language: English strings in one resource table now. A Russian translation is added before the first pilot user.
+- No administrator pre-approval; no prompt in this version. Option A stands: plugins without `hostPermissions` get
+  `document.read`, `document.edit` and `menu` (see `docs/DECISION_LOG.md`, item 2).
+- The prompt wording and the Russian strings are deferred until a prompt is built.
+- Reconciled on 2026-11-28 by the assistant: the earlier text proposed a first-use prompt that the user did not choose.
+  Pending the user's confirmation.

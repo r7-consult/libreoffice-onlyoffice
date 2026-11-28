@@ -358,7 +358,7 @@ M0356,method,GetPlaceholderText,word,10,yes,(),read,Examples/Word/ApiBlockLvlSdt
 M0357,method,GetPosition,cell;common;pdf;slide;word,10,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetPosition.js
 M0358,method,GetSubject,cell;pdf;slide;word,10,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
 M0359,method,GetTime,cell;slide;word,10,yes,(),read,Examples/Cell/ApiComment/Methods/GetTime.js
-M0360,method,GroupDrawings,cell;slide;word,10,yes,(aDrawings),read,Examples/Cell/ApiGroup/Methods/Ungroup.js
+M0360,method,GroupDrawings,cell;slide;word,10,yes,(aDrawings),edit,Examples/Cell/ApiGroup/Methods/Ungroup.js
 M0361,method,InsertContent,plugin;word,10,yes,"(content, isInline, pr)",edit,Examples/Plugins/Cell/Enumeration/ContentControlLock.js
 M0362,method,SetAlias,word,10,yes,(sAlias),edit,Examples/Word/ApiBlockLvlSdt/Methods/GetAlias.js
 M0363,method,SetBorderEffectIntensity,pdf,10,yes,(value),edit,Examples/Pdf/ApiBaseAnnotation/Methods/GetBorderEffectIntensity.js
@@ -890,7 +890,7 @@ M0888,method,SetWidowControl,word,3,yes,(isWidowControl),edit,Examples/Word/ApiP
 M0889,method,SetXValues,pdf;slide;word,3,yes,(aValues),edit,Examples/Pdf/ApiChart/Methods/SetXValues.js
 M0890,method,SetXml,cell;slide;word,3,yes,(strXml),edit,Examples/Cell/ApiCustomXmlNode/Methods/SetXml.js
 M0891,method,SetZoom,cell;pdf,3,yes,(nZoom),edit,Examples/Cell/ApiPageSetup/Methods/GetZoom.js
-M0892,method,Ungroup,cell;slide;word,3,yes,(),read,Examples/Cell/ApiGroup/Methods/Ungroup.js
+M0892,method,Ungroup,cell;slide;word,3,yes,(),edit,Examples/Cell/ApiGroup/Methods/Ungroup.js
 M0893,method,UpdateElement,cell;slide;word,3,yes,"(xPath, xmlStr)",read,Examples/Cell/ApiCustomXmlPart/Methods/UpdateElement.js
 M0894,method,ASC,cell,2,yes,(arg1),read,Examples/Cell/Api/Methods/GetWorksheetFunction.js
 M0895,method,AddBodyShapeText,slide,2,yes,(sText),edit,Examples/Slide/ApiNotesPage/Methods/AddBodyShapeText.js

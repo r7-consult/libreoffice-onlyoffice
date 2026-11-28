@@ -120,10 +120,10 @@ Not knowable in advance. Rules:
 ## Phase 6: Linux and macOS (criteria 1 and 8)
 
 See `TEST_MATRIX_LINUX_MACOS.md`.
-1. Linux: decide between CEF (Chromium parity with ONLYOFFICE) and WebKitGTK (small, already in distros).
-   First check whether a GTK3 widget can be embedded in the LibreOffice gtk3 VCL plugin's `systemchildwindow`
-   without a main-loop conflict. That check decides the choice.
-2. macOS: `WKWebView` as a child of the `NSView` returned by `nativeWindowHandle`.
+1. Linux: decision made 2026-11-28: WebKitGTK 4.1 in a GtkPlug on the X11 window, CEF as fallback (`docs/DECISION_LOG.md` item 14).
+   Written in `src/webhost_linux_webkitgtk.cxx`, not compiled. The embedding check on the Linux host still decides
+   whether it works under the LibreOffice gtk3 VCL plugin's `systemchildwindow`; it probably needs a core patch.
+2. macOS: out of scope for now (`docs/DECISION_LOG.md` item 8). When picked up, `WKWebView` as a child of the `NSView` returned by `nativeWindowHandle`.
 3. Both reuse `WebHost`, `ProtocolAdapter`, `CommandEngine` and `runtime.js`; only `webhost_<platform>.cxx` is new.
 
 ---

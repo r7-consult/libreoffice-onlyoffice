@@ -1,4 +1,6 @@
-# Third-party archives and extracted tools (fetched by hand, see config/versions.json)
+# Third-party archives and extracted tools (fetched by hand, see config/versions.json).
+# Do not track: quickjs-ng (MIT) and the WebView2 package are fetched by hand.
+third_party/
 third_party/tools/
 third_party/quickjs-ng.tar.gz
 third_party/webview2/*.nupkg
@@ -7,6 +9,7 @@ third_party/webview2/pkg/
 # Build output and per-profile LibreOffice data
 build/
 dist/
+*.oxt
 logs/
 profile-A/
 profile-B/

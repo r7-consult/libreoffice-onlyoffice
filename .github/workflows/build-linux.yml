@@ -1,0 +1,91 @@
+# Compile check on a GitHub Linux runner. NOT RUN YET: written without a Linux host or a runner.
+# Manual only (Actions > build-linux > Run workflow): pushes do not start a remote build, same as build-windows.
+#
+# Uses the ubuntu-22.04 runner and installs the packages of docker/Dockerfile.linux with apt (no container, so
+# actions/checkout and artifact upload run as usual). The runner already has Node, so nodejs is not installed.
+# Jammy's LibreOffice is 7.3.x: it is enough to compile and link, not to install the .oxt (needs >= 7.6).
+name: build-linux
+on:
+  workflow_dispatch:
+    inputs:
+      test_hooks:
+        description: "PH_TEST_HOOKS for the build (ON compiles the test switches)"
+        type: choice
+        options: ["OFF", "ON"]
+        default: "OFF"
+
+env:
+  LO_SDK: /usr/lib/libreoffice/sdk
+  LO_PROGRAM: /usr/lib/libreoffice/program
+  PH_TEST_HOOKS: ${{ inputs.test_hooks }}
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        # bash -eo pipefail: a failing script is not hidden by "| tee".
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config \
+            libreoffice-dev libreoffice-dev-common libreoffice-core libreoffice-common \
+            libgtk-3-dev libwebkit2gtk-4.1-dev libx11-dev \
+            python3 zip unzip curl ca-certificates
+          echo "LibreOffice package versions:"
+          dpkg-query -W -f='${Package} ${Version}\n' libreoffice-dev libreoffice-core libwebkit2gtk-4.1-dev || true
+          ls -d "$LO_SDK" "$LO_PROGRAM" || true
+
+      - name: Fetch quickjs-ng
+        run: bash scripts/fetch_quickjs.sh 2>&1 | tee fetch.log
+
+      - name: Generate UNO headers
+        run: bash scripts/gen_uno_headers.sh 2>&1 | tee gen.log
+
+      - name: Build
+        shell: bash
+        run: |
+          # Errors are also published as one annotation (readable through the API without log access).
+          set +e
+          bash scripts/build.sh 2>&1 | tee build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            errors="$(grep -E 'error:|fatal error|CMake Error|undefined reference|cannot find -l|collect2:|^FAILED:|^ERROR:' build.log | head -n 50)"
+            if [ -z "$errors" ]; then errors="$(tail -n 40 build.log)"; fi
+            errors="${errors//'%'/'%25'}"
+            errors="${errors//$'\r'/}"
+            errors="${errors//$'\n'/'%0A'}"
+            echo "::error title=build::${errors}"
+            exit 1
+          fi
+
+      - name: Pack OXT
+        run: bash scripts/pack.sh 2>&1 | tee pack.log
+
+      - name: Stage tests (Node tests, py_compile)
+        if: always()
+        run: bash scripts/run_stage_tests.sh 2>&1 | tee tests.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pluginhost-linux-ubuntu22.04
+          if-no-files-found: ignore
+          path: |
+            fetch.log
+            gen.log
+            build.log
+            pack.log
+            tests.log
+            build/bin/pluginhost.so
+            build/libpluginhost.so
+            build/lib/*.so
+            dist/*.oxt
+            build/.ninja_log
+            build/CMakeFiles/CMakeError.log
+            build/CMakeFiles/CMakeOutput.log

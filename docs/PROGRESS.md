@@ -17,10 +17,10 @@ Build machine checklist (first run, in this order): `scripts\env.ps1`, `scripts\
 | 3 Lifecycle without restart | DRAFT | `host_service.*`: sessions outlive the panel; `acquire` reattaches, `release` hides. `test_stage3.py`. |
 | 4 Protocol adapter and runtime | NODE-TESTED (JS) + DRAFT (C++) | `extension/content/runtime.js` passes `tests/test_runtime.js`. C++: `protocol_adapter.*`, `plugin_config.*`, `json_mini.*`, `document_bridge.*` (Writer: GetSelectedText, PasteText, LogTest). `test_stage4.py`. Test fixture `tests/plugins/hello`. |
 | 5 CommandEngine, QuickJS, Api | NODE-TESTED (shim) + DRAFT (C++) | `command_engine.*` (QuickJS-ng, watchdog, undo rollback on failure), `api_bridge.cxx` (native operations), `extension/js/api_shim.js` passes `tests/test_api_shim.js` (ten public Api methods). `test_stage5.py` (fill time, Undo, TimeoutError). |
-| 6 Context menu | DRAFT | `context_menu.*`: interceptor reads a cache set by the page; attaches to the document active at panel creation only. Click handling NOT implemented. Timing needs a manual right-click (`test_stage6.py` checks attach and items only). |
+| 6 Context menu | DRAFT | `context_menu.*`: interceptor reads a cache set by the page; attaches to the document active at panel creation only. Click handling is in `menu_dispatch.cxx` (not run). Timing needs a manual right-click (`test_stage6.py` checks attach and items only). |
 | 7 Renderer failure isolation | DRAFT | `webhost_win.cxx` ProcessFailed handler -> `HostService::markFailed`; restart happens on the next panel attach. `test_stage7.py` kills WebView2 processes of the plugin data folder. Panel does not show a "stopped" message yet. |
 | 8 Two LibreOffice versions | DRAFT (scripts only) | `scripts\install.ps1`, `run_all.ps1` take the profile. LibreOffice not available here, so nothing ran. |
-| 10 Linux and macOS preparation | DRAFT | `webhost_stub.cxx` (no browser yet), `docs/TEST_MATRIX_LINUX_MACOS.md`. CEF and WKWebView implementations NOT written. |
+| 10 Linux and macOS preparation | DRAFT | `webhost_linux_webkitgtk.cxx` (WebKitGTK 4.1, written, not compiled; decision in `docs/DECISION_LOG.md` item 14), `webhost_stub.cxx` (macOS placeholder), `docs/TEST_MATRIX_LINUX_MACOS.md`. CEF fallback and WKWebView implementations NOT written. |
 | 11 RESULTS.md | DRAFT | `docs/RESULTS.md`: all criteria NOT VERIFIED. |
 
 ## Known gaps in the draft
