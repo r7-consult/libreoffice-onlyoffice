@@ -1,13 +1,15 @@
 # Plan: full ONLYOFFICE plugin API support
 
 Status on 2026-11-28: about 10 document `Api` calls and 4 `executeMethod` names are implemented
-(see `PLAN_NEXT.md`, phase 4). This plan describes how to reach the whole plugin API.
-Revision 2 (same day): reviewed and challenged; the findings are in section 8 and are already applied to
-sections 0–7.
+(see `PLAN_NEXT.md`, phase 4).
+
+Revision 3 (same day): reviewed for **execution by Haiku**. The plan is split into a small foundation built
+once by stronger models and a large, repetitive "factory" that Haiku runs card by card. Review findings are in
+section 10 and are already applied.
 
 ## 0. Target: what "100 %" means
 
-"100 %" is a **measured** target. Every inventory item (step 1) gets one state in `docs/API_COVERAGE.csv`:
+Every inventory item (section 3, F1) gets one state in `docs/API_COVERAGE.csv`:
 
 | State | Meaning |
 |---|---|
@@ -16,209 +18,211 @@ sections 0–7.
 | CORE | Needs a LibreOffice core change, tracked as K-1…K-6 from `LIBREOFFICE_PLUGIN_HOST_OPTION_A_PLUS.md` |
 | WONTFIX | Meaningless in LibreOffice, with the reason (server-only features, co-editing, ONLYOFFICE-only UI) |
 
-**Gate (usage-weighted, primary):** DONE + MAPPED-LIMITED cover ≥ 99 % of the API calls made by the top 50
-marketplace plugins, and each of those 50 plugins passes its smoke script or has every failure explained.
+**Gate (usage-weighted):** DONE + MAPPED-LIMITED cover ≥ 99 % of the API calls made by the top 50 marketplace
+plugins, and each of those plugins passes its smoke script or has every failure explained.
 
-**Reported, not a gate:** coverage by count of inventory rows. A count target would spend most of the budget
-on members that no plugin calls (revision 1 had "≥ 90 % by count"; dropped, see section 8, R-3).
+**Reported, not a gate:** coverage by count of rows. **No row stays TODO** when the plan is declared complete.
 
-**No row may stay TODO or UNKNOWN when the plan is declared complete**, even if its state is WONTFIX.
+Not reachable from an extension alone: K-3 (content controls, plugin objects, form fields, JS macros in OOXML),
+K-1 (run-time Calc functions), K-2, K-4, K-5 (ribbon tabs, caret screen position, buttons on content controls),
+and features of ONLYOFFICE's server.
 
-Not reachable from an extension alone:
-- **K-3:** content controls, plugin objects (OLE), form fields and JS macros stored in OOXML need changes in the
-  `oox` and `xmloff` filters.
-- **K-1:** Calc custom functions registered at run time under arbitrary names.
-- **K-2, K-4, K-5:** ribbon tabs, exact caret screen position, in-document buttons of content controls.
-- Features of ONLYOFFICE's server: co-editing, document builder service URLs, server file links.
+## 1. Execution model: who does what
 
-## 1. Step 1: inventory and usage
+Model routing follows `AGENTS.md`. The rule that makes the plan affordable:
+**a Haiku task never designs anything.** It fills in a template, runs one command, and either passes or
+escalates.
 
-The plan cannot be sized without the real list. Build it from sources, by script:
-
-1. Parse the public ONLYOFFICE sources (`office-js-api`, `sdkjs-plugins`, `sdkjs`, api.onlyoffice.com). List every
-   `Asc.plugin` member, every `executeMethod` name, every event, every `Api` class and member for Word, Cell,
-   Slide, Form and PDF, and every `config.json` key.
-2. Write `docs/API_INVENTORY.csv` with columns `area, class, member, kind, editors, signature, read|edit, source`.
-   The `read|edit` column feeds the permission allowlist in section 2.
-3. Usage: download the top 50 marketplace plugins and statically count which rows each calls. Write
-   `docs/API_USAGE.csv`. Static counting misses dynamic names (`executeMethod(name)` from a variable); flag those
-   plugins for a runtime trace in step 4 of section 4.
-4. Record the ONLYOFFICE version, and re-run on each ONLYOFFICE release.
-
-**Licence:** names and signatures only. No code or documentation text copied.
-**Done when:** both files are committed and every row has `editors` and `read|edit`.
-**Size:** 3–5 days.
-
-## 2. Architecture: generic bridge, `Api` written in JS
-
-Today each `Api` method is a C++ operation in `api_bridge.cxx` plus a JS shim. That does not scale to
-thousands of members.
-
-| Option | Work per member | Verdict |
+| Work | Model | Why |
 |---|---|---|
-| A. Keep C++ per method | C++ + JS + test, compile per change | Reject: too slow to develop |
-| B. Generic UNO call from QuickJS, `Api*` classes in JS | JS + test | **Choose** |
-| C. Reuse LibreOffice `jsuno` | Low | Reject: off by default (`--enable-quickjs`), exposes all of UNO, no limits |
+| Decisions: permission policy, MAPPED-LIMITED rulings, denylist, go/no-go | Opus | Judgement, few calls |
+| Foundation F1–F9: parsers, bridge, sandbox, conversion layer, test runner, templates, recipes | Sonnet | Real design and C++; done once |
+| Factory: one card = 5–10 members of one class, or one fixture, or one plugin smoke script | Haiku | Repetitive, template-driven, checked by a script |
+| Card review: spot check of 1 card in 10, plus every card that changed an expectation | Sonnet | Catches template drift cheaply |
 
-### 2.1 Bridge
+Cost control:
+- The factory starts only after the pilot (section 5) shows Haiku passes ≥ 70 % of cards on the first try and
+  escalates ≤ 20 %. Otherwise Sonnet fixes the template or recipes, not the cards.
+- Every card is self-contained. Haiku reads at most: the card, one recipe file, one class file (≤ 400 lines), and
+  the test output. No browsing of the LibreOffice source tree.
+- C++ is never touched by a factory card. All factory work is JS, CSV and fixtures, loaded at run time, so no
+  compile is needed per card.
 
-- One C++ primitive: `call(handle, interface, method, args)`, plus `get`/`set` for properties.
-- It is implemented with Core Reflection (`XIdlMethod::invoke`). That is slower than a direct C++ call; the M2 benchmark
-  measures it (section 7).
-- Handles are integers in a table owned by one command. All are released when the command ends, so no UNO object
-  outlives a command, which matches ONLYOFFICE, where `callCommand` keeps no objects either.
-- Bulk calls are first-class: `getDataArray`/`setDataArray`, enumeration of a whole paragraph range, so one JS
-  call is one UNO call.
+## 2. Architecture (unchanged from revision 2, condensed)
 
-### 2.2 Security: the bridge must not be reachable by plugin code
+- **Generic bridge.** One C++ primitive `call(handle, interface, method, args)` (plus `get`/`set`), implemented
+  with Core Reflection. Handles live for one command only. Bulk calls (`getDataArray`/`setDataArray`, paragraph
+  range enumeration) are first-class.
+- **`Api*` classes in JS**, one file per class under `extension/js/api/`.
+- **Sandbox.**
+  - The primitive exists only as a closure argument, never on `globalThis`. Today's global `__ph_call` in
+    `command_engine.cxx` must be removed.
+  - Intrinsics and `Api*` prototypes are frozen before plugin code runs.
+  - The allowlist is per (interface, method) and generated from `extension/js/api/*.js`, with read/edit from the
+    inventory. A fixed denylist wins: `XStorable`, `XComponentLoader`, dispatch, scripting, shell, file access,
+    service manager, configuration.
+- **Conversion layer**, built once: units, colours, enums, A1/R1C1 addresses, and Writer character positions
+  through a per-command paragraph offset table.
+- `jsuno` is not reused (off by default, all of UNO exposed, no limits).
 
-**Finding from this review:** today `command_engine.cxx` puts the primitive on the global object as `__ph_call`,
-so plugin code can call it directly and skip the `Api` layer. With today's ten fixed operations that is harmless.
-With a generic bridge it would expose any allowed UNO method to any plugin. Required before the first generic call:
+## 3. Foundation (Sonnet, Opus where marked)
 
-1. The primitive is passed into the `Api` layer as a closure argument and never stored on `globalThis`.
-2. After the `Api` layer loads and before plugin code runs, every built-in prototype and `Api*` class is frozen
-   (`Object.freeze` on `Object`, `Array`, `Function`, `Promise` and the rest of the intrinsics, and on all `Api*`
-   prototypes). Plugin code then cannot hook a built-in the `Api` layer calls and capture handles or values.
-3. The allowlist is **per (interface, method)**, not per interface. It is generated at build time from the calls
-   that `extension/js/api/*.js` actually makes. Every entry is marked `read` or `edit` from the inventory, so the
-   `document.read` / `document.edit` permission is checked inside the bridge.
-4. A fixed denylist always wins over the allowlist: storing or loading files (`XStorable`, `XComponentLoader`),
-   dispatch (`XDispatchHelper`, `XDispatchProvider`), scripting and macros, shell execution, file access
-   (`XSimpleFileAccess`), the service manager, and configuration.
-5. Fuzz tests (section 4) try to reach a denied method through every `Api` class.
+Build these in order. Each one has an exit check that Haiku will later rely on.
 
-### 2.3 Shared conversion layer (build first)
-
-Every `Api` area depends on it, so it is part of step 2, not of the work packages:
-- Units: ONLYOFFICE twips, points and EMU ↔ UNO 1/100 mm.
-- Colours, enums, alignment and border constants.
-- Range addresses: A1 and R1C1 ↔ `CellRangeAddress`.
-- Text positions. ONLYOFFICE Word uses character positions in the document. Writer has no direct offset index, and a
-  cursor that moves character by character is O(n). The layer keeps a per-command paragraph → start-offset table,
-  built once with one enumeration, then moves within one paragraph. This is the main performance risk of the Word
-  `Api`; measure it in M2 on a 300-page document.
-
-**Exit criterion for step 2:**
-- The current ten methods run on the generic bridge, and the existing tests pass.
-- Filling 10 000 cells with one bulk call takes < 1 s; per-cell calls (10 000 bridge calls) take < 2 s.
-- `GetRange(start, end)` on a 300-page document takes < 50 ms.
-- The fuzz suite cannot reach any denied method.
-
-**Size:** 2–3 weeks.
-
-## 3. Work packages
-
-Order inside each package follows `API_USAGE.csv`: most-used members first. A package is complete when its members
-up to the 99 % usage line are DONE or MAPPED-LIMITED and the rest are recorded with a state.
-
-| # | Package | Content |
+| # | Deliverable | Exit check |
 |---|---|---|
-| WP1 | Plugin runtime | All `Asc.plugin` members: `executeMethod`, `callCommand`, `executeCommand`, `resizeWindow`, translation, theme, `button`, `info`, `Asc.scope` limits |
-| WP2 | Plugin types and windows | panel, panelRight, window (modal and non-modal), background, system; window buttons, `isVisual`, `isModal`, `isInsideMode`, sizes, `EditorsSupport` |
-| WP3 | Events | Document, selection, sheet, slide and context-menu events from UNO listeners; `config.events` and `attachEvent` |
-| WP4 | Writer `Api` | Document, paragraphs, runs, text properties, styles, tables, sections, headers and footers, bookmarks, hyperlinks, comments, footnotes, fields, shapes and images |
-| WP5 | Calc `Api` | Worksheets, ranges, formats, formulas, names, charts, conditional formats, validation, protection |
-| WP6 | Impress `Api` | Presentation, slides, shapes, text frames, images, tables, charts, layouts and masters |
-| WP7 | `executeMethod` catalogue | Selection, search and replace, insert, get text/HTML/file, comments, track changes, content controls |
-| WP8 | Menus and toolbar | Dynamic context-menu items with cached synchronous answers; toolbar and menu via the UI configuration API. Ribbon tab is CORE (K-2) |
-| WP9 | Content controls and forms | Emulation with fields and frames where ODF allows. OOXML round trip is CORE (K-3) |
-| WP10 | Macros and custom functions | JS macros in document user properties; Calc add-in with `XVolatileResult`. Run-time names are CORE (K-1) |
-| WP11 | Manager and security | Install, update and remove with data cleanup; permission policy (`PLAN_NEXT.md` phase 4); admin policy |
-| WP12 | Platforms | macOS (`WKWebView`), Linux (CEF or WebKitGTK). Only the browser host is new |
+| F1 | `scripts/inventory.py`: parses ONLYOFFICE sources into `docs/API_INVENTORY.csv` (`id, area, class, member, kind, editors, signature, read|edit, source`). Names and signatures only | Every row has `editors` and `read|edit`; the script is reproducible from a pinned ONLYOFFICE version |
+| F2 | `scripts/usage.py`: counts calls of the top 50 plugins into `docs/API_USAGE.csv`; flags plugins with dynamic method names | Each of the 50 plugins appears; flagged ones listed |
+| F3 | Generic bridge, closure-only primitive, frozen intrinsics, generated allowlist, denylist (C++ + JS) | Fuzz suite cannot reach a denied method; the 10 existing methods pass on the new bridge |
+| F4 | Conversion layer `extension/js/api/_convert.js` | Unit tests for every conversion; Writer `GetRange` < 50 ms on a 300-page document |
+| F5 | **Headless test runner.** A UNO service `org.example.pluginhost.TestRunner` with `run(source, scopeJson) → resultJson`, plus `tests/run_member.py`, which starts `soffice --headless`, loads a fixture, runs one test and prints PASS/FAIL. Env var `PLUGINHOST_API_DIR` makes the engine load `api/*.js` from the repository, so JS edits need no reinstall | `python tests/run_member.py cell.ApiRange.SetValue` prints PASS in < 10 s; editing a JS file and re-running picks up the change |
+| F6 | **Expectations.** `scripts/expect.py` runs each test through ONLYOFFICE Document Builder and stores the result in `tests/expected/<id>.json`. Check the Document Builder licence first (Opus decision) | Expectations exist for the 10 existing methods; files are read-only for factory cards |
+| F7 | **Templates.** `templates/member_<kind>.js` and `templates/test_<kind>.js` for getter, setter, collection, constructor, and `executeMethod`. `scripts/new_card.py <class> <ids...>` creates the card file, the stubs and the test files | A generated stub for a new getter passes after filling in one UNO call |
+| F8 | **Recipes.** `docs/recipes/{writer,calc,impress,common}.md`: short, tested UNO snippets ("get the text cursor of a paragraph", "set a cell's number format", property names for character attributes) | Each recipe snippet is backed by a passing test |
+| F9 | **Card checker.** `scripts/check_card.py <card>` runs: lint, allowlist generation (fails on a denylisted method), the card's tests, the performance budgets of the area, and updates `API_COVERAGE.csv` | Fails on any of: denied method, edited expectation, test without assertion, file > 400 lines |
+| D1 | **Decisions (Opus):** permission policy for plugins without `hostPermissions`; the MAPPED-LIMITED rules (which differences are acceptable: units rounding, default fonts, numbering) | Written in `docs/adr/` before the pilot |
 
-**Sizing rule instead of a fixed total.** Revision 1 gave 40–55 person-weeks. That number was not derived from
-anything, and the full API is likely several thousand members, so it was removed (section 8, R-2). After step 1:
+**Size:** 5–7 weeks of Sonnet-driven work, plus a few Opus decisions. This is the only part of the plan that needs
+a compiler and the build machine.
 
-```
-weeks per package = members up to the 99 % usage line / members per week
-                  + fixed cost per package (conversion work, fixtures)
+## 4. Card format (what Haiku receives)
+
+One file per card in `cards/todo/<area>-<class>-<n>.md`, generated by F7. Haiku moves it to `cards/done/` or
+`cards/escalated/`.
+
+```markdown
+# Card cell-ApiRange-03
+Members: ApiRange.SetNumberFormat, ApiRange.GetNumberFormat, ApiRange.SetAlignHorizontal, ... (≤ 10)
+Edit only: extension/js/api/cell/ApiRange.js
+Read: docs/recipes/calc.md (section "Number formats", "Alignment")
+Tests: tests/members/cell/ApiRange/*.js (generated, do not change the assertions)
+Run: python tests/run_member.py --card cards/todo/cell-ApiRange-03.md
+Done when: python scripts/check_card.py cards/todo/cell-ApiRange-03.md prints PASS
 ```
 
-Measure `members per week` in M2 on the ten ported methods plus the first 30 members of WP5. Plan with that
-measured rate, not an assumed one. WP1–WP3 and WP8–WP12 are sized as features, not by member count.
+**Haiku rules (non-negotiable):**
+1. Edit only the files listed under "Edit only". Never edit tests, expectations, templates, recipes, C++,
+   the allowlist or the denylist.
+2. Use only UNO calls from the recipe file. If the recipe has no way to do it, escalate; do not search the
+   LibreOffice source.
+3. At most 3 attempts per member. Then mark the member `ESCALATE` in the card with: the test output, what was tried,
+   and a one-line guess at the cause. Continue with the next member.
+4. If the result differs from the expectation in a way the MAPPED-LIMITED rules (D1) list, record it as
+   MAPPED-LIMITED with the rule number. Any other difference is an escalation, not a code change.
+5. Never write PASS without the checker's output.
 
-Dependencies: step 1 → step 2 → WP1, WP2 → WP3 → WP4–WP7 in parallel → WP8–WP11. WP12 starts after ADR-001.
+## 5. Pilot (gate for the factory)
 
-## 4. Conformance testing
+1. Sonnet makes 10 cards: 4 Calc, 4 Writer, 2 `executeMethod`, chosen from the most-used rows.
+2. Haiku runs them, one card per agent, with no extra help.
+3. Measure: first-try pass rate, escalation rate, tokens per card, wall time per card, and how many escalations were
+   caused by a missing recipe versus a template flaw.
+4. **Gate:** first-try pass ≥ 70 %, escalations ≤ 20 %. If missed, Sonnet improves the recipes or templates and the
+   pilot runs again on 10 new cards.
+5. The measured tokens per card × number of cards gives the factory cost. Opus approves the budget before the
+   factory starts.
 
-1. **Expectations from ONLYOFFICE itself.** Use ONLYOFFICE Document Builder, which runs the same `Api` scripts
-   headless, to produce the expected results once per member. Check its licence (community edition) before use.
-   Plugin UI members, which Document Builder cannot run, get expectations from the Desktop Editors by a recorded
-   manual run.
-2. **Behavioural comparison, not file comparison.** A test sets a value through `Api` and reads it back through
-   `Api`, and also reads the UNO model directly. Comparing exported files between two engines is too noisy.
-   Accepted differences are recorded as MAPPED-LIMITED with the reason. No expectation is edited without a recorded
-   reason.
-3. **Generated tests.** One test per inventory row, from a template per member kind (getter, setter, collection,
-   constructor). Fixtures are ODF and OOXML files in `tests/fixtures/`.
-4. **Real plugins.** The top 50 plugins run unmodified, with a smoke script each. Plugins flagged in step 1 for
-   dynamic method names also get a runtime trace of the calls actually made. Results go in `docs/PLUGIN_COMPAT.md`.
-5. **Performance budgets** from `RESULTS.md` and section 2.3 run on every package; a package may not break an
-   earlier budget.
-6. **Fuzz and abuse:** malformed arguments, infinite loops, huge strings, handles used after their command ended,
-   attempts to reach denied methods (section 2.2). Nothing may crash LibreOffice or escape the sandbox.
-7. **Coverage report:** `scripts/coverage.py` joins inventory, usage, tests and states, prints counts per area and the
-   usage-weighted figure, and fails if a row is DONE without a passing test.
+## 6. Factory work packages
 
-## 5. Core changes to ask for in parallel (not blocking)
+Cards are generated in `API_USAGE.csv` order: most-used members first. A package stops at the 99 % usage line. Rows
+below the line get a state (usually TODO → DONE later, or WONTFIX) by a Haiku card that only classifies.
 
-One tracked issue per item, small upstreamable patches. Each moves rows from CORE to DONE:
-- **K-1:** register Calc functions at run time.
-- **K-2:** an API for ribbon tabs.
-- **K-3:** OOXML and ODF filter support for content controls and plugin objects.
-- **K-4:** the caret's screen position, and view events.
-- **K-5:** buttons on content controls.
-- **K-6:** a native window handle for gtk3 under Wayland.
+| # | Package | Factory share | Not for Haiku |
+|---|---|---|---|
+| WP1 | Plugin runtime (`Asc.plugin` members) | Tests and small members | Window and message plumbing (Sonnet) |
+| WP2 | Plugin types and windows | — | All (Sonnet: native windows) |
+| WP3 | Events | Event-name mapping rows | Listener wiring in C++ (Sonnet) |
+| WP4 | Writer `Api` | Most members | Tables, fields, footnotes, sections (Sonnet writes the first card of each class) |
+| WP5 | Calc `Api` | Most members | Charts, conditional formats (first card by Sonnet) |
+| WP6 | Impress `Api` | Most members | Masters and layouts (first card by Sonnet) |
+| WP7 | `executeMethod` catalogue | Most methods | Search and replace engine, track changes (Sonnet) |
+| WP8 | Menus and toolbar | — | Sonnet |
+| WP9 | Content controls and forms | Classification of rows | Emulation design (Opus), implementation (Sonnet). OOXML round trip is CORE |
+| WP10 | Macros and custom functions | — | Sonnet; run-time names are CORE |
+| WP11 | Manager and security | Fixture and smoke scripts | Sonnet |
+| WP12 | macOS and Linux browser hosts | — | Sonnet; the JS `Api` is shared |
+| WP13 | Top-50 plugin smoke scripts | One card per plugin: script, run, record result | Failures are triaged by Sonnet |
 
-LibreOffice core never goes to a pushed branch of this repository. Patches live in `C:\Oracle\lo` and go upstream
-as patches.
+**Rule for a new class:** Sonnet writes the first card of every new `Api*` class and adds any missing recipes.
+Haiku continues with the rest of that class. This keeps design out of Haiku's cards.
 
-## 6. Risks
+Sizing: the factory size is `cards × measured cost per card` from the pilot. Sonnet work per package is sized as
+features. No total is committed before F1, F2 and the pilot are done.
 
-| Risk | Effect | Handling |
-|---|---|---|
-| Inventory far larger than expected | Long schedule | Usage-weighted gate; the long tail is recorded, not implemented |
-| Plugin code reaches the bridge | Sandbox escape inside UNO | Section 2.2: closure-only primitive, frozen intrinsics, method-level allowlist, denylist, fuzz tests |
-| Core Reflection overhead | Slow commands | Bulk calls; M2 benchmark; fall back to C++ for the few hot members only |
-| Character positions in Writer | Slow Word `Api` on big documents | Offset table per command (section 2.3); 50 ms budget |
-| Model differences (styles, numbering, units) | Plugin output differs | Recorded as MAPPED-LIMITED; compatibility code only where a top-50 plugin needs it |
-| UNO calls cannot be cancelled on the main thread | Watchdog cannot stop one long call | Bulk calls with size limits; watchdog checked between bridge calls |
-| ONLYOFFICE changes the API | Coverage drifts | Re-run the inventory per ONLYOFFICE release |
-| Licence of copied material | Legal exposure | Names and signatures only; implementations from documentation and observed behaviour |
+## 7. Conformance testing
 
-## 7. Milestones and gates
+1. Expectations come from ONLYOFFICE Document Builder (F6). Plugin UI members get expectations from a recorded
+   Desktop Editors run.
+2. Tests are behavioural: set through `Api`, read back through `Api` and through UNO. No file diffs between engines.
+3. One generated test per inventory row (F7).
+4. The top 50 plugins have a smoke script each (WP13). Flagged plugins with dynamic method names get a runtime trace.
+5. Performance budgets run on every card through the checker (F9): 10 000 cells < 1 s in bulk, < 2 s per cell;
+   Writer `GetRange` < 50 ms on 300 pages; context menu < 300 ms.
+6. The fuzz suite runs on every card that changes a class. Nothing may crash LibreOffice or reach a denied method.
+7. `scripts/coverage.py` prints counts per area and the usage-weighted figure, and fails if a row is DONE without a
+   passing test.
+
+## 8. Core changes (parallel, not blocking)
+
+One upstream issue per item: K-1 run-time Calc functions, K-2 ribbon tab API, K-3 OOXML/ODF filter support for
+content controls and plugin objects, K-4 caret position and view events, K-5 buttons on content controls, K-6 native
+window handle for gtk3 under Wayland. Patches stay in `C:\Oracle\lo` and go upstream; LibreOffice core never goes to
+a pushed branch of this repository.
+
+## 9. Risks and milestones
+
+| Risk | Handling |
+|---|---|
+| Haiku drifts from the template, or "fixes" tests | Checker refuses edited tests and expectations; Sonnet spot checks 1 card in 10 |
+| Recipes missing, so escalations pile up | Pilot measures this; Sonnet adds recipes, not Haiku |
+| Plugin code reaches the bridge | Closure-only primitive, frozen intrinsics, method-level allowlist, denylist, fuzz suite |
+| Core Reflection or Writer offsets too slow | Budgets in the checker; C++ fallback only for measured hot members (Sonnet) |
+| Inventory far larger than expected | Usage-weighted gate; long tail is classified, not implemented |
+| Document Builder licence not usable | Fall back to Desktop Editors runs scripted through a plugin; slower, Sonnet task |
+| ONLYOFFICE changes the API | Re-run F1 per release; new rows become new cards |
 
 | Milestone | Gate |
 |---|---|
-| M0 | `PLAN_NEXT.md` phases 1–2 done: the prototype is built and measured; ADR-001 written |
-| M1 | Inventory and usage committed |
-| M2 | Generic bridge, security measures and conversion layer merged; step 2 exit criteria met; `members per week` measured; package sizes computed |
-| M3 | WP1–WP3 done; the 3 plugins of `PLAN_NEXT.md` phase 4 run unmodified |
-| M4 | WP4–WP7 done up to the 99 % usage line; compatibility report published |
-| M5 | WP8–WP11 done; CORE rows have upstream issue numbers |
-| M6 | WP12 done; the section 0 gate is met on all platforms |
+| M0 | `PLAN_NEXT.md` phases 1–2 done; ADR-001 written |
+| M1 | F1, F2 done: inventory and usage committed |
+| M2 | F3–F9 and D1 done; foundation exit checks pass |
+| M3 | Pilot gate met; factory budget approved (Opus) |
+| M4 | WP1–WP3 done; the 3 plugins of `PLAN_NEXT.md` phase 4 run unmodified |
+| M5 | WP4–WP7 up to the 99 % line; WP13 smoke results published |
+| M6 | WP8–WP12 done; CORE rows have upstream issue numbers; section 0 gate met |
 
-Go / no-go reviews happen at M0 (ADR-001) and at M2, where the bridge cost and the real development rate are known.
+Go / no-go reviews: M0 (ADR-001), M2 (bridge cost known), M3 (factory cost known).
 
-## 8. Review log
+## 10. Review log
 
-### Revision 2: review and challenge of revision 1
+### Revision 3: can Haiku execute it?
 
 | # | Finding | Change |
 |---|---|---|
-| R-1 | **Security hole in the design.** Revision 1 said "allowlist of services and interfaces". An interface-level allowlist exposes every method of that interface; for example `XModel` leads to the frames and `XStorable` to arbitrary file writes. Also, the current code exposes `__ph_call` on the global object, so plugin code can bypass the `Api` layer | Section 2.2: method-level allowlist generated from the `Api` sources, fixed denylist, primitive only in a closure, frozen intrinsics, fuzz tests. Required before the first generic call |
-| R-2 | **Unfounded estimate.** 40–55 person-weeks was not derived from a count. For a few thousand members it implies more than ten members per day with tests | Fixed total removed. Sizing formula with a rate measured in M2 |
-| R-3 | **Wrong primary target.** "≥ 90 % of rows by count" pays for members no plugin uses | Usage-weighted gate (99 % of the top 50 plugins' calls). Count is reported only |
-| R-4 | **Expectations recorded through Document Server** are hard to automate for `Api` members | ONLYOFFICE Document Builder runs the same `Api` headless; Desktop Editors only for UI members |
-| R-5 | **File-diff testing** between two engines produces noise | Behavioural round trip through `Api` and UNO |
-| R-6 | **Cross-cutting conversion work** (units, colours, enums, addresses, text positions) was spread over the work packages and would be built several times | Section 2.3, built once in step 2 |
-| R-7 | **Missing performance risk:** character-position ranges in Writer | Offset table design and a 50 ms budget on a 300-page document |
-| R-8 | **Core Reflection cost** was not mentioned; the exit criterion "within 20 % of C++" compared to an unmeasured baseline | Absolute budgets in step 2 exit criteria; C++ fallback only for measured hot members |
-| R-9 | **Static usage counting** misses dynamic `executeMethod` names | Runtime trace for flagged plugins (section 4.4) |
-| R-10 | **Over-engineering:** lazy per-class loading of `Api` files was proposed without a measured start-up cost | Removed; revisit only if start-up is measured as slow |
-| R-11 | **Inventory lacked a read/edit column**, so the permission split had no source | Column added in step 1 |
+| H-1 | Revision 2 had no division of labour. Most tasks mixed design and typing, so they needed a strong model throughout | Section 1: Haiku fills templates only; Sonnet builds the foundation once; Opus makes the decisions |
+| H-2 | No way to test a member without the GUI and a rebuild. Each attempt would have cost a build and a manual run | F5: headless test runner as a UNO service plus `PLUGINHOST_API_DIR`, so JS edits are tested in seconds. The engine already loads JS from disk at run time (`command_engine.cxx`, `readShim`), so this needs no new loading mechanism |
+| H-3 | Haiku would have searched the LibreOffice source for UNO calls: slow, costly and error-prone | F8: tested recipe files; rule 2 in section 4 forbids searching the source |
+| H-4 | Expectations could be "fixed" by the executor to make tests pass | F6 and F9: expectation files are generated, read-only for cards, and the checker refuses edits |
+| H-5 | Tasks were too large: a work package is weeks of work, far beyond one agent context | Section 4: cards of ≤ 10 members of one class, generated by script |
+| H-6 | MAPPED-LIMITED was a judgement call at each member | D1: Opus writes the acceptable-difference rules once; Haiku applies them by number or escalates |
+| H-7 | No evidence that Haiku can do the work at an acceptable rate | Section 5: pilot with a measurable gate before the factory starts |
+| H-8 | New classes need design (first-of-kind patterns) | Rule: Sonnet writes the first card of every new class |
+| H-9 | Several packages (windows, menus, macros, platforms, C++ listeners) are not template work | Marked "not for Haiku" in section 6 instead of pretending they fit |
+| H-10 | Escalations had no format, so they would be expensive to triage | Section 4 rule 3: test output, attempts, one-line cause guess |
+| H-11 | Over-engineering risk: building all templates and recipes up front | Recipes grow per area: Sonnet adds them when writing each class's first card, and the pilot covers only Calc, Writer and `executeMethod` |
 
-What revision 1 got right and is kept: the inventory-first order, the generic bridge over per-method C++, the
-rejection of `jsuno`, the CORE state with K-numbers, the separation of the browser host per platform, and the M0 and
-M2 go / no-go points.
+### Revision 2: review of revision 1 (kept)
+
+| # | Finding | Change |
+|---|---|---|
+| R-1 | Interface-level allowlist exposed whole interfaces; global `__ph_call` let plugin code skip the `Api` layer | Method-level generated allowlist, denylist, closure-only primitive, frozen intrinsics, fuzz tests |
+| R-2 | 40–55 person-week estimate had no basis | Removed; sizing from measured rates |
+| R-3 | Count-based target paid for unused members | Usage-weighted gate |
+| R-4 | Expectations via Document Server were hard to automate | Document Builder |
+| R-5 | File diffs between engines are noisy | Behavioural round trip |
+| R-6 | Conversion work was spread over packages | One conversion layer |
+| R-7 | Writer character positions were a hidden performance risk | Offset table and 50 ms budget |
+| R-8 | Core Reflection cost was unmeasured | Absolute budgets; C++ fallback for hot members |
+| R-9 | Static usage counting misses dynamic names | Runtime traces |
+| R-10 | Lazy loading was over-engineering | Removed |
+| R-11 | No read/edit source for permissions | Inventory column |
