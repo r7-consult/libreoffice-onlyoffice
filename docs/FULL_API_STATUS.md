@@ -7,7 +7,8 @@ or ONLYOFFICE build was run, and no UNO call was executed.
 
 | Item | Result | Where |
 |---|---|---|
-| F1 inventory | Built from source, not from the SDK declarations (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names, from 5,974 example files | `scripts/inventory.py`, `docs/API_INVENTORY.csv` |
+| F1 inventory | Names from call sites in the examples (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names. Signatures and read\|edit added from the `sdkjs` declarations for the 2,061 method rows with examples: 1,942 signatures; read 1,308, edit 491, UNCLASSIFIED 262 (119 with no declaration, 143 unclear). Heuristic, spot-checked only | `scripts/inventory.py`, `docs/API_INVENTORY.csv`, `docs/API_CLASSIFICATION_RULES.md` |
+| D1 decisions (proposed) | Permission policy: option B, first-use prompt per plugin. Acceptable differences: MLR-1 to MLR-15. Both wait for user sign-off | `docs/adr/ADR-002-permission-policy.md`, `docs/adr/ADR-003-mapped-limited-rules.md` |
 | F2 usage | 38 plugins from `sdkjs-plugins`, 139 names. 73 names are flagged `in_api_examples=no` (helpers bundled in plugins, such as `Tween` and `Decorate`) | `docs/API_USAGE.csv` |
 | F7 templates and generator | Five member kinds, five test kinds, `new_card.py` with refusals. Generated class and test files parse with `node --check` (checked in a sandbox copy) | `templates/`, `scripts/new_card.py` |
 | F9 card checker | Static checks: card fields, member limit, protected paths, tests unchanged vs HEAD, line limit, denied names. Tested on 4 failing cards and 1 clean card; the clean card returns BLOCKED because the runner is missing | `scripts/check_card.py` |
@@ -23,8 +24,8 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 | F5 headless runner `tests/run_member.py` | Running LibreOffice headless | Build machine |
 | F6 expectations from Document Builder | Running Document Builder; licence check | Opus decision, then Sonnet on a machine that can run it |
 | F8 recipes | Each snippet must be tested | Sonnet, after F5 |
-| D1 decisions (permission policy, MAPPED-LIMITED rules) | Human decision | Opus, then the user |
-| read\|edit classification (`API_INVENTORY.csv` column) | Needs the SDK declarations or a manual pass | Sonnet; blocks the allowlist in F3 |
+| D1 sign-off (ADR-002, ADR-003 are Proposed) | Open questions listed in the ADRs, and the Document Builder licence | The user |
+| read\|edit for the 262 UNCLASSIFIED rows | Needs a judgement pass or a manual check | Sonnet, then spot-check; blocks the allowlist in F3 |
 | Pilot (10 cards) | F5, F6, F8 | After the foundation |
 
 ## Deviations from the plan (record these in the decision log)
