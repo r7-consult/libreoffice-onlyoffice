@@ -7,7 +7,7 @@ or ONLYOFFICE build was run, and no UNO call was executed.
 
 | Item | Result | Where |
 |---|---|---|
-| F1 inventory | Names from call sites in the examples (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names. Signatures and read\|edit added from the `sdkjs` declarations for the 2,061 method rows with examples: 1,942 signatures; read 1,308, edit 491, UNCLASSIFIED 262 (119 with no declaration, 143 unclear). Heuristic, spot-checked only | `scripts/inventory.py`, `docs/API_INVENTORY.csv`, `docs/API_CLASSIFICATION_RULES.md` |
+| F1 inventory | Names from call sites in the examples (see deviations). 2,114 rows: 2,063 methods and 51 `executeMethod` names. Signatures and read\|edit added from the `sdkjs` declarations for the 2,061 method rows with examples: 1,942 signatures; read 1,372, edit 582, UNCLASSIFIED 109 (99 with no declaration in sdkjs, 10 unclear). The last 155 decisions (64 read, 91 edit) and the 264 rows they cover come from a classification pass by three subagents; not yet checked by a person | `scripts/inventory.py`, `docs/API_INVENTORY.csv`, `docs/API_CLASSIFICATION_RULES.md` |
 | D1 decisions (proposed) | Permission policy: option B, first-use prompt per plugin. Acceptable differences: MLR-1 to MLR-15. Both wait for user sign-off | `docs/adr/ADR-002-permission-policy.md`, `docs/adr/ADR-003-mapped-limited-rules.md` |
 | F2 usage | 38 plugins from `sdkjs-plugins`, 139 names. 73 names are flagged `in_api_examples=no` (helpers bundled in plugins, such as `Tween` and `Decorate`) | `docs/API_USAGE.csv` |
 | F7 templates and generator | Five member kinds, five test kinds, `new_card.py` with refusals. Generated class and test files parse with `node --check` (checked in a sandbox copy) | `templates/`, `scripts/new_card.py` |
@@ -51,3 +51,17 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 2. Opus: decide the permission policy and the MAPPED-LIMITED rules (D1), and check the Document Builder licence.
 3. Sonnet, on the build machine: F3, F4, F5, then F6, F8, then the read|edit classification.
 4. Pilot (plan section 5), only after step 3.
+
+## Classification pass: open judgement calls (check before the allowlist uses these)
+
+The 155 decisions from the pass were made by reading sdkjs bodies. The agents flagged these for review:
+
+- `ApiRange.Copy` is edit in cell, but the majority class was read. `SetOpacity` is edit by majority (pdf), while the word watermark variant only sets a detached settings object.
+- `GetStartPage` is edit only because it calls `ForceRecalculate`, which the rules count as an edit. It is really a getter.
+- `RecognizeContent` (pdf) is edit: it calls `EditPage`, which adds drawings.
+- `RecalculateAllFormulas` and `ShowDetails` are edit. `ShowDetails` drills into a new sheet, so it may need its own rule.
+- `Find` is read: it runs a search and sets `_searchOptions` on the object.
+- `CreateGroup` is read, but `builder_CreateGroup` was not traced. `GetFormRoles` and `GetTablesOfFigures` are read from internal declarations only.
+- `GetRightBorder` and `GetTopBorder` follow the `GetLeftBorder` getter pattern without reading their bodies.
+- Unclear, left UNCLASSIFIED: `GetRangeBySelect`, `Redraw`, `GetKey`, `SetFormula` (declared only on word-internal classes), `SetMatchCase`, `GoTo`, `GoToPage`, `AddShape`, `AddImage`, `AddOleObject`.
+- 99 members have no declaration in sdkjs at all. They stay UNCLASSIFIED. They include the form creators, `AddListObject`, `GetSort`, `GetTablesOfContents`, `SetTableStyle`, `Traverse` and `RemoveSlide`.

@@ -11,7 +11,7 @@ M0009,method,GetRange,cell;common;pdf;plugin;slide;word,1604,yes,"(Start, End)",
 M0010,method,SetValue,cell;common;pdf;word,1555,yes,(value),edit,Examples/Cell/Api/Methods/AddComment.js
 M0011,method,CreateNoFill,cell;common;pdf;slide;word,1465,yes,(),read,Examples/Cell/Api/Methods/Color.js
 M0012,method,Push,cell;pdf;plugin;slide;word,1347,yes,(oElement),edit,Examples/Cell/Api/Methods/CreateNumbering.js
-M0013,method,CreateShape,common;pdf;slide;word,1325,yes,"(shapeType, width, height, fill, stroke)",UNCLASSIFIED,Examples/Enumerations/AnimationEffectType.js
+M0013,method,CreateShape,common;pdf;slide;word,1325,yes,"(shapeType, width, height, fill, stroke)",read,Examples/Enumerations/AnimationEffectType.js
 M0014,method,CreateParagraph,cell;pdf;plugin;slide;word,1199,yes,(),read,Examples/Cell/Api/Methods/CreateNumbering.js
 M0015,method,SetPosition,cell;common;pdf;slide;word,1170,yes,(position),edit,Examples/Cell/ApiDrawing/Methods/GetClassType.js
 M0016,method,GetContent,cell;pdf;slide;word,1139,yes,(),read,Examples/Cell/Api/Methods/CreateBullet.js
@@ -41,7 +41,7 @@ M0039,method,SetFontSize,cell;common;pdf;slide;word,225,yes,(fontSize),edit,Exam
 M0040,method,SetTitle,cell;pdf;slide;word,221,yes,(title),read,Examples/Cell/Api/Methods/GetCore.js
 M0041,method,SetSeriesFill,cell;pdf;slide;word,215,yes,"(oFill, nSeries, bAll)",edit,Examples/Cell/ApiChart/Methods/AddSeria.js
 M0042,method,GetRow,cell;pdf;slide;word,212,yes,(rowIndex),read,Examples/Cell/ApiRange/Methods/GetRow.js
-M0043,method,CreateChart,common;pdf;slide;word,208,yes,"(chartType, series, seriesNames, categoryNames, width, height, styleIndex, numFormats)",UNCLASSIFIED,Examples/Enumerations/ChartType.js
+M0043,method,CreateChart,common;pdf;slide;word,208,yes,"(chartType, series, seriesNames, categoryNames, width, height, styleIndex, numFormats)",read,Examples/Enumerations/ChartType.js
 M0044,method,GetFormatConditions,cell,203,yes,(),edit,Examples/Cell/ApiAboveAverage/Methods/Delete.js
 M0045,method,MillimetersToEmus,cell;form;pdf;slide;word,203,yes,(mm),read,Examples/Cell/Api/Methods/GetByInternalId.js
 M0046,method,GetTextPr,cell;pdf;slide;word,192,yes,(),read,Examples/Cell/ApiParagraph/Methods/SetLanguage.js
@@ -49,8 +49,8 @@ M0047,method,CreateRadialGradientFill,cell;pdf;slide;word,184,yes,(gradientStops
 M0048,method,SetBasedOn,word,183,yes,(oStyle),edit,Examples/Word/Api/Methods/CreateParaPr.js
 M0049,method,HexColor,cell;pdf;slide;word,160,yes,(hexString),read,Examples/Cell/Api/Methods/GetByInternalId.js
 M0050,method,GetTextRange,cell;pdf;slide;word,149,yes,(),read,Examples/Cell/ApiDocumentContent/Methods/GetTextRange.js
-M0051,method,AddDataField,cell,146,yes,(field),UNCLASSIFIED,Examples/Cell/Api/Methods/GetAllPivotTables.js
-M0052,method,InsertPivotNewWorksheet,cell,145,yes,"(dataRef, newSheetName)",UNCLASSIFIED,Examples/Cell/Api/Methods/GetAllPivotTables.js
+M0051,method,AddDataField,cell,146,yes,(field),edit,Examples/Cell/Api/Methods/GetAllPivotTables.js
+M0052,method,InsertPivotNewWorksheet,cell,145,yes,"(dataRef, newSheetName)",edit,Examples/Cell/Api/Methods/GetAllPivotTables.js
 M0053,method,AddFields,cell,141,yes,(options),edit,Examples/Cell/Api/Methods/GetPivotByName.js
 M0054,method,SetHeight,cell;pdf;slide;word,129,yes,(nValue),edit,Examples/Cell/Api/Methods/CreateCustomGeometry.js
 M0055,method,GetText,cell;pdf;slide;word,126,yes,(),read,Examples/Cell/Api/Methods/AddComment.js
@@ -74,7 +74,7 @@ M0072,method,GetCore,cell;slide;word,96,yes,(),read,Examples/Cell/Api/Methods/Ge
 M0073,method,SetFill,cell;pdf;slide;word,95,yes,(fill),read,Examples/Cell/Api/Methods/CreateCustomGeometry.js
 M0074,method,AddListObject,cell,93,yes,,UNCLASSIFIED,Examples/Cell/ApiListColumn/Methods/Delete.js
 M0075,method,SetFontFamily,cell;pdf;slide;word,93,yes,(fontFamily),edit,Examples/Cell/Api/Methods/CreateRun.js
-M0076,method,Copy,cell;common;pdf;slide;word,92,yes,(),UNCLASSIFIED,Examples/Cell/ApiChart/Methods/Copy.js
+M0076,method,Copy,cell;common;pdf;slide;word,92,yes,(),read,Examples/Cell/ApiChart/Methods/Copy.js
 M0077,method,GetMaster,slide,92,yes,(),read,Examples/Slide/Api/Methods/CreateLayout.js
 M0078,method,Color,cell;common;pdf;slide;word,90,yes,"(r, g, b, a)",read,Examples/Cell/Api/Methods/Color.js
 M0079,method,RemoveAllElements,cell;pdf;slide;word,88,yes,(),edit,Examples/Cell/Api/Methods/CreateParagraph.js
@@ -100,7 +100,7 @@ M0098,method,GetNodes,cell;slide;word,61,yes,(xPath),read,Examples/Cell/ApiCusto
 M0099,method,GetPivotFields,cell,61,yes,(field),read,Examples/Cell/ApiPivotField/Methods/AutoSort.js
 M0100,method,GetActions,pdf,60,yes,(),read,Examples/Pdf/Api/Methods/CreateGoToAction.js
 M0101,method,SetTextPr,cell;pdf;slide;word,60,yes,(oTextPr),edit,Examples/Cell/Api/Methods/CreateTextPr.js
-M0102,method,AddChart,cell,59,yes,"(sDataRange, bInRows, sType, nStyleIndex, nExtX, nExtY, nFromCol, nColOffset, nFromRow, nRowOffset)",UNCLASSIFIED,Examples/Cell/ApiChart/Methods/AddSeria.js
+M0102,method,AddChart,cell,59,yes,"(sDataRange, bInRows, sType, nStyleIndex, nExtX, nExtY, nFromCol, nColOffset, nFromRow, nRowOffset)",edit,Examples/Cell/ApiChart/Methods/AddSeria.js
 M0103,method,GetFill,cell;pdf;slide;word,59,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetFill.js
 M0104,method,GetAllComments,cell;slide;word,58,yes,(),read,Examples/Cell/Api/Methods/GetAllComments.js
 M0105,method,CreateInlineLvlSdt,word,56,yes,(),edit,Examples/Word/Api/Methods/CreateInlineLvlSdt.js
@@ -115,16 +115,16 @@ M0113,method,GetPath,cell;pdf;slide;word,52,yes,(nIndex),read,Examples/Cell/ApiG
 M0114,method,QuadBezTo,cell;pdf;slide;word,52,yes,"(x1, y1, x2, y2)",read,Examples/Cell/ApiPath/Methods/ArcTo.js
 M0115,method,SetCaps,cell;pdf;slide;word,52,yes,(isCaps),edit,Examples/Cell/ApiParagraph/Methods/SetCaps.js
 M0116,method,SetTableLook,pdf;slide;word,52,yes,"(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)",edit,Examples/Pdf/ApiTable/Methods/GetTableLook.js
-M0117,method,AddDatabar,cell,51,yes,(),UNCLASSIFIED,Examples/Cell/ApiDatabar/Methods/Delete.js
+M0117,method,AddDatabar,cell,51,yes,(),edit,Examples/Cell/ApiDatabar/Methods/Delete.js
 M0118,method,GetAddress,cell,50,yes,"(RowAbs, ColAbs, RefStyle, External, RelativeTo)",read,Examples/Cell/Api/Methods/attachEvent.js
 M0119,method,SetImage,form;pdf;word,50,yes,"(imageUrl, appearance)",edit,Examples/Forms/Api/Methods/CreatePictureForm.js
 M0120,method,GetWidth,cell;pdf;slide;word,49,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetLine.js
 M0121,method,AddInlineLvlSdt,word,48,yes,(oSdt),edit,Examples/Word/Api/Methods/CreateInlineLvlSdt.js
 M0122,method,CreateComboBoxForm,common;form;word,48,yes,,UNCLASSIFIED,Examples/Enumerations/ComboBoxFormPr.js
-M0123,method,CreateShd,cell;common;pdf;slide;word,48,yes,"(type, color)",UNCLASSIFIED,Examples/Cell/Api/Methods/CreateShd.js
+M0123,method,CreateShd,cell;common;pdf;slide;word,48,yes,"(type, color)",read,Examples/Cell/Api/Methods/CreateShd.js
 M0124,method,SetShd,cell;common;pdf;slide;word,48,yes,"(type, r, g, b)",edit,Examples/Cell/Api/Methods/CreateShd.js
 M0125,method,CreateButtonField,pdf,47,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateButtonField.js
-M0126,method,GetTablePr,slide;word,47,yes,(),UNCLASSIFIED,Examples/Slide/ApiStyle/Methods/GetTablePr.js
+M0126,method,GetTablePr,slide;word,47,yes,(),read,Examples/Slide/ApiStyle/Methods/GetTablePr.js
 M0127,method,GetParent,cell;common;pdf;slide;word,46,yes,(),read,Examples/Cell/ApiAboveAverage/Methods/GetParent.js
 M0128,method,SetUnderline,cell;common;pdf;slide;word,46,yes,(isUnderline),edit,Examples/Cell/ApiFont/Methods/GetUnderline.js
 M0129,method,CreatePictureForm,common;form;word,44,yes,,UNCLASSIFIED,Examples/Enumerations/PictureFormPr.js
@@ -149,7 +149,7 @@ M0147,method,SetColumnWidth,cell;pdf;slide;word,36,yes,"(columnIndex, width)",ed
 M0148,method,AddSlide,plugin;slide,35,yes,"(oSlide, nIndex)",edit,Examples/Plugins/Slide/Api/Methods/GoToSlide.js
 M0149,method,GetCount,cell;form;slide;word,35,yes,(),read,Examples/Cell/ApiAboveAverage/Methods/Delete.js
 M0150,method,GetInternalId,cell;pdf;slide;word,35,yes,(),read,Examples/Cell/Api/Methods/GetByInternalId.js
-M0151,method,AddIconSetCondition,cell,34,yes,(),UNCLASSIFIED,Examples/Cell/ApiFormatConditions/Methods/AddIconSetCondition.js
+M0151,method,AddIconSetCondition,cell,34,yes,(),edit,Examples/Cell/ApiFormatConditions/Methods/AddIconSetCondition.js
 M0152,method,CreateComplexForm,form;word,34,yes,,UNCLASSIFIED,Examples/Forms/Api/Methods/CreateComplexForm.js
 M0153,method,GetHex,cell;pdf;slide;word,34,yes,(),read,Examples/Cell/ApiColor/Methods/FromJSON.js
 M0154,method,SetDoubleStrikeout,cell;pdf;slide;word,33,yes,(isDoubleStrikeout),edit,Examples/Cell/ApiParagraph/Methods/SetDoubleStrikeout.js
@@ -158,7 +158,7 @@ M0156,method,GetFinalSection,word,32,yes,(),read,Examples/Word/ApiDocument/Metho
 M0157,method,GetFont,cell;common,32,yes,(),read,Examples/Cell/ApiAboveAverage/Methods/Delete.js
 M0158,method,GetItem,cell;common;word,32,yes,(nameOrIndex),read,Examples/Cell/ApiAreas/Methods/GetItem.js
 M0159,method,SetSpacingLine,cell;common;pdf;slide;word,32,yes,"(nLine, sLineRule)",edit,Examples/Cell/ApiParagraph/Methods/GetSpacingLineRule.js
-M0160,method,CreateImage,pdf;slide;word,31,yes,"(imageSrc, width, height)",UNCLASSIFIED,Examples/Pdf/Api/Methods/CreateImage.js
+M0160,method,CreateImage,pdf;slide;word,31,yes,"(imageSrc, width, height)",read,Examples/Pdf/Api/Methods/CreateImage.js
 M0161,method,CreateNumbering,cell;common;pdf;slide;word,31,yes,"(numType, startAt)",read,Examples/Cell/Api/Methods/CreateNumbering.js
 M0162,method,CreateSlide,plugin;slide,31,yes,(),read,Examples/Plugins/Slide/Api/Methods/GoToSlide.js
 M0163,method,SetLanguage,cell;pdf;slide;word,31,yes,(langId),edit,Examples/Cell/Api/Methods/GetCore.js
@@ -179,12 +179,12 @@ M0177,method,SetOutLine,cell;pdf;slide;word,28,yes,(stroke),edit,Examples/Cell/A
 M0178,method,AddTabStop,cell;pdf;slide;word,27,yes,(),edit,Examples/Cell/ApiParagraph/Methods/AddTabStop.js
 M0179,method,GetId,cell;plugin;slide;word,27,yes,(),read,Examples/Cell/Api/Methods/GetCommentById.js
 M0180,method,SetMarkerFill,cell;pdf;slide;word,27,yes,"(oFill, nSeries, nMarker, bAllMarkers)",edit,Examples/Cell/ApiChart/Methods/SetHorAxisMajorTickMark.js
-M0181,method,AddTop10,cell,26,yes,(),UNCLASSIFIED,Examples/Cell/ApiFormatConditions/Methods/AddTop10.js
+M0181,method,AddTop10,cell,26,yes,(),edit,Examples/Cell/ApiFormatConditions/Methods/AddTop10.js
 M0182,method,GetElementsCount,cell;pdf;slide;word,26,yes,(),read,Examples/Cell/ApiDocumentContent/Methods/GetElementsCount.js
 M0183,method,GetValidation,cell,26,yes,(),edit,Examples/Cell/ApiRange/Methods/GetValidation.js
 M0184,method,MoveCursorToPos,cell;pdf;slide;word,26,yes,(nPos),edit,Examples/Cell/ApiTextRange/Methods/MoveCursorToPos.js
 M0185,method,SetHighlight,cell;common;pdf;slide;word,26,yes,(sColor),edit,Examples/Cell/ApiTextRange/Methods/SetHighlight.js
-M0186,method,SetType,cell;common;pdf;slide;word,26,yes,(type),UNCLASSIFIED,Examples/Cell/ApiColorScaleCriterion/Methods/SetType.js
+M0186,method,SetType,cell;common;pdf;slide;word,26,yes,(type),edit,Examples/Cell/ApiColorScaleCriterion/Methods/SetType.js
 M0187,method,GetPriority,cell,25,yes,(),read,Examples/Cell/ApiAboveAverage/Methods/SetFirstPriority.js
 M0188,method,GetTimeLine,common;slide,25,yes,(),read,Examples/Enumerations/AnimationEffectType.js
 M0189,method,SetHyperlink,cell;slide,25,yes,"(range, address, subAddress, screenTip, textToDisplay)",read,Examples/Cell/ApiHyperlink/Methods/Delete.js
@@ -210,15 +210,15 @@ M0208,method,Search,pdf;slide;word,24,yes,"(sText, isMatchCase)",edit,Examples/P
 M0209,method,SetAdjValue,cell;pdf;slide;word,24,yes,"(sName, nValue)",read,Examples/Cell/ApiGeometry/Methods/AddAdj.js
 M0210,method,SetStrikeout,cell;pdf;slide;word,24,yes,(isStrikeout),edit,Examples/Cell/ApiParagraph/Methods/SetStrikeout.js
 M0211,method,SetTextRect,cell;pdf;slide;word,24,yes,"(sLeft, sTop, sRight, sBottom)",edit,Examples/Cell/ApiGeometry/Methods/AddAdj.js
-M0212,method,AddColorScale,cell,23,yes,(ColorScaleType),UNCLASSIFIED,Examples/Cell/ApiColorScale/Methods/Delete.js
+M0212,method,AddColorScale,cell,23,yes,(ColorScaleType),edit,Examples/Cell/ApiColorScale/Methods/Delete.js
 M0213,method,AddEffect,common;slide,23,yes,"(drawing, effectType, trigger)",read,Examples/Enumerations/AnimationEffectType.js
 M0214,method,CreateOleObject,plugin;slide;word,23,yes,"(sImageSrc, nWidth, nHeight, sData, sAppId)",edit,Examples/Plugins/Slide/Api/Methods/RemoveOleObject.js
 M0215,method,GetLevel,word,23,yes,(nLevel),read,Examples/Word/Api/Methods/CreateNumbering.js
-M0216,method,GetTableCellPr,common;word,23,yes,(),UNCLASSIFIED,Examples/Enumerations/TableStyleOverrideType.js
+M0216,method,GetTableCellPr,common;word,23,yes,(),read,Examples/Enumerations/TableStyleOverrideType.js
 M0217,method,IsFixed,word,23,yes,(),read,Examples/Word/ApiCheckBoxForm/Methods/IsFixed.js
 M0218,method,SetPlaceholderText,word,23,yes,(sText),edit,Examples/Word/ApiBlockLvlSdt/Methods/GetPlaceholderText.js
-M0219,method,AddUniqueValues,cell,22,yes,(),UNCLASSIFIED,Examples/Cell/ApiFormatConditions/Methods/AddUniqueValues.js
-M0220,method,GetFormRoles,form;word,22,yes,,UNCLASSIFIED,Examples/Forms/ApiDocument/Methods/GetFormRoles.js
+M0219,method,AddUniqueValues,cell,22,yes,(),edit,Examples/Cell/ApiFormatConditions/Methods/AddUniqueValues.js
+M0220,method,GetFormRoles,form;word,22,yes,,read,Examples/Forms/ApiDocument/Methods/GetFormRoles.js
 M0221,method,GetMainSequence,common;slide,22,yes,(),read,Examples/Enumerations/AnimationEffectType.js
 M0222,method,GetTableStyles,cell,22,yes,(),read,Examples/Cell/ApiTableStyle/Methods/Delete.js
 M0223,method,SetIndFirstLine,cell;pdf;slide;word,22,yes,(nValue),edit,Examples/Cell/ApiParagraph/Methods/GetIndFirstLine.js
@@ -237,15 +237,15 @@ M0235,method,AddWidget,pdf,20,yes,"(pageIndex, rect, isCopy)",edit,Examples/Pdf/
 M0236,method,CreateComboBoxContentControl,word,20,yes,"(list, selected)",edit,Examples/Word/Api/Methods/CreateComboBoxContentControl.js
 M0237,method,CreatePresetColor,cell;common;pdf;slide;word,20,yes,(presetColor),read,Examples/Cell/Api/Methods/CreatePresetColor.js
 M0238,method,CreateShadow,cell;pdf;slide;word,20,yes,(settings),read,Examples/Cell/Api/Methods/CreateShadow.js
-M0239,method,GetChartType,cell;pdf;slide;word,20,yes,(),UNCLASSIFIED,Examples/Cell/ApiChart/Methods/GetAllSeries.js
+M0239,method,GetChartType,cell;pdf;slide;word,20,yes,(),read,Examples/Cell/ApiChart/Methods/GetAllSeries.js
 M0240,method,GetDropdownList,word,20,yes,(),read,Examples/Word/ApiContentControlList/Methods/Add.js
 M0241,method,GetLanguage,cell;pdf;slide;word,20,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
 M0242,method,GetSeries,cell;pdf;slide;word,20,yes,(nIdx),read,Examples/Cell/ApiChart/Methods/GetSeries.js
 M0243,method,SetBullet,cell;pdf;slide,20,yes,(oBullet),edit,Examples/Cell/Api/Methods/CreateBullet.js
 M0244,method,SetShadow,cell;pdf;slide;word,20,yes,(shadow),read,Examples/Cell/Api/Methods/CreateShadow.js
-M0245,method,AddAboveAverage,cell,19,yes,(),UNCLASSIFIED,Examples/Cell/ApiAboveAverage/Methods/Delete.js
+M0245,method,AddAboveAverage,cell,19,yes,(),edit,Examples/Cell/ApiAboveAverage/Methods/Delete.js
 M0246,method,CreatePatternFill,cell;common;pdf;slide;word,19,yes,"(patternType, bgColor, fgColor)",read,Examples/Cell/Api/Methods/CreatePatternFill.js
-M0247,method,CreateThemeColorScheme,slide,19,yes,"(arrColors, sName)",UNCLASSIFIED,Examples/Slide/Api/Methods/CreateTheme.js
+M0247,method,CreateThemeColorScheme,slide,19,yes,"(arrColors, sName)",read,Examples/Slide/Api/Methods/CreateTheme.js
 M0248,method,GetDescription,cell;pdf;slide;word,19,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
 M0249,method,GetIndex,cell;pdf;slide;word,19,yes,(),read,Examples/Cell/ApiColorScaleCriterion/Methods/GetIndex.js
 M0250,method,GetTag,word,19,yes,(),read,Examples/Word/ApiBlockLvlSdt/Methods/GetTag.js
@@ -289,19 +289,19 @@ M0287,method,SetTableBorderInsideH,slide;word,15,yes,"(type, size, fill)",edit,E
 M0288,method,SetTableBorderInsideV,slide;word,15,yes,"(type, size, fill)",edit,Examples/Slide/ApiTablePr/Methods/SetTableBorderInsideV.js
 M0289,method,SetTableBorderLeft,slide;word,15,yes,"(type, size, fill)",edit,Examples/Slide/ApiTablePr/Methods/SetTableBorderLeft.js
 M0290,method,SetTableBorderRight,slide;word,15,yes,"(type, size, fill)",edit,Examples/Slide/ApiTablePr/Methods/SetTableBorderRight.js
-M0291,method,SetTablePr,slide;word,15,yes,(tablePr),UNCLASSIFIED,Examples/Slide/Api/Methods/CreateTablePr.js
+M0291,method,SetTablePr,slide;word,15,yes,(tablePr),edit,Examples/Slide/Api/Methods/CreateTablePr.js
 M0292,method,SetTag,word,15,yes,(tag),edit,Examples/Word/ApiBlockLvlSdt/Methods/GetTag.js
 M0293,method,SetVerPosition,word,15,yes,"(sRelativeFrom, nDistance, bPercent)",edit,Examples/Word/Api/Methods/CreateGroup.js
 M0294,method,SetVertAlign,cell;pdf;slide;word,15,yes,(type),edit,Examples/Cell/ApiRun/Methods/SetVertAlign.js
-M0295,method,AddBookmark,word,14,yes,,UNCLASSIFIED,Examples/Word/ApiBookmark/Methods/Delete.js
+M0295,method,AddBookmark,word,14,yes,,edit,Examples/Word/ApiBookmark/Methods/Delete.js
 M0296,method,CreateMath,cell;pdf;slide;word,14,yes,"(text, format)",edit,Examples/Cell/Api/Methods/CreateMath.js
 M0297,method,CreatePlaceholder,slide,14,yes,(sType),edit,Examples/Slide/Api/Methods/CreateLayout.js
 M0298,method,CreateThemeFontScheme,slide,14,yes,"(mjLatin, mjEa, mjCs, mnLatin, mnEa, mnCs, sName)",read,Examples/Slide/Api/Methods/CreateTheme.js
-M0299,method,GetDataFields,cell,14,yes,(field),UNCLASSIFIED,Examples/Cell/ApiPivotDataField/Methods/GetCaption.js
+M0299,method,GetDataFields,cell,14,yes,(field),read,Examples/Cell/ApiPivotDataField/Methods/GetCaption.js
 M0300,method,GetHyperlinks,cell,14,yes,(),read,Examples/Cell/ApiHyperlink/Methods/Delete.js
 M0301,method,GetOutlineLvl,cell;pdf;slide;word,14,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetOutlineLvl.js
 M0302,method,SetLayout,pdf,14,yes,(layout),edit,Examples/Pdf/ApiButtonWidget/Methods/GetBehavior.js
-M0303,method,AddDefName,cell,13,yes,"(sName, sRef, isHidden)",UNCLASSIFIED,Examples/Cell/Api/Methods/AddDefName.js
+M0303,method,AddDefName,cell,13,yes,"(sName, sRef, isHidden)",edit,Examples/Cell/Api/Methods/AddDefName.js
 M0304,method,AddProtectedRange,cell,13,yes,"(sTitle, sDataRange)",read,Examples/Cell/ApiProtectedRange/Methods/AddUser.js
 M0305,method,CreateBullet,cell;pdf;slide,13,yes,(sSymbol),read,Examples/Cell/Api/Methods/CreateBullet.js
 M0306,method,CreateRadiobuttonField,pdf,13,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateRadiobuttonField.js
@@ -316,7 +316,7 @@ M0314,method,SetSpeed,slide,13,yes,(speed),edit,Examples/Slide/Api/Methods/Creat
 M0315,method,CreateGoToAction,pdf,12,yes,"(page, goToType, zoom, rect)",read,Examples/Pdf/Api/Methods/CreateGoToAction.js
 M0316,method,CreateHyperlink,slide;word,12,yes,"(link, tooltip)",edit,Examples/Slide/Api/Methods/CreateHyperlink.js
 M0317,method,CreateTheme,slide,12,yes,"(sName, oMaster, oClrScheme, oFormatScheme, oFontScheme)",read,Examples/Slide/Api/Methods/CreateTheme.js
-M0318,method,CreateWordArt,common;slide;word,12,yes,"(oTextPr, sText, sTransform, oFill, oStroke, nRotAngle, nWidth, nHeight, nIndLeft, nIndTop)",UNCLASSIFIED,Examples/Enumerations/TextTransform.js
+M0318,method,CreateWordArt,common;slide;word,12,yes,"(oTextPr, sText, sTransform, oFill, oStroke, nRotAngle, nWidth, nHeight, nIndLeft, nIndTop)",read,Examples/Enumerations/TextTransform.js
 M0319,method,Fill,cell;pdf;slide;word,12,yes,(oFill),read,Examples/Cell/ApiDrawing/Methods/Fill.js
 M0320,method,GetBorderColor,pdf;word,12,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetBorderColor.js
 M0321,method,GetHeader,cell;word,12,yes,"(sType, isCreate)",edit,Examples/Cell/ApiSort/Methods/GetHeader.js
@@ -329,10 +329,10 @@ M0327,method,RemoveRow,pdf;slide;word,12,yes,(cell),edit,Examples/Pdf/ApiTable/M
 M0328,method,SetDropCap,word,12,yes,(position),edit,Examples/Word/ApiDropCap/Methods/Clear.js
 M0329,method,SetPageMargins,word,12,yes,"(left, top, right, bottom)",edit,Examples/Word/ApiDocument/Methods/CreateSection.js
 M0330,method,SetTipText,word,12,yes,(sText),edit,Examples/Word/ApiCheckBoxForm/Methods/GetTipText.js
-M0331,method,ApplyTheme,slide,11,yes,(oApiTheme),UNCLASSIFIED,Examples/Slide/Api/Methods/CreateTheme.js
+M0331,method,ApplyTheme,slide,11,yes,(oApiTheme),edit,Examples/Slide/Api/Methods/CreateTheme.js
 M0332,method,CreateSection,word,11,yes,(oParagraph),edit,Examples/Word/ApiDocument/Methods/CreateSection.js
 M0333,method,CreateThemeFormatScheme,slide,11,yes,"(arrFill, arrBgFill, arrLine, sName)",edit,Examples/Slide/Api/Methods/CreateTheme.js
-M0334,method,Find,cell;common;pdf;slide,11,yes,(oSearchData),UNCLASSIFIED,Examples/Cell/ApiRange/Methods/Find.js
+M0334,method,Find,cell;common;pdf;slide,11,yes,(oSearchData),read,Examples/Cell/ApiRange/Methods/Find.js
 M0335,method,GetAppliesTo,cell,11,yes,(),read,Examples/Cell/ApiAboveAverage/Methods/GetAppliesTo.js
 M0336,method,GetCurrentSlide,slide,11,yes,(),read,Examples/Slide/ApiGroup/Methods/GetClassType.js
 M0337,method,GetProtectedRange,cell,11,yes,(sTitle),read,Examples/Cell/ApiProtectedRange/Methods/AddUser.js
@@ -340,9 +340,9 @@ M0338,method,GetRotation,cell;pdf;slide;word,11,yes,(),read,Examples/Cell/ApiDra
 M0339,method,GetScopeType,cell,11,yes,(),read,Examples/Cell/ApiColorScale/Methods/GetScopeType.js
 M0340,method,SetChecked,pdf;word,11,yes,(checked),edit,Examples/Pdf/ApiCheckboxWidget/Methods/IsChecked.js
 M0341,method,SetOddAndEvenPagesHeaderFooter,cell,11,yes,(bDifferent),read,Examples/Cell/ApiHeaderFooter/Methods/GetText.js
-M0342,method,SetOpacity,pdf;word,11,yes,(value),UNCLASSIFIED,Examples/Pdf/ApiBaseAnnotation/Methods/SetOpacity.js
+M0342,method,SetOpacity,pdf;word,11,yes,(value),edit,Examples/Pdf/ApiBaseAnnotation/Methods/SetOpacity.js
 M0343,method,SetSizes,slide,11,yes,"(nWidth, nHeight)",read,Examples/Slide/ApiGroup/Methods/GetClassType.js
-M0344,method,SetSubject,cell;pdf;slide;word,11,yes,(subject),UNCLASSIFIED,Examples/Cell/Api/Methods/GetCore.js
+M0344,method,SetSubject,cell;pdf;slide;word,11,yes,(subject),edit,Examples/Cell/Api/Methods/GetCore.js
 M0345,method,AddRow,pdf;slide;word,10,yes,"(oCell, isBefore)",edit,Examples/Pdf/ApiTable/Methods/AddRow.js
 M0346,method,CreateLineAnnot,pdf,10,yes,"(rect, startPoint, endPoint)",edit,Examples/Pdf/Api/Methods/CreateLineAnnot.js
 M0347,method,CreateSchemeColor,cell;common;pdf;slide;word,10,yes,(schemeColorId),read,Examples/Cell/Api/Methods/CreateSchemeColor.js
@@ -367,7 +367,7 @@ M0365,method,SetDirection,cell;common;word,10,yes,(direction),read,Examples/Cell
 M0366,method,SetDistances,word,10,yes,"(nLeft, nTop, nRight, nBottom)",edit,Examples/Word/ApiDrawing/Methods/SetDistances.js
 M0367,method,SetEndStyle,pdf,10,yes,(style),edit,Examples/Pdf/Api/Methods/CreateLineAnnot.js
 M0368,method,SetRequired,pdf;word,10,yes,(required),edit,Examples/Pdf/ApiBaseField/Methods/SetRequired.js
-M0369,method,SetRowAxisLayout,cell,10,yes,"(type, compact)",UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/AutoSort.js
+M0369,method,SetRowAxisLayout,cell,10,yes,"(type, compact)",edit,Examples/Cell/ApiPivotField/Methods/AutoSort.js
 M0370,method,SetTabs,cell;common;pdf;slide;word,10,yes,"(aPos, aVal)",edit,Examples/Cell/ApiParagraph/Methods/SetTabs.js
 M0371,method,SetTime,cell;slide;word,10,yes,(timeStamp),edit,Examples/Cell/ApiComment/Methods/SetTime.js
 M0372,method,Traverse,slide;word,10,yes,,UNCLASSIFIED,Examples/Slide/ApiDrawing/Methods/GetVisitor.js
@@ -396,7 +396,7 @@ M0394,method,GetLockValue,cell;common;pdf;slide;word,9,yes,(sType),read,Examples
 M0395,method,GetModified,cell;slide;word,9,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
 M0396,method,GetPosInParent,pdf;word,9,yes,(),read,Examples/Pdf/ApiRichParagraph/Methods/GetPosInParent.js
 M0397,method,GetRevision,cell;slide;word,9,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
-M0398,method,GetScreenTipText,cell;pdf;slide;word,9,yes,,UNCLASSIFIED,Examples/Cell/ApiHyperlink/Methods/GetScreenTipText.js
+M0398,method,GetScreenTipText,cell;pdf;slide;word,9,yes,,read,Examples/Cell/ApiHyperlink/Methods/GetScreenTipText.js
 M0399,method,GetVersion,cell;slide;word,9,yes,(),read,Examples/Cell/Api/Methods/GetCore.js
 M0400,method,SetCategory,cell;slide;word,9,yes,(sCategory),read,Examples/Cell/Api/Methods/GetCore.js
 M0401,method,SetContentStatus,cell;slide;word,9,yes,(sStatus),read,Examples/Cell/Api/Methods/GetCore.js
@@ -424,11 +424,11 @@ M0422,method,GetColorScaleCriteria,cell,8,yes,(),edit,Examples/Cell/ApiColorScal
 M0423,method,GetComment,cell,8,yes,(),read,Examples/Cell/ApiComment/Methods/Delete.js
 M0424,method,GetDashType,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiShape/Methods/GetLine.js
 M0425,method,GetDefaultStyle,common;word,8,yes,(sStyleType),read,Examples/Enumerations/StyleType.js
-M0426,method,GetFontNames,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetFontNames.js
+M0426,method,GetFontNames,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetFontNames.js
 M0427,method,GetFontScheme,slide,8,yes,(),read,Examples/Slide/Api/Methods/FromJSON.js
-M0428,method,GetIndFirstLine,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetIndFirstLine.js
-M0429,method,GetIndLeft,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetIndLeft.js
-M0430,method,GetIndRight,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetIndRight.js
+M0428,method,GetIndFirstLine,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetIndFirstLine.js
+M0429,method,GetIndLeft,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetIndLeft.js
+M0430,method,GetIndRight,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetIndRight.js
 M0431,method,GetItalic,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiFont/Methods/GetItalic.js
 M0432,method,GetLock,word,8,yes,(),read,Examples/Word/ApiBlockLvlSdt/Methods/GetLock.js
 M0433,method,GetLockAspect,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetLockAspect.js
@@ -436,10 +436,10 @@ M0434,method,GetNumberFormat,cell,8,yes,(),read,Examples/Cell/ApiAboveAverage/Me
 M0435,method,GetOrientation,cell,8,yes,(),read,Examples/Cell/ApiListObject/Methods/GetSort.js
 M0436,method,GetShadow,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetShadow.js
 M0437,method,GetSlideShowTransition,slide,8,yes,(),read,Examples/Slide/ApiSlide/Methods/GetSlideShowTransition.js
-M0438,method,GetSpacingAfter,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetSpacingAfter.js
-M0439,method,GetSpacingBefore,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetSpacingBefore.js
+M0438,method,GetSpacingAfter,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetSpacingAfter.js
+M0439,method,GetSpacingBefore,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetSpacingBefore.js
 M0440,method,GetSpacingLineRule,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetSpacingLineRule.js
-M0441,method,GetSpacingLineValue,cell;pdf;slide;word,8,yes,(),UNCLASSIFIED,Examples/Cell/ApiParagraph/Methods/GetSpacingLineValue.js
+M0441,method,GetSpacingLineValue,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetSpacingLineValue.js
 M0442,method,GetTableDescription,pdf;slide;word,8,yes,(),read,Examples/Pdf/ApiTable/Methods/GetTableDescription.js
 M0443,method,GetTableTitle,pdf;slide;word,8,yes,(),read,Examples/Pdf/ApiTable/Methods/GetTableTitle.js
 M0444,method,GetTextFill,cell;pdf;slide;word,8,yes,(),read,Examples/Cell/ApiTextPr/Methods/GetTextFill.js
@@ -449,7 +449,7 @@ M0447,method,GetWrapperShape,word,8,yes,(),read,Examples/Word/ApiCheckBoxForm/Me
 M0448,method,IsFilled,word,8,yes,(),read,Examples/Word/ApiCheckBoxForm/Methods/IsFilled.js
 M0449,method,MergeCells,pdf;slide;word,8,yes,(aCells),edit,Examples/Pdf/ApiTable/Methods/MergeCells.js
 M0450,method,SetBeginArrow,cell;pdf;slide;word,8,yes,"(type, width, length)",edit,Examples/Cell/ApiStroke/Methods/GetBeginArrow.js
-M0451,method,SetBorders,cell;common,8,yes,"(bordersIndex, lineStyle, oColor)",UNCLASSIFIED,Examples/Cell/ApiCharacters/Methods/GetParent.js
+M0451,method,SetBorders,cell;common,8,yes,"(bordersIndex, lineStyle, oColor)",edit,Examples/Cell/ApiCharacters/Methods/GetParent.js
 M0452,method,SetCapType,cell;pdf;slide;word,8,yes,(type),edit,Examples/Cell/ApiStroke/Methods/GetCapType.js
 M0453,method,SetColorScheme,slide,8,yes,(oApiColorScheme),read,Examples/Slide/Api/Methods/CreateThemeColorScheme.js
 M0454,method,SetEndArrow,cell;pdf;slide;word,8,yes,"(type, width, length)",edit,Examples/Cell/ApiStroke/Methods/GetEndArrow.js
@@ -473,7 +473,7 @@ M0471,method,AutoColor,word,7,yes,(),read,Examples/Word/Api/Methods/AutoColor.js
 M0472,method,ClearContent,cell;pdf;slide;word,7,yes,(),edit,Examples/Cell/ApiRun/Methods/ClearContent.js
 M0473,method,CreateHighlightAnnot,pdf,7,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateHighlightAnnot.js
 M0474,method,CreateStampAnnot,pdf,7,yes,"(position, type, author, creationDate)",edit,Examples/Pdf/Api/Methods/CreateStampAnnot.js
-M0475,method,GetAllRoles,form,7,yes,,UNCLASSIFIED,Examples/Forms/ApiDocument/Methods/GetFormRoles.js
+M0475,method,GetAllRoles,form,7,yes,,read,Examples/Forms/ApiDocument/Methods/GetFormRoles.js
 M0476,method,GetCaption,cell;word,7,yes,(),read,Examples/Cell/ApiCharacters/Methods/GetCaption.js
 M0477,method,GetCellsCount,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/ApiRange/Methods/GetCellsCount.js
 M0478,method,GetCenterHeader,cell,7,yes,(),read,Examples/Cell/ApiHeaderFooter/Methods/GetText.js
@@ -485,9 +485,9 @@ M0483,method,GetFontFamily,cell;pdf;slide;word,7,yes,(fontSlot),edit,Examples/Ce
 M0484,method,GetFontSize,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/ApiTextPr/Methods/GetFontSize.js
 M0485,method,GetFreezePanes,cell,7,yes,(),read,Examples/Cell/Api/Methods/SetFreezePanesType.js
 M0486,method,GetFullName,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/Api/Methods/GetFullName.js
-M0487,method,GetLinkedText,cell;pdf;slide;word,7,yes,,UNCLASSIFIED,Examples/Cell/ApiHyperlink/Methods/GetLinkedText.js
+M0487,method,GetLinkedText,cell;pdf;slide;word,7,yes,,read,Examples/Cell/ApiHyperlink/Methods/GetLinkedText.js
 M0488,method,GetOutLine,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/ApiTextPr/Methods/GetOutLine.js
-M0489,method,GetPivotItems,cell,7,yes,(index),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/GetPivotItems.js
+M0489,method,GetPivotItems,cell,7,yes,(index),read,Examples/Cell/ApiPivotField/Methods/GetPivotItems.js
 M0490,method,GetRGB,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/ApiColor/Methods/GetRGB.js
 M0491,method,GetRowsCount,cell;pdf;slide;word,7,yes,(),read,Examples/Cell/ApiRange/Methods/GetRowsCount.js
 M0492,method,GetScript,pdf,7,yes,(),read,Examples/Pdf/Api/Methods/CreateJsAction.js
@@ -505,7 +505,7 @@ M0503,method,SetLastPriority,cell,7,yes,(),read,Examples/Cell/ApiAboveAverage/Me
 M0504,method,SetOrientation,cell;common,7,yes,(angle),read,Examples/Cell/ApiPageSetup/Methods/GetOrientation.js
 M0505,method,SetPriority,cell,7,yes,(Priority),read,Examples/Cell/ApiColorScale/Methods/SetPriority.js
 M0506,method,SetRadioGroup,word,7,yes,(sKey),edit,Examples/Word/ApiCheckBoxForm/Methods/GetChoiceName.js
-M0507,method,SetScreenTipText,cell;pdf;slide;word,7,yes,,UNCLASSIFIED,Examples/Cell/ApiHyperlink/Methods/SetScreenTipText.js
+M0507,method,SetScreenTipText,cell;pdf;slide;word,7,yes,,edit,Examples/Cell/ApiHyperlink/Methods/SetScreenTipText.js
 M0508,method,SetTableBorderAll,slide;word,7,yes,"(type, size, fill)",edit,Examples/Slide/Api/Methods/CreateTablePr.js
 M0509,method,SetTableStyle,cell,7,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/SetTableStyle.js
 M0510,method,SetValueIndexes,pdf,7,yes,(valueIndexes),edit,Examples/Pdf/ApiBaseListField/Methods/AddOption.js
@@ -521,7 +521,7 @@ M0519,method,CreateNamedAction,pdf,6,yes,(name),read,Examples/Pdf/Api/Methods/Cr
 M0520,method,CreateResetFormsAction,pdf,6,yes,"(isAllExcept, names)",read,Examples/Pdf/Api/Methods/CreateResetFormsAction.js
 M0521,method,CreateTextAnnot,pdf,6,yes,(rect),read,Examples/Pdf/Api/Methods/CreateTextAnnot.js
 M0522,method,CreateUriAction,pdf,6,yes,(uri),read,Examples/Pdf/Api/Methods/CreateUriAction.js
-M0523,method,DeleteAttribute,cell;slide;word,6,yes,"(xPath, name)",UNCLASSIFIED,Examples/Cell/ApiCustomXmlNode/Methods/DeleteAttribute.js
+M0523,method,DeleteAttribute,cell;slide;word,6,yes,"(xPath, name)",edit,Examples/Cell/ApiCustomXmlNode/Methods/DeleteAttribute.js
 M0524,method,EmusToMillimeters,cell;pdf;slide;word,6,yes,(emu),read,Examples/Cell/Api/Methods/EmusToMillimeters.js
 M0525,method,GetAll,cell;slide;word,6,yes,(),read,Examples/Cell/ApiCustomXmlPart/Methods/Delete.js
 M0526,method,GetAllTables,slide;word,6,yes,(),read,Examples/Slide/ApiLayout/Methods/GetAllTables.js
@@ -539,10 +539,10 @@ M0537,method,GetPTCondition,cell,6,yes,(),read,Examples/Cell/ApiColorScale/Metho
 M0538,method,GetParentContentControl,word,6,yes,(),read,Examples/Word/ApiBlockLvlSdt/Methods/GetParentContentControl.js
 M0539,method,GetParentTableCell,word,6,yes,(),read,Examples/Word/ApiBlockLvlSdt/Methods/GetParentTableCell.js
 M0540,method,GetRectDiff,pdf,6,yes,(),read,Examples/Pdf/ApiCircleAnnotation/Methods/GetRectDiff.js
-M0541,method,GetShd,word,6,yes,(),UNCLASSIFIED,Examples/Word/ApiParagraph/Methods/GetShd.js
-M0542,method,GetTableRowPr,word,6,yes,(),UNCLASSIFIED,Examples/Word/ApiStyle/Methods/GetTableRowPr.js
+M0541,method,GetShd,word,6,yes,(),read,Examples/Word/ApiParagraph/Methods/GetShd.js
+M0542,method,GetTableRowPr,word,6,yes,(),read,Examples/Word/ApiStyle/Methods/GetTableRowPr.js
 M0543,method,GetTablesOfContents,word,6,yes,,UNCLASSIFIED,Examples/Word/ApiDocument/Methods/GetTablesOfContents.js
-M0544,method,GetTablesOfFigures,word,6,yes,,UNCLASSIFIED,Examples/Word/ApiDocument/Methods/GetTablesOfFigures.js
+M0544,method,GetTablesOfFigures,word,6,yes,,read,Examples/Word/ApiDocument/Methods/GetTablesOfFigures.js
 M0545,method,GetThemeName,cell;pdf;slide;word,6,yes,(),read,Examples/Cell/ApiColor/Methods/GetThemeName.js
 M0546,method,MoveCursorDown,slide;word,6,yes,"(count, addToSelect)",edit,Examples/Slide/ApiPresentation/Methods/MoveCursorDown.js
 M0547,method,MoveCursorRight,slide;word,6,yes,"(count, addToSelect, byWords)",edit,Examples/Slide/ApiPresentation/Methods/MoveCursorRight.js
@@ -558,11 +558,11 @@ M0556,method,SetDate,word,6,yes,(date),edit,Examples/Word/ApiDateForm/Methods/Ge
 M0557,method,SetEqualColumns,common;word,6,yes,"(nCount, nSpace)",edit,Examples/Enumerations/twips.js
 M0558,method,SetFormat,pdf;word,6,yes,(action),edit,Examples/Pdf/ApiActionCollection/Methods/GetFormat.js
 M0559,method,SetFreezePanesType,cell;common,6,yes,(FreezePaneType),read,Examples/Cell/Api/Methods/GetFreezePanesType.js
-M0560,method,SetLink,cell;pdf;slide;word,6,yes,,UNCLASSIFIED,Examples/Cell/ApiHyperlink/Methods/SetLink.js
+M0560,method,SetLink,cell;pdf;slide;word,6,yes,,edit,Examples/Cell/ApiHyperlink/Methods/SetLink.js
 M0561,method,SetPageSize,word,6,yes,"(nWidth, nHeight, isPortrait)",edit,Examples/Word/ApiDocument/Methods/CreateSection.js
 M0562,method,SetScopeType,cell,6,yes,(ScopeType),read,Examples/Cell/ApiColorScale/Methods/SetScopeType.js
 M0563,method,SetTextFit,common;pdf;slide,6,yes,(fitType),read,Examples/Enumerations/TextFitType.js
-M0564,method,UpdateAttribute,cell;slide;word,6,yes,"(xPath, name, value)",UNCLASSIFIED,Examples/Cell/ApiCustomXmlNode/Methods/UpdateAttribute.js
+M0564,method,UpdateAttribute,cell;slide;word,6,yes,"(xPath, name, value)",edit,Examples/Cell/ApiCustomXmlNode/Methods/UpdateAttribute.js
 M0565,method,AddComboBoxContentControl,word,5,yes,"(list, selected)",edit,Examples/Word/ApiDocument/Methods/AddComboBoxContentControl.js
 M0566,method,AddDatePickerContentControl,word,5,yes,(datePickerPr),edit,Examples/Word/ApiDocument/Methods/AddDatePickerContentControl.js
 M0567,method,AddLayout,slide,5,yes,"(nPos, oLayout)",read,Examples/Slide/ApiLayout/Methods/Copy.js
@@ -570,7 +570,7 @@ M0568,method,AddPictureContentControl,word,5,yes,"(width, height)",edit,Examples
 M0569,method,Apply,cell,5,yes,,UNCLASSIFIED,Examples/Cell/ApiSort/Methods/Apply.js
 M0570,method,CreateBlipFill,cell;common;pdf;slide;word,5,yes,"(imageUrl, blipFillType)",read,Examples/Cell/Api/Methods/CreateBlipFill.js
 M0571,method,CreateCheckboxField,pdf,5,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateCheckboxField.js
-M0572,method,CreateGroup,slide;word,5,yes,(drawings),UNCLASSIFIED,Examples/Slide/Api/Methods/CreateGroup.js
+M0572,method,CreateGroup,slide;word,5,yes,(drawings),read,Examples/Slide/Api/Methods/CreateGroup.js
 M0573,method,CreateLayout,slide,5,yes,(oMaster),edit,Examples/Slide/Api/Methods/CreateLayout.js
 M0574,method,Duplicate,cell;slide,5,yes,(nPos),read,Examples/Cell/ApiTableStyle/Methods/Duplicate.js
 M0575,method,ExpandTo,cell;pdf;slide;word,5,yes,(range),read,Examples/Cell/ApiTextRange/Methods/ExpandTo.js
@@ -582,7 +582,7 @@ M0580,method,GetPagesCount,pdf,5,yes,(),read,Examples/Pdf/ApiDocument/Methods/Ge
 M0581,method,GetRepliesCount,cell;slide;word,5,yes,(),read,Examples/Cell/ApiComment/Methods/GetRepliesCount.js
 M0582,method,GetSelectedCells,pdf;slide;word,5,yes,(),read,Examples/Pdf/ApiTable/Methods/GetSelectedCells.js
 M0583,method,GetSmallCaps,cell;pdf;slide;word,5,yes,(),read,Examples/Cell/ApiTextPr/Methods/GetSmallCaps.js
-M0584,method,GetSpacing,cell;pdf;slide;word,5,yes,(),UNCLASSIFIED,Examples/Cell/ApiTextPr/Methods/GetSpacing.js
+M0584,method,GetSpacing,cell;pdf;slide;word,5,yes,(),read,Examples/Cell/ApiTextPr/Methods/GetSpacing.js
 M0585,method,InsertParagraph,pdf;slide;word,5,yes,"(paragraph, sPosition, beRNewPara)",edit,Examples/Pdf/ApiParagraph/Methods/InsertParagraph.js
 M0586,method,IsEmpty,cell;pdf;slide;word,5,yes,(),read,Examples/Cell/ApiParagraph/Methods/IsEmpty.js
 M0587,method,IsSolved,cell;slide;word,5,yes,(),read,Examples/Cell/ApiComment/Methods/IsSolved.js
@@ -599,7 +599,7 @@ M0597,method,SetCellMarginTop,pdf;slide;word,5,yes,(nValue),edit,Examples/Pdf/Ap
 M0598,method,SetChoiceName,word,5,yes,(choiceName),edit,Examples/Word/ApiCheckBoxForm/Methods/GetChoiceName.js
 M0599,method,SetComb,pdf;word,5,yes,(comb),edit,Examples/Pdf/ApiTextField/Methods/IsComb.js
 M0600,method,SetCustomType,word,5,yes,"(sType, sTextFormatString, sAlign)",edit,Examples/Word/ApiDocument/Methods/GetAllNumberedParagraphs.js
-M0601,method,SetDuration,slide,5,yes,(duration),UNCLASSIFIED,Examples/Slide/ApiAnimationEffect/Methods/SetDuration.js
+M0601,method,SetDuration,slide,5,yes,(duration),edit,Examples/Slide/ApiAnimationEffect/Methods/SetDuration.js
 M0602,method,SetFlipH,cell;pdf;slide;word,5,yes,(bFlip),read,Examples/Cell/ApiDrawing/Methods/SetFlipH.js
 M0603,method,SetFontColor,cell,5,yes,(oColor),read,Examples/Cell/Api/Methods/CreateColorByName.js
 M0604,method,SetImageSize,word,5,yes,"(nWidth, nHeight)",read,Examples/Word/ApiWatermarkSettings/Methods/GetImageHeight.js
@@ -617,7 +617,7 @@ M0615,method,SetVertAxisMajorTickMark,cell;common;pdf;slide;word,5,yes,(sTickMar
 M0616,method,SetVertAxisTickLabelPosition,cell;common;pdf;slide;word,5,yes,(sTickLabelPosition),read,Examples/Cell/ApiChart/Methods/SetVertAxisTickLabelPosition.js
 M0617,method,SetVerticalAlign,pdf;slide;word,5,yes,(sType),edit,Examples/Pdf/ApiTableCell/Methods/SetVerticalAlign.js
 M0618,method,SetVisible,cell;slide,5,yes,(isVisible),read,Examples/Cell/ApiPivotItem/Methods/SetVisible.js
-M0619,method,AddCustomFunction,cell,4,yes,(fCustom),UNCLASSIFIED,Examples/Cell/Api/Methods/AddCustomFunction.js
+M0619,method,AddCustomFunction,cell,4,yes,(fCustom),edit,Examples/Cell/Api/Methods/AddCustomFunction.js
 M0620,method,AddEndnote,word,4,yes,(),edit,Examples/Word/ApiDocument/Methods/AddEndnote.js
 M0621,method,AddMaster,slide,4,yes,"(pos, apiMaster)",read,Examples/Slide/Api/Methods/CreateMaster.js
 M0622,method,AddPageNumber,word,4,yes,(),edit,Examples/Word/ApiParagraph/Methods/AddPageNumber.js
@@ -625,7 +625,7 @@ M0623,method,ApplyChartStyle,cell;pdf;slide;word,4,yes,(nStyleId),read,Examples/
 M0624,method,ButtonFloatAction,plugin,4,no,,UNCLASSIFIED,Examples/Plugins/Cell/Plugin/Events/onFloatActionButtonClick.js
 M0625,method,Calculate,cell,4,yes,(),read,Examples/Cell/Api/Methods/Calculate.js
 M0626,method,CentimetersToPoints,cell;pdf;slide;word,4,yes,(cm),read,Examples/Cell/Api/Methods/CentimetersToPoints.js
-M0627,method,ChangeChartType,cell;pdf;slide;word,4,yes,(sType),UNCLASSIFIED,Examples/Cell/ApiChartSeries/Methods/ChangeChartType.js
+M0627,method,ChangeChartType,cell;pdf;slide;word,4,yes,(sType),edit,Examples/Cell/ApiChartSeries/Methods/ChangeChartType.js
 M0628,method,ClearBackground,slide,4,yes,(),read,Examples/Slide/ApiLayout/Methods/ClearBackground.js
 M0629,method,CreateCircleAnnot,pdf,4,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateCircleAnnot.js
 M0630,method,CreateInkAnnot,pdf,4,yes,"(rect, inkPaths)",edit,Examples/Pdf/Api/Methods/CreateInkAnnot.js
@@ -649,23 +649,23 @@ M0647,method,GetDuration,slide,4,yes,(),read,Examples/Slide/ApiAnimationEffect/M
 M0648,method,GetEndArrow,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiStroke/Methods/GetEndArrow.js
 M0649,method,GetFormat,pdf;word,4,yes,(),read,Examples/Pdf/ApiActionCollection/Methods/GetFormat.js
 M0650,method,GetFormula,cell,4,yes,(),read,Examples/Cell/ApiDatabar/Methods/GetFormula.js
-M0651,method,GetHighlight,pdf;slide;word,4,yes,(),UNCLASSIFIED,Examples/Pdf/ApiRun/Methods/GetHighlight.js
+M0651,method,GetHighlight,pdf;slide;word,4,yes,(),read,Examples/Pdf/ApiRun/Methods/GetHighlight.js
 M0652,method,GetJoinType,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiStroke/Methods/GetJoinType.js
 M0653,method,GetLastRunWithText,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiParagraph/Methods/GetLastRunWithText.js
 M0654,method,GetLayoutsCount,slide,4,yes,(),read,Examples/Slide/ApiLayout/Methods/Delete.js
 M0655,method,GetLocation,cell,4,yes,(),read,Examples/Cell/Api/Methods/SetFreezePanesType.js
 M0656,method,GetNames,pdf,4,yes,(),read,Examples/Pdf/ApiHideShowFormsAction/Methods/GetNames.js
 M0657,method,GetNodeValue,cell;slide;word,4,yes,(),read,Examples/Cell/ApiCustomXmlNode/Methods/GetNodeValue.js
-M0658,method,GetPageMarginBottom,word,4,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
-M0659,method,GetPageMarginLeft,word,4,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
-M0660,method,GetPageMarginRight,word,4,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
-M0661,method,GetPageMarginTop,word,4,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
+M0658,method,GetPageMarginBottom,word,4,yes,(),read,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
+M0659,method,GetPageMarginLeft,word,4,yes,(),read,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
+M0660,method,GetPageMarginRight,word,4,yes,(),read,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
+M0661,method,GetPageMarginTop,word,4,yes,(),read,Examples/Word/ApiSection/Methods/GetPageMarginBottom.js
 M0662,method,GetParagraph,cell;pdf;slide;word,4,yes,(index),read,Examples/Cell/ApiTextRange/Methods/GetParagraph.js
 M0663,method,GetParentParagraph,pdf;word,4,yes,(),read,Examples/Pdf/ApiRichRun/Methods/GetParentParagraph.js
 M0664,method,GetRGBA,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiColor/Methods/GetRGBA.js
 M0665,method,GetRadioGroup,word,4,yes,(),read,Examples/Word/ApiCheckBoxForm/Methods/GetChoiceName.js
 M0666,method,GetRows,cell,4,yes,(value),read,Examples/Cell/ApiRange/Methods/GetHidden.js
-M0667,method,GetSettings,cell;pdf;slide;word,4,yes,(),UNCLASSIFIED,Examples/Cell/ApiShadow/Methods/GetSettings.js
+M0667,method,GetSettings,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiShadow/Methods/GetSettings.js
 M0668,method,GetStartStyle,pdf,4,yes,(),read,Examples/Pdf/ApiLineAnnotation/Methods/GetStartStyle.js
 M0669,method,GetTintAndShade,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiColor/Methods/GetTintAndShade.js
 M0670,method,GetTransparent,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiFill/Methods/GetTransparent.js
@@ -673,7 +673,7 @@ M0671,method,GetUser,cell,4,yes,(sId),read,Examples/Cell/ApiProtectedRange/Metho
 M0672,method,GetVerticalTextAlign,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiShape/Methods/GetVerticalTextAlign.js
 M0673,method,HasTextContent,cell;pdf;slide;word,4,yes,(),read,Examples/Cell/ApiDrawing/Methods/HasTextContent.js
 M0674,method,InchesToPoints,cell;pdf;slide;word,4,yes,(inches),read,Examples/Cell/Api/Methods/InchesToPoints.js
-M0675,method,InsertPivotExistingWorksheet,cell,4,yes,"(dataRef, pivotRef, confirmation)",UNCLASSIFIED,Examples/Cell/Api/Methods/InsertPivotExistingWorksheet.js
+M0675,method,InsertPivotExistingWorksheet,cell,4,yes,"(dataRef, pivotRef, confirmation)",edit,Examples/Cell/Api/Methods/InsertPivotExistingWorksheet.js
 M0676,method,InsertTextForm,common;form,4,yes,,UNCLASSIFIED,Examples/Enumerations/FormInsertPr.js
 M0677,method,IntersectWith,cell;pdf;slide;word,4,yes,(range),read,Examples/Cell/ApiTextRange/Methods/IntersectWith.js
 M0678,method,IsChecked,pdf;word,4,yes,(),read,Examples/Pdf/ApiCheckboxWidget/Methods/IsChecked.js
@@ -685,7 +685,7 @@ M0683,method,MillimetersToPoints,cell;pdf;slide;word,4,yes,(mm),read,Examples/Ce
 M0684,method,MoveCursorOutside,word,4,yes,(isAfter),edit,Examples/Word/ApiBlockLvlSdt/Methods/MoveCursorOutside.js
 M0685,method,Paste,cell,4,yes,(destination),read,Examples/Cell/ApiAreas/Methods/GetItem.js
 M0686,method,PicasToPoints,cell;pdf;slide;word,4,yes,(pc),read,Examples/Cell/Api/Methods/PicasToPoints.js
-M0687,method,PixelsToEmus,cell;pdf;slide;word,4,yes,(px),UNCLASSIFIED,Examples/Cell/Api/Methods/PixelsToEmus.js
+M0687,method,PixelsToEmus,cell;pdf;slide;word,4,yes,(px),read,Examples/Cell/Api/Methods/PixelsToEmus.js
 M0688,method,PixelsToPoints,cell;pdf;slide;word,4,yes,(px),read,Examples/Cell/Api/Methods/PixelsToPoints.js
 M0689,method,PointsToCentimeters,cell;pdf;slide;word,4,yes,(pt),read,Examples/Cell/Api/Methods/PointsToCentimeters.js
 M0690,method,PointsToEmus,cell;pdf;slide;word,4,yes,(pt),read,Examples/Cell/Api/Methods/PointsToEmus.js
@@ -727,7 +727,7 @@ M0725,method,SetHorAxisMajorTickMark,cell;pdf;slide;word,4,yes,(sTickMark),read,
 M0726,method,SetHorAxisMinorTickMark,cell;pdf;slide;word,4,yes,(sTickMark),read,Examples/Cell/ApiChart/Methods/SetHorAxisMinorTickMark.js
 M0727,method,SetHorAxisOrientation,cell;pdf;slide;word,4,yes,(bIsMinMax),read,Examples/Cell/ApiChart/Methods/SetHorAxisOrientation.js
 M0728,method,SetHorAxisTickLabelPosition,cell;pdf;slide;word,4,yes,(sTickLabelPosition),read,Examples/Cell/ApiChart/Methods/SetHorAxisTickLabelPosition.js
-M0729,method,SetIconSet,cell,4,yes,(iconSet),UNCLASSIFIED,Examples/Cell/ApiIconSetCondition/Methods/Delete.js
+M0729,method,SetIconSet,cell,4,yes,(iconSet),edit,Examples/Cell/ApiIconSetCondition/Methods/Delete.js
 M0730,method,SetId,word,4,yes,(id),edit,Examples/Word/ApiBlockLvlSdt/Methods/GetId.js
 M0731,method,SetKeepLines,word,4,yes,(isKeepLines),edit,Examples/Word/ApiDocument/Methods/CreateStyle.js
 M0732,method,SetKeepNext,word,4,yes,(isKeepNext),edit,Examples/Word/ApiDocument/Methods/CreateStyle.js
@@ -807,15 +807,15 @@ M0805,method,GetElementIndex,word,3,yes,(element),read,Examples/Word/ApiDocument
 M0806,method,GetEndNotesFirstParagraphs,word,3,yes,(),read,Examples/Word/ApiDocument/Methods/AddEndnote.js
 M0807,method,GetFootnotesFirstParagraphs,word,3,yes,(),read,Examples/Word/ApiDocument/Methods/AddFootnote.js
 M0808,method,GetFormula1,cell,3,yes,(),read,Examples/Cell/ApiFormatCondition/Methods/GetFormula1.js
-M0809,method,GetHasFormat,cell,3,yes,(),UNCLASSIFIED,Examples/Cell/ApiTableStyleElement/Methods/Clear.js
+M0809,method,GetHasFormat,cell,3,yes,(),read,Examples/Cell/ApiTableStyleElement/Methods/Clear.js
 M0810,method,GetLeftMargin,cell,3,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetLeftMargin.js
 M0811,method,GetMailMergeReceptionsCount,word,3,yes,(),read,Examples/Word/Api/Methods/GetMailMergeReceptionsCount.js
 M0812,method,GetMailMergeTemplateDocContent,word,3,yes,(),edit,Examples/Word/Api/Methods/GetMailMergeReceptionsCount.js
 M0813,method,GetParentRow,pdf;slide;word,3,yes,(),read,Examples/Pdf/ApiTableCell/Methods/GetParentRow.js
 M0814,method,GetPivotByName,cell,3,yes,(name),read,Examples/Cell/Api/Methods/GetPivotByName.js
 M0815,method,GetPlaceholder,pdf;slide,3,yes,(),read,Examples/Pdf/ApiComboboxField/Methods/GetPlaceholder.js
-M0816,method,GetPosX,cell;pdf;slide,3,yes,(),UNCLASSIFIED,Examples/Cell/ApiDrawing/Methods/GetPosX.js
-M0817,method,GetPosY,cell;pdf;slide,3,yes,(),UNCLASSIFIED,Examples/Cell/ApiDrawing/Methods/GetPosY.js
+M0816,method,GetPosX,cell;pdf;slide,3,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetPosX.js
+M0817,method,GetPosY,cell;pdf;slide,3,yes,(),read,Examples/Cell/ApiDrawing/Methods/GetPosY.js
 M0818,method,GetPrintGridlines,cell,3,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetPrintGridlines.js
 M0819,method,GetPrintHeadings,cell,3,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetPrintHeadings.js
 M0820,method,GetQuoteText,cell;slide;word,3,yes,(),read,Examples/Cell/ApiComment/Methods/GetQuoteText.js
@@ -842,7 +842,7 @@ M0840,method,InsertInContentControl,word,3,yes,(nType),edit,Examples/Word/ApiDra
 M0841,method,IsAutoFit,pdf;word,3,yes,(),read,Examples/Pdf/ApiBaseWidget/Methods/IsAutoFit.js
 M0842,method,IsEditable,pdf;word,3,yes,(),read,Examples/Pdf/ApiComboboxField/Methods/IsEditable.js
 M0843,method,Move,cell,3,yes,"(type, index)",edit,Examples/Cell/ApiPivotDataField/Methods/Move.js
-M0844,method,PasteSpecial,cell;common,3,yes,"(sPasteType, sPasteSpecialOperation, bSkipBlanks, bTranspose)",UNCLASSIFIED,Examples/Cell/ApiRange/Methods/PasteSpecial.js
+M0844,method,PasteSpecial,cell;common,3,yes,"(sPasteType, sPasteSpecialOperation, bSkipBlanks, bTranspose)",edit,Examples/Cell/ApiRange/Methods/PasteSpecial.js
 M0845,method,RemoveReplies,cell;slide;word,3,yes,"(nPos, nCount, bRemoveAll)",edit,Examples/Cell/ApiComment/Methods/RemoveReplies.js
 M0846,method,ReplaceByElement,word,3,yes,(oElement),edit,Examples/Word/ApiBlockLvlSdt/Methods/ReplaceByElement.js
 M0847,method,ReplaceCurrentImage,cell;slide;word,3,yes,"(sImageUrl, Width, Height)",read,Examples/Cell/ApiWorksheet/Methods/ReplaceCurrentImage.js
@@ -852,7 +852,7 @@ M0850,method,SetApplicationId,cell;slide;word,3,yes,(sAppId),read,Examples/Cell/
 M0851,method,SetAttribute,cell;slide;word,3,yes,"(name, value)",edit,Examples/Cell/ApiCustomXmlNode/Methods/SetAttribute.js
 M0852,method,SetAutoFit,pdf;word,3,yes,(auto),edit,Examples/Pdf/ApiBaseWidget/Methods/IsAutoFit.js
 M0853,method,SetBetweenBorder,word,3,yes,"(type, size, space, color)",edit,Examples/Word/ApiParagraph/Methods/SetBetweenBorder.js
-M0854,method,SetBottomMargin,cell,3,yes,(nPoints),UNCLASSIFIED,Examples/Cell/ApiPageSetup/Methods/GetBottomMargin.js
+M0854,method,SetBottomMargin,cell,3,yes,(nPoints),edit,Examples/Cell/ApiPageSetup/Methods/GetBottomMargin.js
 M0855,method,SetCategoryName,pdf;slide;word,3,yes,"(sName, nCategory)",edit,Examples/Pdf/ApiChart/Methods/SetCategoryName.js
 M0856,method,SetColumnBackgroundColor,pdf;slide;word,3,yes,(color),read,Examples/Pdf/ApiTableCell/Methods/SetColumnBackgroundColor.js
 M0857,method,SetData,cell;slide;word,3,yes,(sData),read,Examples/Cell/ApiOleObject/Methods/SetData.js
@@ -860,12 +860,12 @@ M0858,method,SetDataLabelsTextPr,cell;slide;word,3,yes,(textPr),read,Examples/Ce
 M0859,method,SetDifferentFirstPageHeaderFooter,cell,3,yes,(bDifferent),read,Examples/Cell/ApiPageSetup/Methods/GetDifferentFirstPageHeaderFooter.js
 M0860,method,SetErrorMessage,cell,3,yes,(ErrorMessage),read,Examples/Cell/ApiValidation/Methods/GetErrorMessage.js
 M0861,method,SetErrorTitle,cell,3,yes,(ErrorTitle),read,Examples/Cell/ApiValidation/Methods/GetErrorTitle.js
-M0862,method,SetFunction,cell,3,yes,(func),UNCLASSIFIED,Examples/Cell/ApiPivotDataField/Methods/GetFunction.js
+M0862,method,SetFunction,cell,3,yes,(func),edit,Examples/Cell/ApiPivotDataField/Methods/GetFunction.js
 M0863,method,SetHorFlip,word,3,yes,(bFlip),edit,Examples/Word/ApiDrawing/Methods/GetNextDrawing.js
-M0864,method,SetIndex,slide;word,3,yes,(nIdx),UNCLASSIFIED,Examples/Slide/ApiPlaceholder/Methods/GetIndex.js
+M0864,method,SetIndex,slide;word,3,yes,(nIdx),edit,Examples/Slide/ApiPlaceholder/Methods/GetIndex.js
 M0865,method,SetInputMessage,cell,3,yes,(InputMessage),read,Examples/Cell/ApiValidation/Methods/GetInputMessage.js
 M0866,method,SetInputTitle,cell,3,yes,(InputTitle),read,Examples/Cell/ApiValidation/Methods/GetInputTitle.js
-M0867,method,SetLeftMargin,cell,3,yes,(nPoints),UNCLASSIFIED,Examples/Cell/ApiPageSetup/Methods/GetLeftMargin.js
+M0867,method,SetLeftMargin,cell,3,yes,(nPoints),edit,Examples/Cell/ApiPageSetup/Methods/GetLeftMargin.js
 M0868,method,SetMultiline,pdf;word,3,yes,(multiline),edit,Examples/Pdf/ApiTextField/Methods/IsMultiline.js
 M0869,method,SetNodeValue,cell;slide;word,3,yes,(xml),edit,Examples/Cell/ApiCustomXmlNode/Methods/SetNodeValue.js
 M0870,method,SetPaperSize,cell;common,3,yes,(sPaperSize),read,Examples/Cell/ApiPageSetup/Methods/GetPaperSize.js
@@ -877,14 +877,14 @@ M0875,method,SetRelativeHeight,common;word,3,yes,"(relativeFrom, percent)",edit,
 M0876,method,SetRelativeWidth,common;word,3,yes,"(relativeFrom, percent)",edit,Examples/Enumerations/SizeRelFromH.js
 M0877,method,SetRestart,word,3,yes,(isRestart),edit,Examples/Word/ApiNumberingLevel/Methods/GetLevelIndex.js
 M0878,method,SetRightBorder,word,3,yes,"(type, size, space, color)",edit,Examples/Word/ApiParagraph/Methods/SetRightBorder.js
-M0879,method,SetRightMargin,cell,3,yes,(nPoints),UNCLASSIFIED,Examples/Cell/ApiPageSetup/Methods/GetRightMargin.js
+M0879,method,SetRightMargin,cell,3,yes,(nPoints),edit,Examples/Cell/ApiPageSetup/Methods/GetRightMargin.js
 M0880,method,SetSeriaNumFormat,pdf;slide;word,3,yes,"(sFormat, nSeria)",edit,Examples/Pdf/ApiChart/Methods/SetSeriaNumFormat.js
-M0881,method,SetTableCellPr,word,3,yes,(tableCellPr),UNCLASSIFIED,Examples/Word/Api/Methods/CreateTableCellPr.js
+M0881,method,SetTableCellPr,word,3,yes,(tableCellPr),edit,Examples/Word/Api/Methods/CreateTableCellPr.js
 M0882,method,SetTableHeader,pdf;word,3,yes,(isHeader),edit,Examples/Pdf/ApiTableRowPr/Methods/SetTableHeader.js
-M0883,method,SetTableRowPr,word,3,yes,(tableRowPr),UNCLASSIFIED,Examples/Word/Api/Methods/CreateTableRowPr.js
+M0883,method,SetTableRowPr,word,3,yes,(tableRowPr),edit,Examples/Word/Api/Methods/CreateTableRowPr.js
 M0884,method,SetTextColor,pdf,3,yes,(color),edit,Examples/Pdf/ApiBaseWidget/Methods/GetTextColor.js
 M0885,method,SetTopBorder,word,3,yes,"(type, size, space, color)",edit,Examples/Word/ApiParagraph/Methods/SetTopBorder.js
-M0886,method,SetTopMargin,cell,3,yes,(nPoints),UNCLASSIFIED,Examples/Cell/ApiPageSetup/Methods/GetTopMargin.js
+M0886,method,SetTopMargin,cell,3,yes,(nPoints),edit,Examples/Cell/ApiPageSetup/Methods/GetTopMargin.js
 M0887,method,SetVerAlign,common;word,3,yes,"(sRelativeFrom, sAlign)",edit,Examples/Enumerations/RelFromV.js
 M0888,method,SetWidowControl,word,3,yes,(isWidowControl),edit,Examples/Word/ApiParagraph/Methods/SetWidowControl.js
 M0889,method,SetXValues,pdf;slide;word,3,yes,(aValues),edit,Examples/Pdf/ApiChart/Methods/SetXValues.js
@@ -905,7 +905,7 @@ M0903,method,AddMathEquation,slide;word,2,yes,"(sText, sFormat)",edit,Examples/S
 M0904,method,AddNumberedCrossRef,common;word,2,yes,"(sRefTo, oParaTo, bLink, bAboveBelow, sSepWith)",edit,Examples/Enumerations/numberedRefTo.js
 M0905,method,ApplyRedact,pdf,2,yes,"(includeForms, includeAnnots)",edit,Examples/Pdf/ApiDocument/Methods/ApplyRedact.js
 M0906,method,ChangeBgFillStyles,slide,2,yes,(arrBgFill),read,Examples/Slide/ApiThemeFormatScheme/Methods/ChangeBgFillStyles.js
-M0907,method,ChangeColor,slide,2,yes,"(nPos, oColor)",UNCLASSIFIED,Examples/Slide/ApiTheme/Methods/GetColorScheme.js
+M0907,method,ChangeColor,slide,2,yes,"(nPos, oColor)",edit,Examples/Slide/ApiTheme/Methods/GetColorScheme.js
 M0908,method,ClearFormat,pdf,2,yes,(),edit,Examples/Pdf/ApiComboboxField/Methods/ClearFormat.js
 M0909,method,CreateCaretAnnot,pdf,2,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateCaretAnnot.js
 M0910,method,CreateDropDownListContentControl,word,2,yes,"(list, selected)",edit,Examples/Word/Api/Methods/CreateDropDownListContentControl.js
@@ -953,7 +953,7 @@ M0951,method,GetCharactersLimit,word,2,yes,(),read,Examples/Word/ApiTextForm/Met
 M0952,method,GetChoiceName,word,2,yes,(),read,Examples/Word/ApiCheckBoxForm/Methods/GetChoiceName.js
 M0953,method,GetCols,cell,2,yes,(sRange),read,Examples/Cell/ApiRange/Methods/GetCols.js
 M0954,method,GetColumnGrand,cell,2,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetColumnGrand.js
-M0955,method,GetColumnsWidths,word,2,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetColumnsSpaces.js
+M0955,method,GetColumnsWidths,word,2,yes,(),read,Examples/Word/ApiSection/Methods/GetColumnsSpaces.js
 M0956,method,GetCommentsReport,common;word,2,yes,(),read,Examples/Enumerations/CommentReport.js
 M0957,method,GetContents,pdf,2,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetContents.js
 M0958,method,GetCurrentContentControl,word,2,yes,(),read,Examples/Word/ApiDocument/Methods/GetCurrentContentControl.js
@@ -1059,7 +1059,7 @@ M1057,method,GetTableStyleRowHeaders,cell,2,yes,(),read,Examples/Cell/ApiPivotTa
 M1058,method,GetTableStyleRowStripes,cell,2,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetTableStyleRowStripes.js
 M1059,method,GetTextColor,pdf,2,yes,(),read,Examples/Pdf/ApiBaseWidget/Methods/GetTextColor.js
 M1060,method,GetTextFit,pdf;slide,2,yes,(),read,Examples/Pdf/ApiShape/Methods/GetTextFit.js
-M1061,method,GetTextOperator,cell,2,yes,,UNCLASSIFIED,Examples/Cell/ApiFormatCondition/Methods/GetTextOperator.js
+M1061,method,GetTextOperator,cell,2,yes,,read,Examples/Cell/ApiFormatCondition/Methods/GetTextOperator.js
 M1062,method,GetTextToDisplay,cell,2,yes,(),read,Examples/Cell/ApiHyperlink/Methods/GetTextToDisplay.js
 M1063,method,GetThemesColors,cell,2,yes,(),read,Examples/Cell/Api/Methods/GetThemesColors.js
 M1064,method,GetTotalsCalculation,cell,2,yes,,UNCLASSIFIED,Examples/Cell/ApiListColumn/Methods/GetTotalsCalculation.js
@@ -1067,7 +1067,7 @@ M1065,method,GetTriggerType,slide,2,yes,(),read,Examples/Slide/ApiAnimationEffec
 M1066,method,GetUseHyperlinks,word,2,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/GetUseHyperlinks.js
 M1067,method,GetVertices,pdf,2,yes,(),read,Examples/Pdf/ApiPolygonAnnotation/Methods/GetVertices.js
 M1068,method,GetWrapText,cell,2,yes,(),read,Examples/Cell/ApiRange/Methods/GetWrapText.js
-M1069,method,Insert,cell,2,yes,(shift),UNCLASSIFIED,Examples/Cell/ApiCharacters/Methods/Insert.js
+M1069,method,Insert,cell,2,yes,(shift),edit,Examples/Cell/ApiCharacters/Methods/Insert.js
 M1070,method,InsertParagraphBreak,slide;word,2,yes,(),edit,Examples/Slide/ApiPresentation/Methods/InsertParagraphBreak.js
 M1071,method,IsAllExcept,pdf,2,yes,(),read,Examples/Pdf/ApiResetFormsAction/Methods/IsAllExcept.js
 M1072,method,IsCheckedByDefault,pdf,2,yes,(),read,Examples/Pdf/ApiCheckboxWidget/Methods/IsCheckedByDefault.js
@@ -1084,7 +1084,7 @@ M1082,method,IsScrollLongText,pdf,2,yes,(),read,Examples/Pdf/ApiTextField/Method
 M1083,method,IsToggleToOff,pdf,2,yes,(),read,Examples/Pdf/ApiCheckboxField/Methods/AddOption.js
 M1084,method,LOG,cell,2,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/ERROR_TYPE.js
 M1085,method,MATCH,cell,2,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/IFNA.js
-M1086,method,Merge,cell,2,yes,(isAcross),UNCLASSIFIED,Examples/Cell/ApiRange/Methods/Merge.js
+M1086,method,Merge,cell,2,yes,(isAcross),edit,Examples/Cell/ApiRange/Methods/Merge.js
 M1087,method,Modify,cell,2,yes,"(Type, AlertStyle, Operator, Formula1, Formula2)",edit,Examples/Cell/ApiFormatCondition/Methods/Modify.js
 M1088,method,MoveCursorLeft,slide;word,2,yes,"(count, addToSelect, byWords)",edit,Examples/Slide/ApiPresentation/Methods/MoveCursorLeft.js
 M1089,method,MoveCursorToFooter,word,2,yes,(page),edit,Examples/Word/ApiDocument/Methods/MoveCursorToFooter.js
@@ -1121,9 +1121,9 @@ M1119,method,SetCharactersLimit,word,2,yes,(nChars),edit,Examples/Word/ApiTextFo
 M1120,method,SetCheckedByDefault,pdf,2,yes,(checked),edit,Examples/Pdf/ApiCheckboxWidget/Methods/IsCheckedByDefault.js
 M1121,method,SetComment,cell,2,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetComment.js
 M1122,method,SetCommitOnSelChange,pdf,2,yes,(commitOnSelectionChange),edit,Examples/Pdf/ApiBaseListField/Methods/IsCommitOnSelChange.js
-M1123,method,SetConditionalTableStyle,word,2,yes,(oTableStylePr),UNCLASSIFIED,Examples/Word/Api/Methods/CreateTableStylePr.js
+M1123,method,SetConditionalTableStyle,word,2,yes,(oTableStylePr),edit,Examples/Word/Api/Methods/CreateTableStylePr.js
 M1124,method,SetControlsHighlight,word,2,yes,(color),edit,Examples/Word/ApiDocument/Methods/GetControlsHighlight.js
-M1125,method,SetDefaultStyle,word,2,yes,,UNCLASSIFIED,Examples/Word/ApiHyperlink/Methods/SetDefaultStyle.js
+M1125,method,SetDefaultStyle,word,2,yes,,edit,Examples/Word/ApiHyperlink/Methods/SetDefaultStyle.js
 M1126,method,SetDelay,slide,2,yes,(delay),read,Examples/Slide/ApiAnimationEffect/Methods/SetDelay.js
 M1127,method,SetDistanceFromText,word,2,yes,(distance),edit,Examples/Word/ApiDropCap/Methods/GetDistanceFromText.js
 M1128,method,SetEditable,pdf,2,yes,(allowCustomText),edit,Examples/Pdf/ApiComboboxField/Methods/IsEditable.js
@@ -1144,9 +1144,9 @@ M1142,method,SetHidden,cell,2,yes,(isHidden),read,Examples/Cell/ApiRange/Methods
 M1143,method,SetIgnoreBlank,cell,2,yes,(IgnoreBlank),read,Examples/Cell/ApiValidation/Methods/GetIgnoreBlank.js
 M1144,method,SetIncludePageNumbers,word,2,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/SetIncludePageNumbers.js
 M1145,method,SetKeystroke,pdf,2,yes,(action),edit,Examples/Pdf/ApiActionCollection/Methods/GetKeystroke.js
-M1146,method,SetLayoutBlankLine,cell,2,yes,(insert),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetLayoutBlankLine.js
-M1147,method,SetLayoutSubtotalLocation,cell,2,yes,(type),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetLayoutSubtotalLocation.js
-M1148,method,SetLayoutSubtotals,cell,2,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetLayoutSubtotals.js
+M1146,method,SetLayoutBlankLine,cell,2,yes,(insert),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutBlankLine.js
+M1147,method,SetLayoutSubtotalLocation,cell,2,yes,(type),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutSubtotalLocation.js
+M1148,method,SetLayoutSubtotals,cell,2,yes,(show),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutSubtotals.js
 M1149,method,SetLeftFooter,cell,2,yes,(sText),edit,Examples/Cell/ApiPageSetup/Methods/GetLeftFooter.js
 M1150,method,SetLeftHeader,cell,2,yes,(sText),edit,Examples/Cell/ApiPageSetup/Methods/GetLeftHeader.js
 M1151,method,SetLocale,cell,2,yes,(LCID),read,Examples/Cell/Api/Methods/GetLocale.js
@@ -1168,8 +1168,8 @@ M1166,method,SetPageOrientation,cell;common,2,yes,(sPageOrientation),read,Exampl
 M1167,method,SetParaId,word,2,yes,(paraId),edit,Examples/Word/ApiParagraph/Methods/GetParaId.js
 M1168,method,SetPercentageFormat,pdf,2,yes,"(decimalPlaces, separatorStyle)",edit,Examples/Pdf/ApiComboboxField/Methods/SetPercentageFormat.js
 M1169,method,SetPercentileValues,cell,2,yes,(percentileValues),read,Examples/Cell/ApiIconSetCondition/Methods/GetPercentileValues.js
-M1170,method,SetPosX,pdf;slide,2,yes,(posX),UNCLASSIFIED,Examples/Pdf/ApiDrawing/Methods/SetPosX.js
-M1171,method,SetPosY,pdf;slide,2,yes,(posY),UNCLASSIFIED,Examples/Pdf/ApiDrawing/Methods/SetPosY.js
+M1170,method,SetPosX,pdf;slide,2,yes,(posX),edit,Examples/Pdf/ApiDrawing/Methods/SetPosX.js
+M1171,method,SetPosY,pdf;slide,2,yes,(posY),edit,Examples/Pdf/ApiDrawing/Methods/SetPosY.js
 M1172,method,SetPr,word,2,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/SetPr.js
 M1173,method,SetPrintArea,cell,2,yes,(sRange),read,Examples/Cell/ApiPageSetup/Methods/GetPrintArea.js
 M1174,method,SetPrintTitleColumns,cell,2,yes,(sRange),read,Examples/Cell/ApiPageSetup/Methods/GetPrintTitleColumns.js
@@ -1191,12 +1191,12 @@ M1189,method,SetSpecialFormat,pdf,2,yes,(format),edit,Examples/Pdf/ApiComboboxFi
 M1190,method,SetStartPageNumber,word,2,yes,(nStartNumber),edit,Examples/Word/ApiSection/Methods/GetStartPageNumber.js
 M1191,method,SetStartStyle,pdf,2,yes,(style),edit,Examples/Pdf/ApiLineAnnotation/Methods/SetStartStyle.js
 M1192,method,SetStrikethrough,cell,2,yes,(isStrikethrough),edit,Examples/Cell/ApiFont/Methods/GetStrikethrough.js
-M1193,method,SetStripeSize,cell,2,yes,(size),UNCLASSIFIED,Examples/Cell/ApiTableStyleElement/Methods/GetStripeSize.js
+M1193,method,SetStripeSize,cell,2,yes,(size),edit,Examples/Cell/ApiTableStyleElement/Methods/GetStripeSize.js
 M1194,method,SetStyleColBandSize,word,2,yes,(nCount),edit,Examples/Word/ApiTable/Methods/SetStyleColBandSize.js
-M1195,method,SetStyleName,cell,2,yes,(name),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetStyleName.js
+M1195,method,SetStyleName,cell,2,yes,(name),edit,Examples/Cell/ApiPivotTable/Methods/SetStyleName.js
 M1196,method,SetStyleRowBandSize,word,2,yes,(nCount),edit,Examples/Word/ApiTable/Methods/SetStyleRowBandSize.js
 M1197,method,SetSubscript,cell,2,yes,(isSubscript),edit,Examples/Cell/ApiFont/Methods/GetSubscript.js
-M1198,method,SetSubtotalName,cell,2,yes,(caption),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/GetSubtotalName.js
+M1198,method,SetSubtotalName,cell,2,yes,(caption),edit,Examples/Cell/ApiPivotField/Methods/GetSubtotalName.js
 M1199,method,SetSummary,cell,2,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetSummary.js
 M1200,method,SetSuperscript,cell,2,yes,(isSuperscript),edit,Examples/Cell/ApiFont/Methods/GetSuperscript.js
 M1201,method,SetTextAlign,pdf,2,yes,(textAlign),edit,Examples/Pdf/ApiBaseWidget/Methods/GetTextAlign.js
@@ -1240,14 +1240,14 @@ M1238,method,AVERAGEIFS,cell,1,yes,(),read,Examples/Cell/ApiWorksheetFunction/Me
 M1239,method,AcceptAllRevisionChanges,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/AcceptAllRevisionChanges.js
 M1240,method,Add2,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSortFields/Methods/Add2.js
 M1241,method,AddBreak,word,1,yes,"(breakType, position)",edit,Examples/Word/ApiDrawing/Methods/AddBreak.js
-M1242,method,AddField,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiRange/Methods/AddField.js
+M1242,method,AddField,word,1,yes,,edit,Examples/Word/ApiRange/Methods/AddField.js
 M1243,method,AddListColumn,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/AddListColumn.js
 M1244,method,AddListRow,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/AddListRow.js
 M1245,method,AddPagesCount,word,1,yes,(),edit,Examples/Word/ApiParagraph/Methods/AddPagesCount.js
 M1246,method,AddSeria,cell,1,yes,"(sNameRange, sValuesRange, sXValuesRange)",read,Examples/Cell/ApiChart/Methods/AddSeria.js
-M1247,method,AddWordArt,cell,1,yes,"(oTextPr, sText, sTransform, oFill, oStroke, nRotAngle, nWidth, nHeight, nFromCol, nFromRow, nColOffset, nRowOffset)",UNCLASSIFIED,Examples/Cell/ApiWorksheet/Methods/AddWordArt.js
+M1247,method,AddWordArt,cell,1,yes,"(oTextPr, sText, sTransform, oFill, oStroke, nRotAngle, nWidth, nHeight, nFromCol, nFromRow, nColOffset, nRowOffset)",edit,Examples/Cell/ApiWorksheet/Methods/AddWordArt.js
 M1248,method,ApplyFilter,cell,1,yes,(),read,Examples/Cell/ApiAutoFilter/Methods/ApplyFilter.js
-M1249,method,AutoSort,cell,1,yes,"(order, field)",UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/AutoSort.js
+M1249,method,AutoSort,cell,1,yes,"(order, field)",edit,Examples/Cell/ApiPivotField/Methods/AutoSort.js
 M1250,method,BASE,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/BASE.js
 M1251,method,BESSELI,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/BESSELI.js
 M1252,method,BESSELJ,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/BESSELJ.js
@@ -1327,13 +1327,13 @@ M1325,method,ClearValueFilters,cell,1,yes,(),read,Examples/Cell/ApiPivotField/Me
 M1326,method,CoAuthoringChatSendMessage,word,1,yes,(message),read,Examples/Word/Api/Methods/CoAuthoringChatSendMessage.js
 M1327,method,ConvertDocument,word,1,yes,"(convertType, htmlHeadings, base64img, demoteHeadings, renderHTMLTags)",read,Examples/Word/Api/Methods/ConvertDocument.js
 M1328,method,CreateCheckBoxContentControl,word,1,yes,(checkBoxPr),edit,Examples/Word/Api/Methods/CreateCheckBoxContentControl.js
-M1329,method,CreateColorByName,cell,1,yes,(sPresetColor),UNCLASSIFIED,Examples/Cell/Api/Methods/CreateColorByName.js
+M1329,method,CreateColorByName,cell,1,yes,(sPresetColor),read,Examples/Cell/Api/Methods/CreateColorByName.js
 M1330,method,CreateColorFromRGB,cell,1,yes,"(r, g, b)",read,Examples/Cell/Api/Methods/CreateColorFromRGB.js
 M1331,method,CreateDateField,pdf,1,yes,(rect),edit,Examples/Pdf/Api/Methods/CreateDateField.js
 M1332,method,CreateDatePickerContentControl,word,1,yes,(datePickerPr),edit,Examples/Word/Api/Methods/CreateDatePickerContentControl.js
 M1333,method,CreateImageStampAnnot,pdf,1,yes,"(position, imageSrc, author, creationDate)",edit,Examples/Pdf/Api/Methods/CreateImageStampAnnot.js
 M1334,method,CreatePictureContentControl,word,1,yes,"(width, height)",edit,Examples/Word/Api/Methods/CreatePictureContentControl.js
-M1335,method,Cut,cell,1,yes,(destination),UNCLASSIFIED,Examples/Cell/ApiRange/Methods/Cut.js
+M1335,method,Cut,cell,1,yes,(destination),edit,Examples/Cell/ApiRange/Methods/Cut.js
 M1336,method,DATE,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/DATE.js
 M1337,method,DATEVALUE,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/DATEVALUE.js
 M1338,method,DAVERAGE,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/DAVERAGE.js
@@ -1411,7 +1411,7 @@ M1409,method,FillLeft,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiRange/Methods/Fi
 M1410,method,FillRight,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiRange/Methods/FillRight.js
 M1411,method,FillUp,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiRange/Methods/FillUp.js
 M1412,method,FindPrevious,cell,1,yes,(Before),edit,Examples/Cell/ApiRange/Methods/FindPrevious.js
-M1413,method,ForEach,cell,1,yes,(fCallback),UNCLASSIFIED,Examples/Cell/ApiRange/Methods/ForEach.js
+M1413,method,ForEach,cell,1,yes,(fCallback),read,Examples/Cell/ApiRange/Methods/ForEach.js
 M1414,method,FormatAsTable,cell,1,yes,(sRange),read,Examples/Cell/ApiWorksheet/Methods/FormatAsTable.js
 M1415,method,FreezeAt,cell,1,yes,(frozenRange),read,Examples/Cell/ApiFreezePanes/Methods/FreezeAt.js
 M1416,method,FreezeColumns,cell,1,yes,(count),read,Examples/Cell/ApiFreezePanes/Methods/FreezeColumns.js
@@ -1447,13 +1447,13 @@ M1445,method,GetAllSlides,slide,1,yes,(),read,Examples/Slide/ApiPresentation/Met
 M1446,method,GetAllStyles,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetAllStyles.js
 M1447,method,GetAllUsers,cell,1,yes,(),read,Examples/Cell/ApiProtectedRange/Methods/GetAllUsers.js
 M1448,method,GetAllowedSymbols,word,1,yes,(),read,Examples/Word/ApiTextForm/Methods/GetAllowedSymbols.js
-M1449,method,GetBetweenBorder,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetBetweenBorder.js
+M1449,method,GetBetweenBorder,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetBetweenBorder.js
 M1450,method,GetBodyShape,slide,1,yes,(),read,Examples/Slide/ApiNotesPage/Methods/GetBodyShape.js
 M1451,method,GetBodyShapeText,slide,1,yes,(),read,Examples/Slide/ApiNotesPage/Methods/GetBodyShapeText.js
 M1452,method,GetBookmarkRange,word,1,yes,(sName),edit,Examples/Word/ApiDocument/Methods/GetBookmarkRange.js
 M1453,method,GetBorderEffectIntensity,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetBorderEffectIntensity.js
 M1454,method,GetBorderEffectStyle,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetBorderEffectStyle.js
-M1455,method,GetBottomBorder,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetBottomBorder.js
+M1455,method,GetBottomBorder,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetBottomBorder.js
 M1456,method,GetCalculate,pdf,1,yes,(),read,Examples/Pdf/ApiActionCollection/Methods/GetCalculate.js
 M1457,method,GetCenterHorizontally,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetCenterHorizontally.js
 M1458,method,GetCenterVertically,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetCenterVertically.js
@@ -1461,13 +1461,13 @@ M1459,method,GetCheckStyle,pdf,1,yes,(),read,Examples/Pdf/ApiCheckboxWidget/Meth
 M1460,method,GetCol,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetCol.js
 M1461,method,GetColumnFields,cell,1,yes,(field),read,Examples/Cell/ApiPivotTable/Methods/GetColumnFields.js
 M1462,method,GetColumnRange,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetColumnRange.js
-M1463,method,GetColumnsSpaces,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetColumnsSpaces.js
+M1463,method,GetColumnsSpaces,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetColumnsSpaces.js
 M1464,method,GetContentControlsByTag,word,1,yes,(sTag),read,Examples/Word/ApiDocument/Methods/GetContentControlsByTag.js
 M1465,method,GetContextualSpacing,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetContextualSpacing.js
 M1466,method,GetControlsHighlight,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetControlsHighlight.js
 M1467,method,GetCreationDate,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetCreationDate.js
-M1468,method,GetCriteria1,cell,1,yes,(),UNCLASSIFIED,Examples/Cell/ApiFilter/Methods/GetCriteria1.js
-M1469,method,GetCriteria2,cell,1,yes,(),UNCLASSIFIED,Examples/Cell/ApiFilter/Methods/GetCriteria2.js
+M1468,method,GetCriteria1,cell,1,yes,(),read,Examples/Cell/ApiFilter/Methods/GetCriteria1.js
+M1469,method,GetCriteria2,cell,1,yes,(),read,Examples/Cell/ApiFilter/Methods/GetCriteria2.js
 M1470,method,GetCurSlideIndex,slide,1,yes,(),read,Examples/Slide/ApiPresentation/Methods/GetCurSlideIndex.js
 M1471,method,GetCurrentFootEndnote,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetCurrentFootEndnote.js
 M1472,method,GetCurrentRegion,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetCurrentRegion.js
@@ -1476,11 +1476,11 @@ M1474,method,GetCurrentVisibleSlide,slide,1,yes,(),read,Examples/Slide/ApiPresen
 M1475,method,GetDashPattern,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetDashPattern.js
 M1476,method,GetDifferentFirstPageHeaderFooter,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetDifferentFirstPageHeaderFooter.js
 M1477,method,GetDisplay,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetDisplay.js
-M1478,method,GetDisplayedText,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiHyperlink/Methods/GetDisplayedText.js
-M1479,method,GetDistanceFromText,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiDropCap/Methods/GetDistanceFromText.js
+M1478,method,GetDisplayedText,word,1,yes,,read,Examples/Word/ApiHyperlink/Methods/GetDisplayedText.js
+M1479,method,GetDistanceFromText,word,1,yes,(),read,Examples/Word/ApiDropCap/Methods/GetDistanceFromText.js
 M1480,method,GetDropCap,word,1,yes,(),read,Examples/Word/ApiParagraph/Methods/GetDropCap.js
 M1481,method,GetEffect,slide,1,yes,(index),read,Examples/Slide/ApiAnimationSequence/Methods/GetEffect.js
-M1482,method,GetEndPage,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiRange/Methods/GetEndPage.js
+M1482,method,GetEndPage,word,1,yes,,edit,Examples/Word/ApiRange/Methods/GetEndPage.js
 M1483,method,GetEntireColumn,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetEntireColumn.js
 M1484,method,GetEntireRow,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetEntireRow.js
 M1485,method,GetErrorMessage,cell,1,yes,(),read,Examples/Cell/ApiValidation/Methods/GetErrorMessage.js
@@ -1493,7 +1493,7 @@ M1491,method,GetFirstPageNumber,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Me
 M1492,method,GetFirstSlide,slide,1,yes,,UNCLASSIFIED,Examples/Slide/Api/Methods/GetFirstSlide.js
 M1493,method,GetFitToPagesTall,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetFitToPagesTall.js
 M1494,method,GetFitToPagesWide,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetFitToPagesWide.js
-M1495,method,GetFooterDistance,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetFooterDistance.js
+M1495,method,GetFooterDistance,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetFooterDistance.js
 M1496,method,GetFooterMargin,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetFooterMargin.js
 M1497,method,GetFormKeysByRole,word,1,yes,(role),read,Examples/Word/ApiDocument/Methods/GetFormKeysByRole.js
 M1498,method,GetFormValueByKey,word,1,yes,(key),read,Examples/Word/ApiDocument/Methods/GetFormValueByKey.js
@@ -1501,11 +1501,11 @@ M1499,method,GetFormsByKey,word,1,yes,(key),read,Examples/Word/ApiDocument/Metho
 M1500,method,GetFormsByRole,word,1,yes,(role),read,Examples/Word/ApiDocument/Methods/GetFormsByRole.js
 M1501,method,GetFormsByTag,word,1,yes,(sTag),read,Examples/Word/ApiDocument/Methods/GetFormsByTag.js
 M1502,method,GetFormsHighlight,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetFormsHighlight.js
-M1503,method,GetFormulaArray,cell,1,yes,(),UNCLASSIFIED,Examples/Cell/ApiRange/Methods/GetFormulaArray.js
+M1503,method,GetFormulaArray,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetFormulaArray.js
 M1504,method,GetFreezePanesType,cell,1,yes,(),read,Examples/Cell/Api/Methods/GetFreezePanesType.js
 M1505,method,GetFunction,cell,1,yes,(),read,Examples/Cell/ApiPivotDataField/Methods/GetFunction.js
 M1506,method,GetGroupValue,word,1,yes,(),read,Examples/Word/ApiCheckBoxForm/Methods/GetGroupValue.js
-M1507,method,GetHeaderDistance,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetHeaderDistance.js
+M1507,method,GetHeaderDistance,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetHeaderDistance.js
 M1508,method,GetHeaderMargin,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetHeaderMargin.js
 M1509,method,GetHeaderRowRange,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetHeaderRowRange.js
 M1510,method,GetHiddenFields,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetHiddenFields.js
@@ -1529,7 +1529,7 @@ M1527,method,GetKeystroke,pdf,1,yes,(),read,Examples/Pdf/ApiActionCollection/Met
 M1528,method,GetLastSlide,slide,1,yes,,UNCLASSIFIED,Examples/Slide/Api/Methods/GetLastSlide.js
 M1529,method,GetLayoutByType,slide,1,yes,(sType),read,Examples/Slide/ApiMaster/Methods/GetLayoutByType.js
 M1530,method,GetLayoutType,slide,1,yes,(),read,Examples/Slide/ApiLayout/Methods/GetLayoutType.js
-M1531,method,GetLeftBorder,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetLeftBorder.js
+M1531,method,GetLeftBorder,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetLeftBorder.js
 M1532,method,GetLinesToDrop,word,1,yes,(),read,Examples/Word/ApiDropCap/Methods/GetLinesToDrop.js
 M1533,method,GetListValues,word,1,yes,(),read,Examples/Word/ApiComboBoxForm/Methods/GetListValues.js
 M1534,method,GetLocale,cell,1,yes,(),read,Examples/Cell/Api/Methods/GetLocale.js
@@ -1556,8 +1556,8 @@ M1554,method,GetOptions,pdf,1,yes,(),read,Examples/Pdf/ApiBaseListField/Methods/
 M1555,method,GetPageBreakBefore,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetPageBreakBefore.js
 M1556,method,GetPageCount,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/GetPageCount.js
 M1557,method,GetPageFields,cell,1,yes,(field),read,Examples/Cell/ApiPivotTable/Methods/GetPageFields.js
-M1558,method,GetPageHeight,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageHeight.js
-M1559,method,GetPageWidth,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiSection/Methods/GetPageWidth.js
+M1558,method,GetPageHeight,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetPageHeight.js
+M1559,method,GetPageWidth,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetPageWidth.js
 M1560,method,GetPaperSize,cell,1,yes,(),read,Examples/Cell/ApiPageSetup/Methods/GetPaperSize.js
 M1561,method,GetParagraphMarkTextPr,word,1,yes,(),edit,Examples/Word/ApiParagraph/Methods/GetParagraphMarkTextPr.js
 M1562,method,GetParentLayout,slide,1,yes,(),read,Examples/Slide/ApiDrawing/Methods/GetParentLayout.js
@@ -1583,9 +1583,9 @@ M1581,method,GetRefersToRange,cell,1,yes,(),read,Examples/Cell/ApiName/Methods/G
 M1582,method,GetReplies,pdf,1,yes,(),read,Examples/Pdf/ApiBaseAnnotation/Methods/GetReplies.js
 M1583,method,GetReverseOrder,cell,1,yes,(),read,Examples/Cell/ApiIconSetCondition/Methods/GetReverseOrder.js
 M1584,method,GetReviewReport,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetReviewReport.js
-M1585,method,GetRightBorder,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetRightBorder.js
+M1585,method,GetRightBorder,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetRightBorder.js
 M1586,method,GetRng,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSort/Methods/GetRng.js
-M1587,method,GetRoleColor,form,1,yes,,UNCLASSIFIED,Examples/Forms/ApiFormRoles/Methods/GetRoleColor.js
+M1587,method,GetRoleColor,form,1,yes,,read,Examples/Forms/ApiFormRoles/Methods/GetRoleColor.js
 M1588,method,GetRowFields,cell,1,yes,(field),read,Examples/Cell/ApiPivotTable/Methods/GetRowFields.js
 M1589,method,GetRowHeight,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetRowHeight.js
 M1590,method,GetRowRange,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetRowRange.js
@@ -1606,7 +1606,7 @@ M1604,method,GetSlidesCount,slide,1,yes,(),read,Examples/Slide/ApiPresentation/M
 M1605,method,GetSortOnValue,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSortField/Methods/GetSortOnValue.js
 M1606,method,GetSourceName,cell,1,yes,(),read,Examples/Cell/ApiPivotField/Methods/GetSourceName.js
 M1607,method,GetSourceType,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetSourceType.js
-M1608,method,GetStartPage,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiRange/Methods/GetStartPage.js
+M1608,method,GetStartPage,word,1,yes,,edit,Examples/Word/ApiRange/Methods/GetStartPage.js
 M1609,method,GetStartPageNumber,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetStartPageNumber.js
 M1610,method,GetStatistics,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/GetStatistics.js
 M1611,method,GetStrikethrough,cell,1,yes,(),read,Examples/Cell/ApiFont/Methods/GetStrikethrough.js
@@ -1619,14 +1619,14 @@ M1617,method,GetTable,cell,1,yes,(),read,Examples/Cell/ApiPivotField/Methods/Get
 M1618,method,GetTableRange1,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetTableRange1.js
 M1619,method,GetTableRange2,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/GetTableRange2.js
 M1620,method,GetTables,word,1,yes,(),read,Examples/Word/ApiTable/Methods/GetTables.js
-M1621,method,GetTabs,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetTabs.js
+M1621,method,GetTabs,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetTabs.js
 M1622,method,GetTagsOfAllContentControls,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetTagsOfAllContentControls.js
 M1623,method,GetTagsOfAllForms,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetTagsOfAllForms.js
 M1624,method,GetTextAlign,pdf,1,yes,(),read,Examples/Pdf/ApiBaseWidget/Methods/GetTextAlign.js
 M1625,method,GetTextSize,pdf,1,yes,(),read,Examples/Pdf/ApiBaseWidget/Methods/GetTextSize.js
 M1626,method,GetTextWithQuads,pdf,1,yes,,UNCLASSIFIED,Examples/Pdf/ApiPage/Methods/GetTextWithQuads.js
-M1627,method,GetTooltip,pdf,1,yes,,UNCLASSIFIED,Examples/Pdf/ApiBaseField/Methods/GetTooltip.js
-M1628,method,GetTopBorder,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiParaPr/Methods/GetTopBorder.js
+M1627,method,GetTooltip,pdf,1,yes,,read,Examples/Pdf/ApiBaseField/Methods/GetTooltip.js
+M1628,method,GetTopBorder,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetTopBorder.js
 M1629,method,GetTopBottom,cell,1,yes,(),read,Examples/Cell/ApiTop10/Methods/GetTopBottom.js
 M1630,method,GetTotal,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListColumn/Methods/GetTotal.js
 M1631,method,GetTotalsRowRange,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetTotalsRowRange.js
@@ -1642,7 +1642,7 @@ M1640,method,GetWorksheet,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetW
 M1641,method,GetWorksheetFunction,cell,1,yes,(),edit,Examples/Cell/Api/Methods/GetWorksheetFunction.js
 M1642,method,GoTo,word,1,yes,(),UNCLASSIFIED,Examples/Word/ApiBookmark/Methods/GoTo.js
 M1643,method,GoToPage,word,1,yes,(index),UNCLASSIFIED,Examples/Word/ApiDocument/Methods/GoToPage.js
-M1644,method,Group,cell,1,yes,"(start, end, by, periods)",UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/Group.js
+M1644,method,Group,cell,1,yes,"(start, end, by, periods)",edit,Examples/Cell/ApiPivotField/Methods/Group.js
 M1645,method,HARMEAN,cell,1,yes,(),read,Examples/Cell/ApiWorksheetFunction/Methods/HARMEAN.js
 M1646,method,HEX2BIN,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/HEX2BIN.js
 M1647,method,HEX2DEC,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/HEX2DEC.js
@@ -1652,7 +1652,7 @@ M1650,method,HOUR,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Meth
 M1651,method,HYPERLINK,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/HYPERLINK.js
 M1652,method,HYPGEOMDIST,cell,1,yes,"(arg1, arg2, arg3, arg4)",read,Examples/Cell/ApiWorksheetFunction/Methods/HYPGEOMDIST.js
 M1653,method,HYPGEOM_DIST,cell,1,yes,"(arg1, arg2, arg3, arg4, arg5)",read,Examples/Cell/ApiWorksheetFunction/Methods/HYPGEOM_DIST.js
-M1654,method,HaveRole,form,1,yes,,UNCLASSIFIED,Examples/Forms/ApiFormRoles/Methods/HaveRole.js
+M1654,method,HaveRole,form,1,yes,,read,Examples/Forms/ApiFormRoles/Methods/HaveRole.js
 M1655,method,IF,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/IF.js
 M1656,method,IFERROR,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/IFERROR.js
 M1657,method,IFNA,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/IFNA.js
@@ -1701,7 +1701,7 @@ M1699,method,ISO_CEILING,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorkshe
 M1700,method,ISPMT,cell,1,yes,"(arg1, arg2, arg3, arg4)",read,Examples/Cell/ApiWorksheetFunction/Methods/ISPMT.js
 M1701,method,ISREF,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/ISREF.js
 M1702,method,ISTEXT,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/ISTEXT.js
-M1703,method,InsertWatermark,word,1,yes,"(sText, bIsDiagonal)",UNCLASSIFIED,Examples/Word/ApiDocument/Methods/InsertWatermark.js
+M1703,method,InsertWatermark,word,1,yes,"(sText, bIsDiagonal)",edit,Examples/Word/ApiDocument/Methods/InsertWatermark.js
 M1704,method,Intersect,cell,1,yes,"(Range1, Range2)",read,Examples/Cell/Api/Methods/Intersect.js
 M1705,method,IsAutoColor,word,1,yes,(),read,Examples/Word/ApiColor/Methods/IsAutoColor.js
 M1706,method,IsCheckBox,word,1,yes,(),read,Examples/Word/ApiInlineLvlSdt/Methods/IsCheckBox.js
@@ -1732,7 +1732,7 @@ M1730,method,LOGNORM_DIST,cell,1,yes,"(arg1, arg2, arg3, arg4)",read,Examples/Ce
 M1731,method,LOGNORM_INV,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/LOGNORM_INV.js
 M1732,method,LOOKUP,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/LOOKUP.js
 M1733,method,LOWER,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/LOWER.js
-M1734,method,LinkWithStyle,word,1,yes,(oStyle),UNCLASSIFIED,Examples/Word/ApiNumberingLevel/Methods/LinkWithStyle.js
+M1734,method,LinkWithStyle,word,1,yes,(oStyle),edit,Examples/Word/ApiNumberingLevel/Methods/LinkWithStyle.js
 M1735,method,MAX,cell,1,yes,(),read,Examples/Cell/ApiWorksheetFunction/Methods/MAX.js
 M1736,method,MAXA,cell,1,yes,(),read,Examples/Cell/ApiWorksheetFunction/Methods/MAXA.js
 M1737,method,MDURATION,cell,1,yes,"(arg1, arg2, arg3, arg4, arg5, arg6)",read,Examples/Cell/ApiWorksheetFunction/Methods/MDURATION.js
@@ -1804,7 +1804,7 @@ M1802,method,PRICEMAT,cell,1,yes,"(arg1, arg2, arg3, arg4, arg5, arg6)",read,Exa
 M1803,method,PRODUCT,cell,1,yes,(),read,Examples/Cell/ApiWorksheetFunction/Methods/PRODUCT.js
 M1804,method,PROPER,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/PROPER.js
 M1805,method,PV,cell,1,yes,"(arg1, arg2, arg3, arg4, arg5)",read,Examples/Cell/ApiWorksheetFunction/Methods/PV.js
-M1806,method,PivotValueCell,cell,1,yes,"(rowLine, colLine)",UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/PivotValueCell.js
+M1806,method,PivotValueCell,cell,1,yes,"(rowLine, colLine)",read,Examples/Cell/ApiPivotTable/Methods/PivotValueCell.js
 M1807,method,QUARTILE,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/QUARTILE.js
 M1808,method,QUARTILE_EXC,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/QUARTILE_EXC.js
 M1809,method,QUARTILE_INC,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFunction/Methods/QUARTILE_INC.js
@@ -1829,14 +1829,14 @@ M1827,method,ROUNDUP,cell,1,yes,"(arg1, arg2)",read,Examples/Cell/ApiWorksheetFu
 M1828,method,ROWS,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/ROWS.js
 M1829,method,RRI,cell,1,yes,"(arg1, arg2, arg3)",read,Examples/Cell/ApiWorksheetFunction/Methods/RRI.js
 M1830,method,RT,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiWorksheetFunction/Methods/F_INV_RT.js
-M1831,method,RecalculateAllFormulas,cell,1,yes,(fLogger),UNCLASSIFIED,Examples/Cell/Api/Methods/RecalculateAllFormulas.js
+M1831,method,RecalculateAllFormulas,cell,1,yes,(fLogger),edit,Examples/Cell/Api/Methods/RecalculateAllFormulas.js
 M1832,method,RecalculateAutoFit,slide,1,yes,,UNCLASSIFIED,Examples/Slide/ApiShape/Methods/RecalculateAutoFit.js
-M1833,method,RecognizeContent,pdf,1,yes,(),UNCLASSIFIED,Examples/Pdf/ApiPage/Methods/RecognizeContent.js
+M1833,method,RecognizeContent,pdf,1,yes,(),edit,Examples/Pdf/ApiPage/Methods/RecognizeContent.js
 M1834,method,RefreshTable,cell,1,yes,(),read,Examples/Cell/ApiPivotTable/Methods/RefreshTable.js
 M1835,method,RejectAllRevisionChanges,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/RejectAllRevisionChanges.js
 M1836,method,RemoveAllEffects,slide,1,yes,(),read,Examples/Slide/ApiAnimationSequence/Methods/RemoveAllEffects.js
 M1837,method,RemoveCustomFunction,cell,1,yes,(sName),read,Examples/Cell/Api/Methods/RemoveCustomFunction.js
-M1838,method,RemoveDuplicates,cell,1,yes,"(aColumns, sHeader)",UNCLASSIFIED,Examples/Cell/ApiRange/Methods/RemoveDuplicates.js
+M1838,method,RemoveDuplicates,cell,1,yes,"(aColumns, sHeader)",edit,Examples/Cell/ApiRange/Methods/RemoveDuplicates.js
 M1839,method,RemoveField,cell,1,yes,(identifier),read,Examples/Cell/ApiPivotTable/Methods/RemoveField.js
 M1840,method,RemoveFooter,word,1,yes,(sType),edit,Examples/Word/ApiSection/Methods/RemoveFooter.js
 M1841,method,RemoveListItem,word,1,yes,(value),edit,Examples/Word/ApiInlineLvlSdt/Methods/RemoveListItem.js
@@ -1892,7 +1892,7 @@ M1890,method,SetAlignVertical,cell,1,yes,(sAlignment),read,Examples/Cell/ApiRang
 M1891,method,SetAllExcept,pdf,1,yes,(isAllExcept),edit,Examples/Pdf/ApiResetFormsAction/Methods/SetAllExcept.js
 M1892,method,SetAssistantTrackRevisions,word,1,yes,"(isTrack, assistantName)",edit,Examples/Word/ApiDocument/Methods/SetAssistantTrackRevisions.js
 M1893,method,SetAxisColor,cell,1,yes,(oColor),read,Examples/Cell/ApiDatabar/Methods/SetAxisColor.js
-M1894,method,SetAxisPosition,cell,1,yes,(position),UNCLASSIFIED,Examples/Cell/ApiDatabar/Methods/SetAxisPosition.js
+M1894,method,SetAxisPosition,cell,1,yes,(position),edit,Examples/Cell/ApiDatabar/Methods/SetAxisPosition.js
 M1895,method,SetBarBorderColor,cell,1,yes,(oColor),read,Examples/Cell/ApiDatabar/Methods/SetBarBorderColor.js
 M1896,method,SetBarColor,cell,1,yes,(oColor),read,Examples/Cell/ApiDatabar/Methods/SetBarColor.js
 M1897,method,SetBarFillType,cell,1,yes,(fillType),read,Examples/Cell/ApiDatabar/Methods/SetBarFillType.js
@@ -1901,29 +1901,29 @@ M1899,method,SetCatFormula,cell,1,yes,(sRange),edit,Examples/Cell/ApiChart/Metho
 M1900,method,SetCellPr,word,1,yes,(oApiTableCellPr),edit,Examples/Word/ApiTableCell/Methods/SetCellPr.js
 M1901,method,SetCheckBoxChecked,word,1,yes,(isChecked),edit,Examples/Word/ApiInlineLvlSdt/Methods/SetCheckBoxChecked.js
 M1902,method,SetCheckStyle,pdf,1,yes,(style),edit,Examples/Pdf/ApiCheckboxWidget/Methods/SetCheckStyle.js
-M1903,method,SetColumnGrand,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetColumnGrand.js
+M1903,method,SetColumnGrand,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetColumnGrand.js
 M1904,method,SetCreationDate,pdf,1,yes,(timeStamp),edit,Examples/Pdf/ApiBaseAnnotation/Methods/SetCreationDate.js
-M1905,method,SetDateOperator,cell,1,yes,(DateOperator),UNCLASSIFIED,Examples/Cell/ApiFormatCondition/Methods/SetDateOperator.js
+M1905,method,SetDateOperator,cell,1,yes,(DateOperator),edit,Examples/Cell/ApiFormatCondition/Methods/SetDateOperator.js
 M1906,method,SetDisplay,pdf,1,yes,(display),edit,Examples/Pdf/ApiBaseAnnotation/Methods/SetDisplay.js
-M1907,method,SetDisplayFieldCaptions,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetDisplayFieldCaptions.js
-M1908,method,SetDisplayFieldsInReportFilterArea,cell,1,yes,"(type, fields)",UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetDisplayFieldsInReportFilterArea.js
+M1907,method,SetDisplayFieldCaptions,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetDisplayFieldCaptions.js
+M1908,method,SetDisplayFieldsInReportFilterArea,cell,1,yes,"(type, fields)",edit,Examples/Cell/ApiPivotTable/Methods/SetDisplayFieldsInReportFilterArea.js
 M1909,method,SetDisplayGridlines,cell,1,yes,(isDisplayed),read,Examples/Cell/ApiWorksheet/Methods/SetDisplayGridlines.js
 M1910,method,SetDisplayHeadings,cell,1,yes,(isDisplayed),read,Examples/Cell/ApiWorksheet/Methods/SetDisplayHeadings.js
 M1911,method,SetDisplayName,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/SetDisplayName.js
-M1912,method,SetDisplayedText,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiHyperlink/Methods/SetDisplayedText.js
+M1912,method,SetDisplayedText,word,1,yes,,edit,Examples/Word/ApiHyperlink/Methods/SetDisplayedText.js
 M1913,method,SetDragToColumn,cell,1,yes,(flag),edit,Examples/Cell/ApiPivotField/Methods/SetDragToColumn.js
 M1914,method,SetDragToData,cell,1,yes,(flag),edit,Examples/Cell/ApiPivotField/Methods/SetDragToData.js
 M1915,method,SetDragToPage,cell,1,yes,(flag),edit,Examples/Cell/ApiPivotField/Methods/SetDragToPage.js
 M1916,method,SetDragToRow,cell,1,yes,(flag),edit,Examples/Cell/ApiPivotField/Methods/SetDragToRow.js
 M1917,method,SetDrawingPrFromDrawing,word,1,yes,(oAnotherDrawing),edit,Examples/Word/ApiDrawing/Methods/SetDrawingPrFromDrawing.js
-M1918,method,SetDupeUnique,cell,1,yes,(dupeUnique),UNCLASSIFIED,Examples/Cell/ApiUniqueValues/Methods/SetDupeUnique.js
+M1918,method,SetDupeUnique,cell,1,yes,(dupeUnique),edit,Examples/Cell/ApiUniqueValues/Methods/SetDupeUnique.js
 M1919,method,SetEndPoint,pdf,1,yes,(point),edit,Examples/Pdf/ApiLineAnnotation/Methods/SetEndPoint.js
 M1920,method,SetEvenAndOddHdrFtr,word,1,yes,(isEvenAndOdd),edit,Examples/Word/ApiDocument/Methods/SetEvenAndOddHdrFtr.js
 M1921,method,SetFontName,cell,1,yes,(sName),read,Examples/Cell/ApiRange/Methods/SetFontName.js
 M1922,method,SetFormula,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiRange/Methods/SetFormula.js
-M1923,method,SetGrandTotalName,cell,1,yes,(name),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetGrandTotalName.js
+M1923,method,SetGrandTotalName,cell,1,yes,(name),edit,Examples/Cell/ApiPivotTable/Methods/SetGrandTotalName.js
 M1924,method,SetHAlign,word,1,yes,(sType),edit,Examples/Word/ApiTable/Methods/SetHAlign.js
-M1925,method,SetHasAutoFormat,cell,1,yes,(hasAutoFormat),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetHasAutoFormat.js
+M1925,method,SetHasAutoFormat,cell,1,yes,(hasAutoFormat),edit,Examples/Cell/ApiPivotTable/Methods/SetHasAutoFormat.js
 M1926,method,SetHide,pdf,1,yes,(isHide),edit,Examples/Pdf/ApiHideShowFormsAction/Methods/SetHide.js
 M1927,method,SetIcon,cell,1,yes,(icon),edit,Examples/Cell/ApiIconCriterion/Methods/SetIcon.js
 M1928,method,SetIconType,pdf,1,yes,(iconType),edit,Examples/Pdf/ApiTextAnnotation/Methods/SetIconType.js
@@ -1931,14 +1931,14 @@ M1929,method,SetIconXPos,pdf,1,yes,(posX),edit,Examples/Pdf/ApiButtonWidget/Meth
 M1930,method,SetIconYPos,pdf,1,yes,(posY),edit,Examples/Pdf/ApiButtonWidget/Methods/SetIconYPos.js
 M1931,method,SetInCellDropdown,cell,1,yes,(InCellDropdown),read,Examples/Cell/ApiValidation/Methods/SetInCellDropdown.js
 M1932,method,SetIncludeLabel,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfFigures/Methods/SetIncludeLabel.js
-M1933,method,SetLayoutCompactRow,cell,1,yes,(compact),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetLayoutCompactRow.js
-M1934,method,SetLayoutForm,cell,1,yes,(type),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetLayoutForm.js
+M1933,method,SetLayoutCompactRow,cell,1,yes,(compact),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutCompactRow.js
+M1934,method,SetLayoutForm,cell,1,yes,(type),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutForm.js
 M1935,method,SetLayoutPageBreak,cell,1,yes,(insert),edit,Examples/Cell/ApiPivotField/Methods/SetLayoutPageBreak.js
 M1936,method,SetLowerHeadingLevel,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/SetLowerHeadingLevel.js
 M1937,method,SetMatchCase,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSort/Methods/SetMatchCase.js
-M1938,method,SetMaxPointType,cell,1,yes,(type),UNCLASSIFIED,Examples/Cell/ApiDatabar/Methods/SetMaxPointType.js
+M1938,method,SetMaxPointType,cell,1,yes,(type),edit,Examples/Cell/ApiDatabar/Methods/SetMaxPointType.js
 M1939,method,SetMaxPointValue,cell,1,yes,(value),read,Examples/Cell/ApiDatabar/Methods/SetMaxPointValue.js
-M1940,method,SetMinPointType,cell,1,yes,(type),UNCLASSIFIED,Examples/Cell/ApiDatabar/Methods/SetMinPointType.js
+M1940,method,SetMinPointType,cell,1,yes,(type),edit,Examples/Cell/ApiDatabar/Methods/SetMinPointType.js
 M1941,method,SetMinPointValue,cell,1,yes,(value),read,Examples/Cell/ApiDatabar/Methods/SetMinPointValue.js
 M1942,method,SetModDate,pdf,1,yes,(timeStamp),edit,Examples/Pdf/ApiBaseAnnotation/Methods/SetModDate.js
 M1943,method,SetNegativeBarColor,cell,1,yes,(oColor),read,Examples/Cell/ApiDatabar/Methods/SetNegativeBarColor.js
@@ -1952,23 +1952,23 @@ M1950,method,SetPercent,cell,1,yes,(percent),read,Examples/Cell/ApiTop10/Methods
 M1951,method,SetPercentMax,cell,1,yes,(percent),read,Examples/Cell/ApiDatabar/Methods/SetPercentMax.js
 M1952,method,SetPercentMin,cell,1,yes,(percent),read,Examples/Cell/ApiDatabar/Methods/SetPercentMin.js
 M1953,method,SetPicture,word,1,yes,(imageUrl),edit,Examples/Word/ApiInlineLvlSdt/Methods/SetPicture.js
-M1954,method,SetPictureSize,word,1,yes,"(width, height)",UNCLASSIFIED,Examples/Word/ApiInlineLvlSdt/Methods/SetPictureSize.js
+M1954,method,SetPictureSize,word,1,yes,"(width, height)",edit,Examples/Word/ApiInlineLvlSdt/Methods/SetPictureSize.js
 M1955,method,SetQuads,pdf,1,yes,(quads),edit,Examples/Pdf/ApiBaseMarkupAnnotation/Methods/SetQuads.js
 M1956,method,SetRange,cell,1,yes,(sRange),edit,Examples/Cell/ApiProtectedRange/Methods/SetRange.js
 M1957,method,SetReadOnly,pdf,1,yes,(readOnly),edit,Examples/Pdf/ApiBaseField/Methods/SetReadOnly.js
 M1958,method,SetReferenceStyle,cell,1,yes,(sReferenceStyle),read,Examples/Cell/Api/Methods/SetReferenceStyle.js
-M1959,method,SetRepeatAllLabels,cell,1,yes,(repeat),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetRepeatAllLabels.js
+M1959,method,SetRepeatAllLabels,cell,1,yes,(repeat),edit,Examples/Cell/ApiPivotTable/Methods/SetRepeatAllLabels.js
 M1960,method,SetRepeatCount,slide,1,yes,(count),read,Examples/Slide/ApiAnimationEffect/Methods/SetRepeatCount.js
-M1961,method,SetRepeatLabels,cell,1,yes,(repeat),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetRepeatLabels.js
+M1961,method,SetRepeatLabels,cell,1,yes,(repeat),edit,Examples/Cell/ApiPivotField/Methods/SetRepeatLabels.js
 M1962,method,SetRoleColor,form,1,yes,,UNCLASSIFIED,Examples/Forms/ApiFormRoles/Methods/SetRoleColor.js
-M1963,method,SetRowGrand,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetRowGrand.js
+M1963,method,SetRowGrand,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetRowGrand.js
 M1964,method,SetScreenTip,cell,1,yes,(sScreenTip),edit,Examples/Cell/ApiHyperlink/Methods/SetScreenTip.js
 M1965,method,SetScript,pdf,1,yes,(script),edit,Examples/Pdf/ApiJsAction/Methods/SetScript.js
 M1966,method,SetSection,word,1,yes,(oSection),edit,Examples/Word/ApiParagraph/Methods/SetSection.js
 M1967,method,SetSeriaXValues,cell,1,yes,"(sRange, nSeria)",edit,Examples/Cell/ApiChart/Methods/SetSeriaXValues.js
-M1968,method,SetShowAllItems,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetShowAllItems.js
-M1969,method,SetShowAsAvailablePivotTableStyle,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiTableStyle/Methods/SetShowAsAvailablePivotTableStyle.js
-M1970,method,SetShowAsAvailableTableStyle,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiTableStyle/Methods/SetShowAsAvailableTableStyle.js
+M1968,method,SetShowAllItems,cell,1,yes,(show),edit,Examples/Cell/ApiPivotField/Methods/SetShowAllItems.js
+M1969,method,SetShowAsAvailablePivotTableStyle,cell,1,yes,(show),edit,Examples/Cell/ApiTableStyle/Methods/SetShowAsAvailablePivotTableStyle.js
+M1970,method,SetShowAsAvailableTableStyle,cell,1,yes,(show),edit,Examples/Cell/ApiTableStyle/Methods/SetShowAsAvailableTableStyle.js
 M1971,method,SetShowAutoFilter,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/SetShowAutoFilter.js
 M1972,method,SetShowAutoFilterDropDown,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/SetShowAutoFilterDropDown.js
 M1973,method,SetShowHeaders,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/SetShowHeaders.js
@@ -1979,30 +1979,30 @@ M1977,method,SetShowTableStyleRowStripes,cell,1,yes,,UNCLASSIFIED,Examples/Cell/
 M1978,method,SetShowValue,cell,1,yes,(showValue),read,Examples/Cell/ApiDatabar/Methods/SetShowValue.js
 M1979,method,SetSortMethod,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSort/Methods/SetSortMethod.js
 M1980,method,SetSortOn,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSortField/Methods/SetSortOn.js
-M1981,method,SetSource,cell,1,yes,(source),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetSource.js
+M1981,method,SetSource,cell,1,yes,(source),edit,Examples/Cell/ApiPivotTable/Methods/SetSource.js
 M1982,method,SetStartPoint,pdf,1,yes,(point),edit,Examples/Pdf/ApiLineAnnotation/Methods/SetStartPoint.js
 M1983,method,SetSubAddress,cell,1,yes,(sSubAddress),edit,Examples/Cell/ApiHyperlink/Methods/SetSubAddress.js
-M1984,method,SetSubtotalLocation,cell,1,yes,(type),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetSubtotalLocation.js
-M1985,method,SetSubtotals,cell,1,yes,(subtotals),UNCLASSIFIED,Examples/Cell/ApiPivotField/Methods/SetSubtotals.js
-M1986,method,SetTableStyleColumnHeaders,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetTableStyleColumnHeaders.js
-M1987,method,SetTableStyleColumnStripes,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetTableStyleColumnStripes.js
-M1988,method,SetTableStyleRowHeaders,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetTableStyleRowHeaders.js
-M1989,method,SetTableStyleRowStripes,cell,1,yes,(show),UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/SetTableStyleRowStripes.js
+M1984,method,SetSubtotalLocation,cell,1,yes,(type),edit,Examples/Cell/ApiPivotTable/Methods/SetSubtotalLocation.js
+M1985,method,SetSubtotals,cell,1,yes,(subtotals),edit,Examples/Cell/ApiPivotField/Methods/SetSubtotals.js
+M1986,method,SetTableStyleColumnHeaders,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetTableStyleColumnHeaders.js
+M1987,method,SetTableStyleColumnStripes,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetTableStyleColumnStripes.js
+M1988,method,SetTableStyleRowHeaders,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetTableStyleRowHeaders.js
+M1989,method,SetTableStyleRowStripes,cell,1,yes,(show),edit,Examples/Cell/ApiPivotTable/Methods/SetTableStyleRowStripes.js
 M1990,method,SetTemplateType,word,1,yes,"(sType, sSymbol)",edit,Examples/Word/ApiNumberingLevel/Methods/SetTemplateType.js
-M1991,method,SetTextOperator,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiFormatCondition/Methods/SetTextOperator.js
+M1991,method,SetTextOperator,cell,1,yes,,edit,Examples/Cell/ApiFormatCondition/Methods/SetTextOperator.js
 M1992,method,SetTextToDisplay,cell,1,yes,(sText),edit,Examples/Cell/ApiHyperlink/Methods/SetTextToDisplay.js
 M1993,method,SetTheme,slide,1,yes,(oTheme),read,Examples/Slide/ApiMaster/Methods/SetTheme.js
 M1994,method,SetThemeColors,cell,1,yes,(sTheme),read,Examples/Cell/Api/Methods/SetThemeColors.js
 M1995,method,SetTitlePage,word,1,yes,(isTitlePage),edit,Examples/Word/ApiSection/Methods/SetTitlePage.js
-M1996,method,SetTopBottom,cell,1,yes,(topBottom),UNCLASSIFIED,Examples/Cell/ApiTop10/Methods/SetTopBottom.js
+M1996,method,SetTopBottom,cell,1,yes,(topBottom),edit,Examples/Cell/ApiTop10/Methods/SetTopBottom.js
 M1997,method,SetTriggerType,slide,1,yes,(trigger),read,Examples/Slide/ApiAnimationEffect/Methods/SetTriggerType.js
 M1998,method,SetUniqueName,pdf,1,yes,(name),edit,Examples/Pdf/ApiBaseAnnotation/Methods/SetUniqueName.js
 M1999,method,SetUpperHeadingLevel,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/SetUpperHeadingLevel.js
 M2000,method,SetVAlign,word,1,yes,(sType),edit,Examples/Word/ApiTable/Methods/SetVAlign.js
 M2001,method,ShowAllData,cell,1,yes,(),read,Examples/Cell/ApiAutoFilter/Methods/ShowAllData.js
 M2002,method,ShowComment,word,1,yes,(commentId),edit,Examples/Word/ApiDocument/Methods/ShowComment.js
-M2003,method,ShowDetails,cell,1,yes,"(rowLine, colLine)",UNCLASSIFIED,Examples/Cell/ApiPivotTable/Methods/ShowDetails.js
-M2004,method,SlidesToJSON,slide,1,yes,"(nStart, nEnd, bWriteLayout, bWriteMaster, bWriteAllMasLayouts, bWriteTableStyles)",UNCLASSIFIED,Examples/Slide/ApiPresentation/Methods/SlidesToJSON.js
+M2003,method,ShowDetails,cell,1,yes,"(rowLine, colLine)",edit,Examples/Cell/ApiPivotTable/Methods/ShowDetails.js
+M2004,method,SlidesToJSON,slide,1,yes,"(nStart, nEnd, bWriteLayout, bWriteMaster, bWriteAllMasLayouts, bWriteTableStyles)",read,Examples/Slide/ApiPresentation/Methods/SlidesToJSON.js
 M2005,method,T,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/T.js
 M2006,method,TAN,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/TAN.js
 M2007,method,TANH,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/TANH.js
