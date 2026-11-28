@@ -181,4 +181,100 @@ t("createBridge refuses a missing native primitive", () => {
   assert.throws(() => createBridge(undefined, policy, 1), /native primitive missing/);
 });
 
+t("the denylist matches the simple interface name, as src/bridge_native.cxx does", () => {
+  const n = makeNative();
+  const evil = {
+    allow: {
+      "com.sun.star.frame.XComponentLoader": { GetName: "read" },
+      "com.sun.star.frame.XStorable": { GetName: "read" },
+      "com.sun.star.script.provider.XScriptProvider": { GetName: "read" },
+      "com.sun.star.lang.XMultiServiceFactory": { GetName: "read" },
+      "com.sun.star.sheet.XSpreadsheet": { GetName: "read", exec: "read" }
+    },
+    canRead: true, canEdit: true
+  };
+  const b = createBridge(n.native, evil, 1);
+  for (const iface of ["com.sun.star.frame.XComponentLoader", "com.sun.star.frame.XStorable",
+                       "com.sun.star.script.provider.XScriptProvider", "com.sun.star.lang.XMultiServiceFactory"]) {
+    assert.throws(() => b.call(1, iface, "GetName", []), /denied:/, iface);
+  }
+  assert.throws(() => b.call(1, "com.sun.star.sheet.XSpreadsheet", "exec", []), /denied:/);
+  assert.strictEqual(b.call(1, "com.sun.star.sheet.XSpreadsheet", "GetName", []), "Doc");
+});
+
+t("inherited names do not count as allowlist or props entries", () => {
+  const n = makeNative();
+  Object.prototype.Evil = { GetName: "read" };
+  Object.prototype.leaked = "edit";
+  try {
+    const b = createBridge(n.native, policy, 1);
+    assert.throws(() => b.call(1, "Evil", "GetName", []), /not in allowlist: Evil.GetName/);
+    assert.throws(() => b.call(1, "constructor", "name", []), /not in allowlist/);
+    assert.throws(() => b.call(1, "Sheet", "toString", []), /not in allowlist/);
+    const limited = createBridge(n.native, Object.assign({}, policy, { props: { name: "read" } }), 1);
+    assert.throws(() => limited.set(1, "leaked", "x"), /property not allowed: leaked/);
+  } finally {
+    delete Object.prototype.Evil;
+    delete Object.prototype.leaked;
+  }
+});
+
+t("a property name is converted once, so the checked name is the name sent", () => {
+  const n = makeNative();
+  const b = createBridge(n.native, policy, 1);
+  let calls = 0;
+  const sneaky = { toString() { calls += 1; return calls === 1 ? "name" : "kind"; } };
+  assert.strictEqual(b.get(1, sneaky), "Doc");
+  assert.strictEqual(calls, 1);
+});
+
+t("a non-string or malformed native result is an error, null and undefined are null", () => {
+  const sendBack = (value) => createBridge(() => value, policy, 1);
+  assert.throws(() => sendBack(5).get(1, "name"), /non-string result/);
+  assert.throws(() => sendBack({}).get(1, "name"), /non-string result/);
+  assert.throws(() => sendBack("{bad").get(1, "name"), /invalid JSON/);
+  assert.throws(() => sendBack("").get(1, "name"), /invalid JSON/);
+  assert.strictEqual(sendBack(undefined).get(1, "name"), null);
+  assert.strictEqual(sendBack(null).get(1, "name"), null);
+});
+
+t("handles inside property reads and arrays are recorded, and then usable", () => {
+  const seen = [];
+  const native = (op, json) => {
+    const a = JSON.parse(json);
+    seen.push([op, a[0]]);
+    if (op === "get") return '{"$h":7}';
+    if (op === "call") return '[{"$h":8},{"$h":9},"text",null]';
+    return "null";
+  };
+  const b = createBridge(native, policy, 1);
+  assert.strictEqual(b.get(1, "child").$h, 7);
+  b.call(1, "Sheet", "GetName", []);
+  assert.strictEqual(b.liveCount(), 4); // 1, 7, 8, 9
+  b.release(8);
+  assert.throws(() => b.release(8), /invalid or released handle/);
+  assert.throws(() => b.release(null), /invalid or released handle/);
+  assert.throws(() => b.get(10, "x"), /invalid or released handle/);
+  b.dispose();
+  assert.throws(() => b.release(9), /bridge disposed/);
+});
+
+t("the argument limit counts UTF-8 bytes, as the host does", () => {
+  const n = makeNative();
+  const b = createBridge(n.native, Object.assign({}, policy, { maxArgBytes: 30 }), 1);
+  const before = n.log.length;
+  // The call JSON is 26 characters plus the text: 3 characters of "e acute" are 29 UTF-16 units but 32 bytes.
+  assert.throws(() => b.call(1, "Sheet", "SetName", ["é".repeat(3)]), /arguments exceed 30 bytes/);
+  assert.strictEqual(n.log.length, before);
+  b.call(1, "Sheet", "SetName", ["é".repeat(2)]); // exactly 30 bytes
+});
+
+t("a bad maxArgBytes in the policy falls back to the default limit", () => {
+  const n = makeNative();
+  for (const bad of ["10", NaN, -1, 0, Infinity, null]) {
+    const b = createBridge(n.native, Object.assign({}, policy, { maxArgBytes: bad }), 1);
+    b.call(1, "Sheet", "SetName", ["x".repeat(100)]);
+  }
+});
+
 console.log(`test_bridge: PASS (${passed} checks)`);

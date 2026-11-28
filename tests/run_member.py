@@ -5,7 +5,7 @@ Run:  python -I tests/run_member.py --card cards/todo/<name>.md
       (scripts/check_card.py runs this command; its exit code decides PASS or FAIL)
 
 For each test file in the card's "Tests:" line it:
-  1. starts LibreOffice headless (or connects to one already running on the port),
+  1. starts LibreOffice headless with a private user profile and a socket listener on the port,
   2. opens a blank fixture document for the area (tests/members/<area>/...),
   3. calls the TestRunner service (org.example.pluginhost.TestRunner, planned in PLAN_FULL_API F5) with the
      test source, which runs setup and run inside the engine and returns the result as JSON,
@@ -30,9 +30,12 @@ Not verified yet: this file has not been run. It needs the build machine, the Te
 import argparse
 import json
 import os
+import pathlib
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -63,7 +66,8 @@ def parse_card(path):
                 fields[m.group(1).strip()] = m.group(2).strip()
     tests = [t.strip() for t in fields.get("Tests", "").split(",") if t.strip()]
     if not tests:
-        exit_cannot_run("card has no Tests line: " + path)
+        print("FAIL card has no Tests line: " + path)  # a bad card is a failure (1), not "cannot run" (2)
+        sys.exit(1)
     return {"tests": tests, "members": fields.get("Members", "")}
 
 
@@ -99,13 +103,18 @@ def expected_value(test_id):
         return json.load(fh), None
 
 
-def start_office(lo_program, port):
-    """Starts soffice headless with a socket listener, unless one already listens on the port."""
+def start_office(lo_program, port, profile_dir):
+    """Starts soffice headless with a socket listener and its own user profile.
+
+    The private profile matters: with the default profile a running LibreOffice of the same user would take the command
+    line over and exit, and the instance we connect to would not have our environment (PLUGINHOST_TEST_SERVICE).
+    """
     soffice = os.path.join(lo_program, "soffice.exe" if os.name == "nt" else "soffice")
     if not os.path.exists(soffice):
-        exit_cannot_run("soffice.exe not found in " + lo_program + " (set LO_PROGRAM)")
+        exit_cannot_run("soffice not found in " + lo_program + " (set LO_PROGRAM)")
     accept = "--accept=socket,host=localhost,port=%d;urp;StarOffice.ComponentContext" % port
-    return subprocess.Popen([soffice, "--headless", "--norestore", "--nologo", "--nodefault", accept])
+    profile = "-env:UserInstallation=" + pathlib.Path(profile_dir).as_uri()
+    return subprocess.Popen([soffice, "--headless", "--norestore", "--nologo", "--nodefault", profile, accept])
 
 
 def connect(port):
@@ -165,41 +174,54 @@ def main(argv):
     card = parse_card(os.path.join(ROOT, args.card) if not os.path.isabs(args.card) else args.card)
 
     lo_program = os.environ.get("LO_PROGRAM", DEFAULT_LO_PROGRAM)
-    port = int(os.environ.get("PLUGINHOST_TEST_PORT", DEFAULT_PORT))
+    try:
+        port = int(os.environ.get("PLUGINHOST_TEST_PORT", DEFAULT_PORT))
+    except ValueError:
+        exit_cannot_run("PLUGINHOST_TEST_PORT is not a number")
     os.environ.setdefault("PLUGINHOST_API_DIR", os.path.join(ROOT, "extension", "js"))
     # Test-only switch: without it the TestRunner service is not created (see docs/TEST_RUNNER.md).
     os.environ["PLUGINHOST_TEST_SERVICE"] = "1"
     if not os.path.isdir(lo_program):
         exit_cannot_run("LibreOffice program folder not found: " + lo_program + " (set LO_PROGRAM)")
     sys.path.insert(0, lo_program)
+    if hasattr(os, "add_dll_directory"):  # Windows, Python 3.8+: pyuno needs the DLLs of the program folder
+        os.add_dll_directory(lo_program)
+    try:
+        import uno  # noqa: F401  (checked here so that a missing module is exit 2, not a traceback with exit 1)
+    except ImportError as exc:
+        exit_cannot_run("the uno module cannot be imported from " + lo_program + ": " + str(exc))
 
-    office = start_office(lo_program, port)
+    profile_dir = tempfile.mkdtemp(prefix="pluginhost-lo-")
+    office = start_office(lo_program, port, profile_dir)
+    desktop = None
+    results = []
     try:
         ctx = connect(port)
-    except SystemExit:
-        office.terminate()
-        raise
-    smgr = ctx.ServiceManager
-    runner = smgr.createInstanceWithContext(SERVICE, ctx)
-    if runner is None:
-        office.terminate()
-        exit_cannot_run("service " + SERVICE + " is not registered: build with -DPH_TEST_HOOKS=ON (see docs/TEST_RUNNER.md)")
-    desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+        smgr = ctx.ServiceManager
+        runner = smgr.createInstanceWithContext(SERVICE, ctx)
+        if runner is None:
+            exit_cannot_run("service " + SERVICE + " is not registered: build with -DPH_TEST_HOOKS=ON (see docs/TEST_RUNNER.md)")
+        desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
 
-    results = []
-    for test_rel in card["tests"]:
-        area = area_of(test_rel)
+        for test_rel in card["tests"]:
+            area = area_of(test_rel)
+            try:
+                ok, msg = run_one(runner, desktop, area, test_rel)
+            except Exception as exc:  # OSError, ValueError, and UNO exceptions: this test fails, the others still run
+                ok, msg = False, test_rel + ": " + str(exc)
+            results.append(ok)
+            print(("PASS " if ok else "FAIL ") + msg)
+    finally:
         try:
-            ok, msg = run_one(runner, desktop, area, test_rel)
-        except (OSError, ValueError) as exc:
-            ok, msg = False, test_rel + ": " + str(exc)
-        results.append(ok)
-        print(("PASS " if ok else "FAIL ") + msg)
-
-    try:
-        desktop.terminate()
-    except Exception:
-        pass
+            if desktop is not None:
+                desktop.terminate()
+        except Exception:
+            pass
+        try:
+            office.wait(timeout=15)
+        except Exception:
+            office.terminate()
+        shutil.rmtree(profile_dir, ignore_errors=True)
     passed = sum(results)
     print("PASS %d/%d" % (passed, len(results)) if all(results) else "FAIL %d/%d" % (passed, len(results)))
     return 0 if all(results) else 1

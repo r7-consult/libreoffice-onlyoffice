@@ -44,8 +44,20 @@
     throw new Error("bridge: " + message);
   }
 
+  var hasOwn = Object.prototype.hasOwnProperty;
+
+  // Own-property read: a polluted Object.prototype must not add policy entries (the C++ side is the enforcer, this
+  // keeps the JS layer from granting more than the policy object holds).
+  function own(obj, key) {
+    return obj !== null && typeof obj === "object" && hasOwn.call(obj, key) ? obj[key] : undefined;
+  }
+
+  // Same rule as lastComponent() in src/bridge_native.cxx: the denylist is matched on the simple interface name, so
+  // "com.sun.star.frame.XStorable" and "XStorable" are both denied.
   function isDenied(iface, method) {
-    if (DENIED_INTERFACES.indexOf(iface) !== -1 || DENIED_INTERFACE_PATTERN.test(iface)) return true;
+    var dot = iface.lastIndexOf(".");
+    var simple = dot === -1 ? iface : iface.substring(dot + 1);
+    if (DENIED_INTERFACES.indexOf(simple) !== -1 || DENIED_INTERFACE_PATTERN.test(simple)) return true;
     return DENIED_METHODS.indexOf(method) !== -1;
   }
 
@@ -53,21 +65,38 @@
     if (typeof handle !== "number" || !live.has(handle)) fail("invalid or released handle");
   }
 
+  // Length of a JSON text in UTF-8 bytes (the host measures bytes, String.length counts UTF-16 units).
+  function utf8Length(text) {
+    var n = 0;
+    for (var i = 0; i < text.length; i++) {
+      var c = text.charCodeAt(i);
+      if (c < 0x80) n += 1;
+      else if (c < 0x800) n += 2;
+      else if (c >= 0xd800 && c <= 0xdbff && i + 1 < text.length &&
+               text.charCodeAt(i + 1) >= 0xdc00 && text.charCodeAt(i + 1) <= 0xdfff) { n += 4; i++; }
+      else n += 3;
+    }
+    return n;
+  }
+
   function checkArgs(args, maxBytes) {
     var json = JSON.stringify(args);
     if (json === undefined) fail("arguments are not JSON");
-    if (json.length > maxBytes) fail("arguments exceed " + maxBytes + " bytes");
+    if (json.length > maxBytes || (json.length * 3 > maxBytes && utf8Length(json) > maxBytes)) {
+      fail("arguments exceed " + maxBytes + " bytes");
+    }
     return json;
   }
 
   function createBridge(native, policy, rootHandle) {
     if (typeof native !== "function") fail("native primitive missing");
     policy = policy || {};
-    var allow = policy.allow || {};
-    var props = policy.props || null;
-    var canRead = policy.canRead === true;
-    var canEdit = policy.canEdit === true;
-    var maxBytes = policy.maxArgBytes || DEFAULT_MAX_ARG_BYTES;
+    var allow = own(policy, "allow") || {};
+    var props = own(policy, "props") || null;
+    var canRead = own(policy, "canRead") === true;
+    var canEdit = own(policy, "canEdit") === true;
+    var maxBytes = own(policy, "maxArgBytes");
+    if (typeof maxBytes !== "number" || !(maxBytes > 0) || maxBytes === Infinity) maxBytes = DEFAULT_MAX_ARG_BYTES;
     var live = new Set();
     var disposed = false;
 
@@ -77,22 +106,33 @@
 
     function run(op, args) {
       var text = native(op, checkArgs(args, maxBytes));
-      return text === undefined || text === null ? null : JSON.parse(text);
-    }
-
-    function track(value) {
-      if (value && typeof value === "object" && typeof value.$h === "number") {
-        live.add(value.$h);
-        return value.$h;
+      if (text === undefined || text === null) return null;
+      if (typeof text !== "string") fail("native returned a non-string result");
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        fail("native returned invalid JSON");
       }
       return undefined;
+    }
+
+    // The host registers a handle for every object in a result, also inside arrays and for property reads. A handle
+    // the bridge did not record would be refused later, so every {"$h": n} in a result is recorded here.
+    function track(value, depth) {
+      if (Array.isArray(value)) {
+        if (depth < 32) {
+          for (var i = 0; i < value.length; i++) track(value[i], depth + 1);
+        }
+        return;
+      }
+      if (value && typeof value === "object" && typeof value.$h === "number") live.add(value.$h);
     }
 
     // props is a flat map { propertyName: "read" | "edit" } when given. "edit" also allows reads.
     function propertyRule(prop, wanted) {
       if (!PROPERTY_NAME.test(prop)) fail("property name not allowed: " + prop);
       if (props) {
-        var rule = props[prop];
+        var rule = own(props, prop);
         if (!rule) fail("property not allowed: " + prop);
         if (wanted === "edit" && rule !== "edit") fail("property is read only: " + prop);
       }
@@ -104,15 +144,19 @@
       get: function (handle, prop) {
         ensureOpen();
         requireHandle(live, handle);
-        propertyRule(String(prop), "read");
-        return run("get", [handle, String(prop)]);
+        var name = String(prop); // converted once: the checked name is the name that is sent
+        propertyRule(name, "read");
+        var result = run("get", [handle, name]);
+        track(result, 0);
+        return result;
       },
 
       set: function (handle, prop, value) {
         ensureOpen();
         requireHandle(live, handle);
-        propertyRule(String(prop), "edit");
-        run("set", [handle, String(prop), value]);
+        var name = String(prop);
+        propertyRule(name, "edit");
+        run("set", [handle, name, value]);
         return undefined;
       },
 
@@ -122,14 +166,13 @@
         iface = String(iface);
         method = String(method);
         if (isDenied(iface, method)) fail("denied: " + iface + "." + method);
-        var ifaceAllow = allow[iface];
-        var kind = ifaceAllow && ifaceAllow[method];
+        var kind = own(own(allow, iface), method);
         if (kind !== "read" && kind !== "edit") fail("not in allowlist: " + iface + "." + method);
         if (kind === "edit" && !canEdit) fail("document.edit permission required");
         if (kind === "read" && !canRead) fail("document.read permission required");
         if (args !== undefined && !Array.isArray(args)) fail("args must be an array");
         var result = run("call", [handle, iface, method, args || []]);
-        track(result);
+        track(result, 0);
         return result;
       },
 

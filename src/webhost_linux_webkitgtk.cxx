@@ -1,11 +1,14 @@
 // Linux browser host: WebKitGTK (webkit2gtk-4.1) in a GtkPlug on the X11 window that LibreOffice gives as the native
 // parent. Implements WebHost (webhost.hxx) the way webhost_win.cxx does for WebView2.
 //
-// DRAFT, NOT COMPILED. Two things must be verified on the Linux host before this is trusted (PLAN_NEXT phase 6):
-//   1. The embedding: gtk_plug_new(XID) works only on X11 or XWayland. On native Wayland it returns null and
-//      createWebHost returns nullptr (the panel then logs "webhost|unavailable"). The check is the decision point.
-//   2. The message-handler signal: script-message-received passes WebKitJavascriptResult, which WebKitGTK marks
-//      deprecated in newer releases. Switch to script-message-with-reply-received if the build warns.
+// DRAFT, NOT COMPILED. Reviewed against the WebKitGTK/GTK3/GLib sources (see review_webhost.md). To verify on Linux:
+//   1. The embedding. gtk_plug_new*() never returns null, so the real checks are: GDK display is X11 (not native
+//      Wayland), the XID is not a GDK-owned window of this process (the gtk3 VCL plugin hands out the XID of its own
+//      frame window, which GtkPlug cannot embed into), and gtk_plug_get_embedded(). Any failure makes createWebHost
+//      return nullptr (the panel then logs "webhost|unavailable"). Works with the qt5/kf5 VCL plugin on xcb, where
+//      the handle is a native child window; see review_webhost.md for the gtk3 core patch that would make it work.
+//   2. script-message-received passes WebKitJavascriptResult in the webkit2gtk-4.1 API (JSCValue only in the 2022
+//      API, 6.0); it is not deprecated here.
 //
 // Page model (matches the Windows host):
 //   - plugin pages are https://<pluginId>.plugin.invalid/... in the panel. The host rewrites that to
@@ -29,6 +32,7 @@
 #include <gtk/gtkx.h>
 #include <webkit2/webkit2.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <deque>
 #include <fstream>
@@ -78,7 +82,38 @@ const char* mimeFor(const std::string& path)
     if (ext == "jpg" || ext == "jpeg") return "image/jpeg";
     if (ext == "gif") return "image/gif";
     if (ext == "svg") return "image/svg+xml";
+    if (ext == "ico") return "image/x-icon";
+    if (ext == "webp") return "image/webp";
+    if (ext == "woff") return "font/woff";
+    if (ext == "woff2") return "font/woff2";
+    if (ext == "ttf") return "font/ttf";
+    if (ext == "wasm") return "application/wasm"; // streaming compile needs this exact type
+    if (ext == "txt") return "text/plain";
+    if (ext == "xml") return "application/xml";
     return "application/octet-stream";
+}
+
+// Host names are case-insensitive (WebView2 maps them that way); WebKit keeps the case of a custom-scheme host.
+std::string lowerAscii(std::string s)
+{
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(c >= 'A' && c <= 'Z' ? c + 32 : c); });
+    return s;
+}
+
+// GtkPlug needs GTK on an X11 display. GTK is already running when the gtk3 VCL plugin is in use. Under the qt5/kf5
+// plugin it is not, so initialise it here, forced to X11 (GtkPlug does not exist on Wayland), without touching the
+// process locale (gtk_init would call setlocale()).
+bool ensureX11Gtk()
+{
+    if (!gdk_display_get_default())
+    {
+        gtk_disable_setlocale();
+        gdk_set_allowed_backends("x11");
+        if (!gtk_init_check(nullptr, nullptr))
+            return false;
+    }
+    GdkDisplay* display = gdk_display_get_default();
+    return display && GDK_IS_X11_DISPLAY(display);
 }
 
 // True when a path (already unescaped, without the leading '/') has no parent-directory segment.
@@ -113,7 +148,7 @@ public:
     void setFailureHandler(FailureHandler handler) override { m_onFailure = std::move(handler); }
     void addDocumentScript(const std::string& scriptPath) override;
     void mapFolder(const std::string& hostName, const std::string& folder) override;
-    bool isReady() const override { return m_plug != nullptr; }
+    bool isReady() const override { return m_view != nullptr; }
 
     // GTK and WebKit callbacks (static, user data = this). Public so the file-level setup can connect them.
     static void onScriptMessage(WebKitUserContentManager* ucm, WebKitJavascriptResult* result, gpointer self);
@@ -121,16 +156,19 @@ public:
     static gboolean onDecidePolicy(WebKitWebView* view, WebKitPolicyDecision* decision,
                                    WebKitPolicyDecisionType type, gpointer self);
     static void onLoadChanged(WebKitWebView* view, WebKitLoadEvent event, gpointer self);
-    static gboolean onProcessCrashed(WebKitWebView* view, gpointer self);
+    static void onProcessTerminated(WebKitWebView* view, WebKitWebProcessTerminationReason reason, gpointer self);
 
 private:
     GtkWidget* makePlug(void* xid);
+    void park();
     void runScript(const std::string& script);
     void deliverPending();
     std::string localUrl(const std::string& url) const;
 
-    GtkWidget* m_plug = nullptr;
-    WebKitWebView* m_view = nullptr;
+    GtkWidget* m_plug = nullptr; // X11 embedding window while a panel exists
+    GtkWidget* m_park = nullptr; // offscreen window that holds the view while no panel exists
+    WebKitWebView* m_view = nullptr; // we own one reference; containers add their own
+    bool m_reloading = false;
     WebKitWebContext* m_context = nullptr;
     WebKitUserContentManager* m_ucm = nullptr;
     MessageHandler m_onMessage;
@@ -142,6 +180,11 @@ private:
 
 WebHostWebKit::WebHostWebKit(void* xid, const std::string& userDataDir)
 {
+    if (!ensureX11Gtk())
+    {
+        logEvent("webhost", "error", "WebKitGTK embedding needs GTK on an X11 or XWayland display; native Wayland is not supported");
+        return;
+    }
     g_mkdir_with_parents(userDataDir.c_str(), 0700);
     // Profile isolation: each plugin gets its own data and cache folders, as on WebView2.
     WebKitWebsiteDataManager* data = webkit_website_data_manager_new(
@@ -157,15 +200,18 @@ WebHostWebKit::WebHostWebKit(void* xid, const std::string& userDataDir)
     webkit_security_manager_register_uri_scheme_as_cors_enabled(security, kScheme);
 
     m_ucm = webkit_user_content_manager_new();
-    webkit_user_content_manager_register_script_message_handler(m_ucm, "pluginhost");
+    if (!webkit_user_content_manager_register_script_message_handler(m_ucm, "pluginhost"))
+        logEvent("webhost", "error", "script message handler 'pluginhost' was not registered");
     g_signal_connect(m_ucm, "script-message-received::pluginhost", G_CALLBACK(&WebHostWebKit::onScriptMessage), this);
     WebKitUserScript* shim = webkit_user_script_new(kPageShim, WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES,
                                                     WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START, nullptr, nullptr);
     webkit_user_content_manager_add_script(m_ucm, shim);
     webkit_user_script_unref(shim);
 
-    m_view = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW, "web-context", m_context,
-                                          "user-content-manager", m_ucm, nullptr));
+    // g_object_ref_sink: the view is a floating GtkWidget; we keep one strong reference so it survives being
+    // moved between containers (plug <-> parking window) and is never destroyed by a container we drop.
+    m_view = WEBKIT_WEB_VIEW(g_object_ref_sink(g_object_new(WEBKIT_TYPE_WEB_VIEW, "web-context", m_context,
+                                                            "user-content-manager", m_ucm, nullptr)));
     WebKitSettings* settings = webkit_web_view_get_settings(m_view);
     webkit_settings_set_allow_file_access_from_file_urls(settings, FALSE);
     webkit_settings_set_enable_developer_extras(settings, FALSE);
@@ -173,14 +219,16 @@ WebHostWebKit::WebHostWebKit(void* xid, const std::string& userDataDir)
 
     g_signal_connect(m_view, "decide-policy", G_CALLBACK(&WebHostWebKit::onDecidePolicy), this);
     g_signal_connect(m_view, "load-changed", G_CALLBACK(&WebHostWebKit::onLoadChanged), this);
-    g_signal_connect(m_view, "web-process-crashed", G_CALLBACK(&WebHostWebKit::onProcessCrashed), this);
+    // web-process-crashed is deprecated since 2.20; web-process-terminated (since 2.20) replaces it.
+    g_signal_connect(m_view, "web-process-terminated", G_CALLBACK(&WebHostWebKit::onProcessTerminated), this);
 
     m_plug = makePlug(xid);
     if (!m_plug)
     {
-        logEvent("webhost", "error", "WebKitGTK needs an X11 or XWayland window; native Wayland is not supported here");
+        logEvent("webhost", "error", "cannot embed WebKitGTK in the given native window (see earlier log lines)");
         gtk_widget_destroy(GTK_WIDGET(m_view));
-        m_view = nullptr;
+        g_object_unref(m_view);
+        m_view = nullptr; // isReady() is false, createWebHost returns nullptr
     }
 }
 
@@ -192,48 +240,77 @@ WebHostWebKit::~WebHostWebKit()
         g_signal_handlers_disconnect_by_data(m_ucm, this);
     if (m_plug)
         gtk_widget_destroy(m_plug); // destroys the view it contains
+    if (m_park)
+        gtk_widget_destroy(m_park);
+    if (m_view)
+        g_object_unref(m_view);
     if (m_ucm)
         g_object_unref(m_ucm);
     if (m_context)
         g_object_unref(m_context);
 }
 
+// Embeds the view in a GtkPlug on the given X11 window. Returns nullptr, leaving the view parentless, on failure.
 GtkWidget* WebHostWebKit::makePlug(void* xid)
 {
-    if (!xid)
+    GdkDisplay* display = gdk_display_get_default();
+    if (!xid || !display || !GDK_IS_X11_DISPLAY(display))
         return nullptr;
     const Window window = static_cast<Window>(reinterpret_cast<std::uintptr_t>(xid));
-    GtkWidget* plug = gtk_plug_new(window);
+    // The gtk3 VCL plugin hands out the XID of a GDK window it owns (its frame window). GtkPlug can only embed into a
+    // GtkSocket in that case ("Can't create GtkPlug as child of non-GtkSocket") and would become a stray top-level.
+    if (gdk_x11_window_lookup_for_display(display, window))
+    {
+        logEvent("webhost", "error", "native window belongs to this process' GTK (gtk3 VCL plugin); GtkPlug cannot embed into it");
+        return nullptr;
+    }
+    // gtk_plug_new* never returns null; a bad XID or a non-X11 display only shows up as "not embedded".
+    GtkWidget* plug = gtk_plug_new_for_display(display, window);
     if (!plug)
         return nullptr;
+    if (!gtk_plug_get_embedded(GTK_PLUG(plug)))
+    {
+        gtk_widget_destroy(plug);
+        return nullptr;
+    }
     gtk_container_add(GTK_CONTAINER(plug), GTK_WIDGET(m_view));
     gtk_widget_show_all(plug);
     return plug;
+}
+
+// Keeps the view alive, hidden from the screen, while no panel window exists (the Windows host parks on a hidden HWND).
+void WebHostWebKit::park()
+{
+    if (!m_park)
+        m_park = gtk_offscreen_window_new();
+    if (gtk_widget_get_parent(GTK_WIDGET(m_view)) != m_park)
+        gtk_container_add(GTK_CONTAINER(m_park), GTK_WIDGET(m_view));
+    gtk_widget_show_all(m_park);
 }
 
 void WebHostWebKit::reparent(void* newParentNativeHandle)
 {
     if (!m_view)
         return;
-    // GTK refuses to add a widget that is still in another container, so take the view out first.
-    // Our own reference keeps the view alive while it is between containers.
-    g_object_ref(m_view);
+    GtkWidget* view = GTK_WIDGET(m_view);
+    // Take the view out of its container first: destroying a container destroys its children, and GTK refuses to add
+    // a widget that still has a parent. Our own reference keeps the view alive in between.
+    if (GtkWidget* parent = gtk_widget_get_parent(view))
+        gtk_container_remove(GTK_CONTAINER(parent), view);
     if (m_plug)
     {
-        gtk_container_remove(GTK_CONTAINER(m_plug), GTK_WIDGET(m_view));
         gtk_widget_destroy(m_plug);
         m_plug = nullptr;
     }
-    GtkWidget* next = makePlug(newParentNativeHandle);
-    g_object_unref(m_view);
-    if (!next)
+    // nullptr = the panel is going away: park the browser. Otherwise embed it in the new panel window.
+    if (newParentNativeHandle)
     {
-        logEvent("webhost", "error", "reparent: no X11 window for the new parent; the panel stops");
-        gtk_widget_destroy(GTK_WIDGET(m_view));
-        m_view = nullptr;
-        return;
+        m_plug = makePlug(newParentNativeHandle);
+        if (!m_plug)
+            logEvent("webhost", "error", "reparent: cannot embed in the new parent window; the view stays parked");
     }
-    m_plug = next;
+    if (!m_plug)
+        park();
 }
 
 std::string WebHostWebKit::localUrl(const std::string& url) const
@@ -242,7 +319,7 @@ std::string WebHostWebKit::localUrl(const std::string& url) const
         return url;
     const std::string rest = url.substr(sizeof kHttpsPrefix - 1);
     const std::size_t end = rest.find('/');
-    const std::string host = rest.substr(0, end);
+    const std::string host = lowerAscii(rest.substr(0, end));
     if (m_mappings.find(host) == m_mappings.end())
         return url;
     return std::string(kScheme) + "://" + rest;
@@ -258,8 +335,15 @@ bool WebHostWebKit::navigate(const std::string& url)
 
 void WebHostWebKit::runScript(const std::string& script)
 {
-    if (m_view)
-        webkit_web_view_run_javascript(m_view, script.c_str(), nullptr, nullptr, nullptr);
+    if (!m_view)
+        return;
+#if WEBKIT_CHECK_VERSION(2, 40, 0)
+    // webkit_web_view_run_javascript is deprecated since 2.40. No callback: the result is not needed.
+    webkit_web_view_evaluate_javascript(m_view, script.c_str(), static_cast<gssize>(script.size()), nullptr, nullptr,
+                                        nullptr, nullptr, nullptr);
+#else
+    webkit_web_view_run_javascript(m_view, script.c_str(), nullptr, nullptr, nullptr);
+#endif
 }
 
 void WebHostWebKit::postMessage(const std::string& jsonUtf8)
@@ -269,7 +353,8 @@ void WebHostWebKit::postMessage(const std::string& jsonUtf8)
         m_pendingPosts.push_back(jsonUtf8); // delivered when the page has loaded
         return;
     }
-    runScript("window.__phDeliver(\"" + jsonEscape(jsonUtf8) + "\");");
+    // Guarded: on an error page or before the shim ran, __phDeliver does not exist.
+    runScript("window.__phDeliver&&window.__phDeliver(\"" + jsonEscape(jsonUtf8) + "\");");
 }
 
 void WebHostWebKit::deliverPending()
@@ -284,15 +369,24 @@ void WebHostWebKit::deliverPending()
 
 void WebHostWebKit::setBounds(int, int, int width, int height)
 {
-    // The plug fills the X window that LibreOffice places, so only the size applies here.
-    if (m_view)
-        gtk_widget_set_size_request(GTK_WIDGET(m_view), width, height);
+    // The plug sits at (0,0) of the panel's X window (PluginPanel always passes 0,0), so only the size applies.
+    // Nothing resizes an XEmbed-less plug for us (there is no GtkSocket), hence the explicit window resize.
+    if (!m_view)
+        return;
+    width = std::max(width, 1);
+    height = std::max(height, 1);
+    gtk_widget_set_size_request(GTK_WIDGET(m_view), width, height);
+    if (m_plug)
+        gtk_window_resize(GTK_WINDOW(m_plug), width, height);
 }
 
 void WebHostWebKit::setVisible(bool visible)
 {
-    if (m_view)
-        gtk_widget_set_visible(GTK_WIDGET(m_view), visible ? TRUE : FALSE);
+    if (!m_view)
+        return;
+    gtk_widget_set_visible(GTK_WIDGET(m_view), visible ? TRUE : FALSE);
+    if (m_plug) // an empty plug window would otherwise stay mapped over the panel
+        gtk_widget_set_visible(m_plug, visible ? TRUE : FALSE);
 }
 
 void WebHostWebKit::addDocumentScript(const std::string& scriptPath)
@@ -313,7 +407,7 @@ void WebHostWebKit::addDocumentScript(const std::string& scriptPath)
 
 void WebHostWebKit::mapFolder(const std::string& hostName, const std::string& folder)
 {
-    m_mappings[hostName] = joinPath(folder, "");
+    m_mappings[lowerAscii(hostName)] = joinPath(folder, "");
 }
 
 void WebHostWebKit::onScriptMessage(WebKitUserContentManager*, WebKitJavascriptResult* result, gpointer self)
@@ -348,7 +442,7 @@ void WebHostWebKit::onSchemeRequest(WebKitURISchemeRequest* request, gpointer se
         return;
     }
     const char* hostCStr = g_uri_get_host(parsed);
-    const std::string hostName = hostCStr ? hostCStr : "";
+    const std::string hostName = lowerAscii(hostCStr ? hostCStr : "");
     const char* pathCStr = g_uri_get_path(parsed);
     gchar* unescaped = g_uri_unescape_string(pathCStr ? pathCStr : "/", nullptr);
     std::string rel = unescaped ? unescaped : "/";
@@ -414,19 +508,36 @@ gboolean WebHostWebKit::onDecidePolicy(WebKitWebView*, WebKitPolicyDecision* dec
 void WebHostWebKit::onLoadChanged(WebKitWebView*, WebKitLoadEvent event, gpointer self)
 {
     auto* host = static_cast<WebHostWebKit*>(self);
-    if (event == WEBKIT_LOAD_FINISHED)
+    if (event == WEBKIT_LOAD_STARTED)
+        host->m_loaded = false; // a new document (navigate, reload): hold messages until it has loaded
+    else if (event == WEBKIT_LOAD_FINISHED)
     {
         host->m_loaded = true;
+        host->m_reloading = false;
         host->deliverPending();
     }
 }
 
-gboolean WebHostWebKit::onProcessCrashed(WebKitWebView*, gpointer self)
+// Same policy as the Windows host: a renderer failure reloads the page; if the reload fails too, report it so the
+// session is re-created on the next attach.
+void WebHostWebKit::onProcessTerminated(WebKitWebView* view, WebKitWebProcessTerminationReason reason, gpointer self)
 {
     auto* host = static_cast<WebHostWebKit*>(self);
+    logEvent("webhost", "process_failed", "reason=" + std::to_string(static_cast<int>(reason)));
+#if WEBKIT_CHECK_VERSION(2, 34, 0)
+    if (reason == WEBKIT_WEB_PROCESS_TERMINATED_BY_API)
+        return; // we asked for it
+#endif
+    host->m_loaded = false;
+    if (!host->m_reloading)
+    {
+        host->m_reloading = true;
+        logEvent("webhost", "renderer_failed");
+        webkit_web_view_reload(view);
+        return;
+    }
     if (host->m_onFailure)
         host->m_onFailure();
-    return TRUE;
 }
 }
 

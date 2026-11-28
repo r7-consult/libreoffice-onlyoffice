@@ -33,14 +33,15 @@ MAX_BYTES = 2 * 1024 * 1024  # minified bundles are skipped
 def walk_sources(root):
     """Yield (relative_path, text) for text source files under root."""
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-        for name in filenames:
+        # Sorted, so first_source in the CSV does not depend on the file system's listing order.
+        dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS)
+        for name in sorted(filenames):
             if os.path.splitext(name)[1].lower() not in TEXT_EXT:
                 continue
             full = os.path.join(dirpath, name)
-            if os.path.getsize(full) > MAX_BYTES:
-                continue
             try:
+                if os.path.getsize(full) > MAX_BYTES:
+                    continue
                 with open(full, encoding="utf-8", errors="replace") as fh:
                     yield os.path.relpath(full, root).replace("\\", "/"), fh.read()
             except OSError:
@@ -80,7 +81,7 @@ def plugin_dirs(plugins_root):
     """Plugin roots are directories that contain config.json, skipping archive and hidden dirs."""
     found = []
     for dirpath, dirnames, filenames in os.walk(plugins_root):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")]
+        dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS and not d.startswith("."))
         if "config.json" in filenames:
             found.append(dirpath)
             dirnames[:] = []  # do not descend into a plugin

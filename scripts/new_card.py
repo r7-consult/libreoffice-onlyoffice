@@ -18,18 +18,27 @@ Rules enforced here (see PLAN_FULL_API.md section 4):
 import argparse
 import csv
 import os
+import re
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 TEMPLATES = os.path.join(ROOT, "templates")
 INVENTORY = os.path.join(ROOT, "docs", "API_INVENTORY.csv")
 KINDS = {"getter", "setter", "collection", "constructor", "execute"}
+IDENT = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
+IDENT_OR_EMPTY = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)?$")
+DOTTED = re.compile(r"^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)*$")
 
 
-def load_inventory():
-    """Return {member name: row id} for every inventory row, so each name must be known."""
+def load_inventory(kind):
+    """Return {member name: row id} for the inventory rows of this card kind, so each name must be known.
+
+    `execute` cards use the executeMethod rows, all other kinds use the method rows. Some names exist in both
+    (for example SearchAndReplace), so the row kind decides which id a test gets.
+    """
+    wanted = "executeMethod" if kind == "execute" else "method"
     with open(INVENTORY, newline="", encoding="utf-8") as fh:
-        return {row["member"]: row["id"] for row in csv.DictReader(fh)}
+        return {row["member"]: row["id"] for row in csv.DictReader(fh) if row["kind"] == wanted}
 
 
 def parse_items(kind, text):
@@ -45,6 +54,16 @@ def parse_items(kind, text):
             if len(parts) != 3:
                 raise ValueError(f"expected Name:Iface:Method, got {raw!r}")
             items.append({"NAME": parts[0], "IFACE": parts[1], "METHOD": parts[2], "PROP": ""})
+    # These values are pasted into JavaScript string literals and into file names: identifiers only.
+    for it in items:
+        for key, pattern in (("NAME", IDENT), ("PROP", IDENT_OR_EMPTY), ("METHOD", IDENT), ("IFACE", DOTTED)):
+            if key in it and not pattern.match(it[key]):
+                raise ValueError(f"{key} must be a plain identifier, got {it[key]!r}")
+        if "PROP" in it and "IFACE" not in it and not it["PROP"]:
+            raise ValueError(f"property name is empty for {it['NAME']!r}")
+    names = [it["NAME"] for it in items]
+    if len(set(names)) != len(names):
+        raise ValueError("a name appears twice in --items")
     return items
 
 
@@ -67,7 +86,9 @@ def add_member_blocks(class_path, cls, kind, items):
     added = []
     chunks = []
     for it in items:
-        if f"// BEGIN {cls}.{it['NAME']}" in existing or f"// BEGIN executeMethod.{it['NAME']}" in existing:
+        owner = "executeMethod" if kind == "execute" else cls
+        # Whole-line match: "// BEGIN ApiRange.GetValue" must not hide a missing ApiRange.GetValueEx.
+        if re.search(r"^// BEGIN " + re.escape(f"{owner}.{it['NAME']}") + r"[ \t]*\r?$", existing, re.MULTILINE):
             continue
         values = {"CLASS": cls, "RETURNS": cls, **it}
         chunks.append(fill(template, values))
@@ -134,6 +155,13 @@ def main(argv):
     args = ap.parse_args(argv)
     test_extras = {"SETUP": args.setup, "ARG": args.arg, "READBACK": args.readback}
 
+    # The class name becomes a file name: "../../bridge" would append member blocks to extension/js/bridge.js.
+    if not IDENT.match(args.cls):
+        print("refused: --class must be a plain identifier", file=sys.stderr)
+        return 1
+    if args.n < 0:
+        print("refused: --n must not be negative", file=sys.stderr)
+        return 1
     class_rel = f"extension/js/api/{args.area}/{args.cls}.js"
     class_path = os.path.join(ROOT, class_rel)
     if not os.path.isfile(class_path):
@@ -148,7 +176,7 @@ def main(argv):
         print("refused: a card holds at most 10 members", file=sys.stderr)
         return 1
 
-    inventory = load_inventory()
+    inventory = load_inventory(args.kind)
     unknown = [it["NAME"] for it in items if it["NAME"] not in inventory]
     if unknown:
         print("refused: not in docs/API_INVENTORY.csv:", ", ".join(unknown), file=sys.stderr)
