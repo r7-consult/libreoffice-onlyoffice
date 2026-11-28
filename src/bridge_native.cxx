@@ -180,6 +180,14 @@ Reference<XInterface> BridgeSession::resolve(const JsonValue& handle) const
     return it->second;
 }
 
+Reference<XInterface> BridgeSession::rootObject() const
+{
+    const auto it = m_handles.find(1);
+    if (it == m_handles.end())
+        throw std::runtime_error("bridge: no document root in this session");
+    return it->second;
+}
+
 std::string BridgeSession::registerHandle(const Reference<XInterface>& obj)
 {
     const std::int64_t id = m_next++;
@@ -238,7 +246,8 @@ std::string BridgeSession::opCall(const std::vector<JsonValue>& args)
     if (rule->second == "read" && !m_policy.canRead)
         throw std::runtime_error("bridge: document.read permission required");
 
-    const Reference<XInterface> obj = resolve(args[0]);
+    // A JSON null receiver means the session root (see rootObject).
+    const Reference<XInterface> obj = args[0].kind == JsonValue::Kind::Null ? rootObject() : resolve(args[0]);
     const Reference<XIdlClass> cls = m_reflection->getType(Any(obj));
     const Sequence<Reference<XIdlMethod>> methods = cls->getMethods();
     Reference<XIdlMethod> target;

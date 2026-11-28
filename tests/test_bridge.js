@@ -20,7 +20,7 @@ function makeNative() {
       objects.delete(args[0]);
       return "null";
     }
-    const obj = objects.get(args[0]);
+    const obj = args[0] === null ? objects.get(1) : objects.get(args[0]);
     if (op === "get") return JSON.stringify(obj[args[1]] === undefined ? null : obj[args[1]]);
     if (op === "set") { obj[args[1]] = args[2]; return "null"; }
     if (op === "call") {
@@ -158,6 +158,14 @@ t("dispose releases every live handle once and disables the bridge", () => {
   assert.strictEqual(n.objects.has(1), false);
   assert.throws(() => b.get(1, "name"), /bridge disposed/);
   b.dispose(); // second call does nothing
+});
+
+t("a null receiver in call goes to native as null (the root)", () => {
+  const n = makeNative();
+  const b = createBridge(n.native, policy, 1);
+  assert.strictEqual(b.call(null, "Sheet", "GetName", []), "Doc");
+  assert.strictEqual(n.log[n.log.length - 1], "call");
+  assert.throws(() => b.get(null, "name"), /invalid or released handle/);
 });
 
 t("the native primitive is not reachable from the bridge object", () => {

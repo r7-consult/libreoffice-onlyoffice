@@ -301,3 +301,19 @@ void recalculateActiveDocument()
     }
 }
 }
+
+namespace pluginhost
+{
+// Root object of a bridge session: the active document, or null when there is none.
+css::uno::Reference<css::uno::XInterface> activeDocumentRoot()
+{
+    try
+    {
+        return css::uno::Reference<css::uno::XInterface>(activeModel());
+    }
+    catch (...)
+    {
+        return css::uno::Reference<css::uno::XInterface>();
+    }
+}
+}

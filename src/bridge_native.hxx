@@ -70,6 +70,8 @@ private:
     std::string opRelease(const std::vector<JsonValue>& args);
 
     css::uno::Reference<css::uno::XInterface> resolve(const JsonValue& handle) const;
+    // Null receiver in a call: the session root (handle 1). Used by executeMethod-style calls. Only call uses it.
+    css::uno::Reference<css::uno::XInterface> rootObject() const;
     css::uno::Any toAny(const JsonValue& v, const css::uno::Type& type);
     std::string toJson(const css::uno::Any& value);
     std::string registerHandle(const css::uno::Reference<css::uno::XInterface>& obj);

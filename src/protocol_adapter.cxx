@@ -207,3 +207,12 @@ void ProtocolAdapter::sendRaw(const std::string& pluginId, const std::string& js
         logEvent("protocol", "no_host", pluginId);
 }
 }
+
+namespace pluginhost
+{
+// Public form of hasPermission, used by the bridge policy in command_engine.cxx.
+bool pluginHasPermission(const std::string& pluginId, const std::string& permission)
+{
+    return hasPermission(pluginId, permission);
+}
+}

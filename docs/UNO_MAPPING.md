@@ -44,7 +44,7 @@ above because the shim does not call it directly yet; it is needed in the chain 
 
 - Sequence support is in `bridge_convert.cxx` (same calls as the Basic bridge), but it is not compiled. The build
   machine must confirm `getDataArray` and `setDataArray` on a real sheet.
-- A null handle for global calls (`executeMethod`) is not supported yet.
+- A null receiver in `call` means the session root (`rootObject()` in `src/bridge_native.cxx`). Not compiled.
 - Each `ApiDocument.GetElement` call makes a loop of bridge calls. Measure this before it is accepted (budget in
   `PLAN_FULL_API.md` section 2.3).
-- The engine does not load the bridge yet, so none of this runs.
+- The engine creates `Asc.bridge` for each command (`installBridge` in `src/command_engine.cxx`). `Api` still runs through `api_shim.js`. Not compiled.
