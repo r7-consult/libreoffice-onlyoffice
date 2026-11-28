@@ -60,12 +60,16 @@ set(PH_SOURCES
 if(WIN32)
   list(APPEND PH_SOURCES webhost_win.cxx)
 else()
-  list(APPEND PH_SOURCES webhost_stub.cxx)
+  # Linux: WebKitGTK 4.1 in a GtkPlug (see docs/DECISION_LOG.md). webhost_stub.cxx stays for macOS, not built here.
+  list(APPEND PH_SOURCES webhost_linux_webkitgtk.cxx)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(PH_GTK3 REQUIRED IMPORTED_TARGET gtk+-3.0)
+  pkg_check_modules(PH_WEBKIT REQUIRED IMPORTED_TARGET webkit2gtk-4.1)
 endif()
 
 add_library(pluginhost SHARED ${PH_SOURCES})
 if(NOT WIN32)
-  target_link_libraries(pluginhost PRIVATE ${CMAKE_DL_LIBS}) # dladdr in paths.cxx
+  target_link_libraries(pluginhost PRIVATE ${CMAKE_DL_LIBS} PkgConfig::PH_GTK3 PkgConfig::PH_WEBKIT) # dladdr; web host
 endif()
 
 if(PH_TEST_HOOKS)

@@ -19,14 +19,13 @@ Decisions taken by the user, with the code or document each one changed. Newest 
 | 11 | Who runs Document Builder for expectations (F6) | The Linux host, after the full code is complete. | `docs/FULL_API_STATUS.md` (next steps) |
 | 12 | Distribution | Internal only for now. | This log |
 | 13 | Pilot members | The ten shim methods already mapped in `docs/UNO_MAPPING.md`. | `docs/UNO_MAPPING.md` |
+| 14 | Linux web host | **WebKitGTK** (webkit2gtk-4.1) in a GtkPlug on the X11 window, CEF as fallback. Approved 2026-11-28. The embedding check on the Linux host decides it. | `src/webhost_linux_webkitgtk.cxx`, `src/CMakeLists.txt` |
 
-Status of this round: items 1, 5, 6, 7, 8 are implemented in source (not compiled). Items 2, 3 are recorded in ADR-002 and
+Status of this round: items 1, 5, 6, 7, 8 and 14 are implemented in source (not compiled). Items 2, 3 are recorded in ADR-002 and
 the prompt is not built yet. Items 4, 9–13 are recorded only.
 
 ## Open (not decided)
 
-- Linux web host: CEF (Chromium parity with ONLYOFFICE) or WebKitGTK (small, in most distributions). Phase 6 item 1 in
-  `docs/PLAN_NEXT.md`. Needs a decision before the Linux host can show a plugin panel.
 - ADR-002: the wording of the prompt (after item 3 is built).
 - Linux packaging: the manifest and `pluginhost.components` still name `pluginhost.dll` and `windows_x86_64`.
 
