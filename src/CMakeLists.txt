@@ -39,6 +39,8 @@ set(PH_SOURCES
   log.cxx
   paths.cxx
   json_mini.cxx
+  bridge_native.cxx
+  bridge_convert.cxx
   plugin_config.cxx
   host_service.cxx
   protocol_adapter.cxx
