@@ -22,7 +22,7 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 
 | Item | Blocked by | Needs |
 |---|---|---|
-| F3 generic bridge, C++ native primitive | Written, not compiled: `src/bridge_native.cxx`, `src/bridge_convert.cxx`, `src/bridge_native.hxx`. Supports get, set, call and release for scalar, string, enum and interface values. Refuses sequences, structs, Any and out-parameters. Null handle (global calls, needed for executeMethod) not yet supported. Allowlist file `extension/js/bridge_allowlist.json` is empty, so every call is refused until it is generated. Not yet called by the engine. Compile and fix on the build machine | Sonnet, build machine |
+| F3 generic bridge, C++ native primitive | Written, not compiled: `src/bridge_native.cxx`, `src/bridge_convert.cxx`, `src/bridge_native.hxx`. Supports get, set, call and release for scalar, string, enum and interface values. Refuses sequences, structs, Any and out-parameters. Null handle (global calls, needed for executeMethod) not yet supported. Allowlist `extension/js/bridge_allowlist.json` now holds the 15 UNO methods behind the first ten shim methods (see `docs/UNO_MAPPING.md`); `tests/test_allowlist.js` checks them against the IDL tree. Not yet called by the engine. Compile and fix on the build machine | Sonnet, build machine |
 | F4 conversion layer | Test run (performance budgets) | Sonnet, build machine |
 | F5 headless runner `tests/run_member.py` | Running LibreOffice headless | Build machine |
 | F6 expectations from Document Builder | Running Document Builder (licence now answered: inherited AGPL-3.0, see `docs/LICENSING.md`) | A machine that can run Document Builder, then Sonnet |

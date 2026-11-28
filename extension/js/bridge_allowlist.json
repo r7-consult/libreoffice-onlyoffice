@@ -1,1 +1,41 @@
-{}
+{
+  "com.sun.star.frame.XModel": {
+    "getCurrentController": "read"
+  },
+  "com.sun.star.sheet.XSpreadsheetView": {
+    "getActiveSheet": "read"
+  },
+  "com.sun.star.sheet.XSpreadsheetDocument": {
+    "getSheets": "read"
+  },
+  "com.sun.star.container.XNameAccess": {
+    "getByName": "read"
+  },
+  "com.sun.star.container.XNamed": {
+    "getName": "read"
+  },
+  "com.sun.star.table.XCellRange": {
+    "getCellRangeByName": "read"
+  },
+  "com.sun.star.sheet.XCellRangeData": {
+    "getDataArray": "read",
+    "setDataArray": "edit"
+  },
+  "com.sun.star.text.XTextDocument": {
+    "getText": "read"
+  },
+  "com.sun.star.container.XEnumerationAccess": {
+    "createEnumeration": "read"
+  },
+  "com.sun.star.container.XEnumeration": {
+    "hasMoreElements": "read",
+    "nextElement": "read"
+  },
+  "com.sun.star.text.XTextRange": {
+    "getString": "read"
+  },
+  "com.sun.star.text.XSimpleText": {
+    "createTextCursorByRange": "read",
+    "insertString": "edit"
+  }
+}
