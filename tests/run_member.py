@@ -137,8 +137,10 @@ def run_one(runner, desktop, area, test_rel):
     if missing:
         return False, test_id + ": " + missing
     doc = open_fixture(desktop, area)
+    import uno  # on sys.path since main() added the LibreOffice program folder
+
     try:
-        raw = runner.run(driver_source(test_text), "{}")
+        raw = uno.invoke(runner, "run", (driver_source(test_text), "{}"))
     except Exception as exc:
         return False, test_id + ": engine error: " + str(exc)
     finally:
@@ -165,6 +167,8 @@ def main(argv):
     lo_program = os.environ.get("LO_PROGRAM", DEFAULT_LO_PROGRAM)
     port = int(os.environ.get("PLUGINHOST_TEST_PORT", DEFAULT_PORT))
     os.environ.setdefault("PLUGINHOST_API_DIR", os.path.join(ROOT, "extension", "js"))
+    # Test-only switch: without it the TestRunner service is not created (see docs/TEST_RUNNER.md).
+    os.environ["PLUGINHOST_TEST_SERVICE"] = "1"
     if not os.path.isdir(lo_program):
         exit_cannot_run("LibreOffice program folder not found: " + lo_program + " (set LO_PROGRAM)")
     sys.path.insert(0, lo_program)

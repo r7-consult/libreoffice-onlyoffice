@@ -9,5 +9,8 @@
     <implementation name="org.example.pluginhost.MenuDispatch">
       <service name="com.sun.star.frame.ProtocolHandler"/>
     </implementation>
+    <implementation name="org.example.pluginhost.TestRunner">
+      <service name="org.example.pluginhost.TestRunner"/>
+    </implementation>
   </component>
 </components>

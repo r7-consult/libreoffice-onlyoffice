@@ -50,6 +50,7 @@ set(PH_SOURCES
   context_menu.cxx
   menu_dispatch.cxx
   panel_factory.cxx
+  test_runner.cxx
   plugin_panel.cxx
 )
 if(WIN32)

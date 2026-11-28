@@ -3,6 +3,7 @@
 
 #include "menu_dispatch.hxx"
 #include "panel_factory.hxx"
+#include "test_runner.hxx"
 
 #include <cppuhelper/implementationentry.hxx>
 #include <uno/lbnames.h>
@@ -25,6 +26,14 @@ cppu::ImplementationEntry s_aServiceEntries[] =
         pluginhost::MenuDispatch::Create,
         pluginhost::MenuDispatch::getImplementationName_static,
         pluginhost::MenuDispatch::getSupportedServiceNames_static,
+        ::cppu::createSingleComponentFactory,
+        nullptr,
+        0
+    },
+    {
+        pluginhost::TestRunner::Create,
+        pluginhost::TestRunner::getImplementationName_static,
+        pluginhost::TestRunner::getSupportedServiceNames_static,
         ::cppu::createSingleComponentFactory,
         nullptr,
         0
