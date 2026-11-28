@@ -22,7 +22,7 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 
 | Item | Blocked by | Needs |
 |---|---|---|
-| F3 generic bridge (C++ and JS) | Compile | Sonnet, build machine |
+| F3 generic bridge, C++ native primitive | Compile. The JS side is done (`extension/js/bridge.js`, 13 tests in `tests/test_bridge.js`) and is not yet loaded by the engine | Sonnet, build machine |
 | F4 conversion layer | Test run (performance budgets) | Sonnet, build machine |
 | F5 headless runner `tests/run_member.py` | Running LibreOffice headless | Build machine |
 | F6 expectations from Document Builder | Running Document Builder (licence now answered: inherited AGPL-3.0, see `docs/LICENSING.md`) | A machine that can run Document Builder, then Sonnet |
