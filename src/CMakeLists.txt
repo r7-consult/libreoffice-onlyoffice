@@ -24,6 +24,10 @@ set(PH_WEBVIEW2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/webview2/pkg/bui
 set(PH_QUICKJS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/quickjs-ng" CACHE PATH
     "quickjs-ng 0.18.0 source tree")
 
+# Test builds only. ON enables PLUGINHOST_API_DIR (run JS from the repository) and PLUGINHOST_TEST_SERVICE (the
+# TestRunner UNO service used by tests/run_member.py). Release builds keep it OFF: those switches must not exist there.
+option(PH_TEST_HOOKS "Test builds: honour PLUGINHOST_API_DIR and PLUGINHOST_TEST_SERVICE" OFF)
+
 # --- QuickJS-ng (static) ----------------------------------------------------
 # Use upstream's own CMake: it carries the MSVC flags QuickJS needs (/experimental:c11atomics,
 # _GNU_SOURCE, warning suppressions). A hand-written source list drifted already (0.18.0 has no cutils.c).
@@ -60,6 +64,13 @@ else()
 endif()
 
 add_library(pluginhost SHARED ${PH_SOURCES})
+if(NOT WIN32)
+  target_link_libraries(pluginhost PRIVATE ${CMAKE_DL_LIBS}) # dladdr in paths.cxx
+endif()
+
+if(PH_TEST_HOOKS)
+  target_compile_definitions(pluginhost PRIVATE PH_TEST_HOOKS=1)
+endif()
 
 target_include_directories(pluginhost PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}"

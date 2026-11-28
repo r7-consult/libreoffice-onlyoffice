@@ -162,20 +162,24 @@ struct AllowlistFile
 };
 
 // Directory with api_shim.js, bridge.js, bridge_boot.js and bridge_allowlist.json, with a trailing separator.
-// PLUGINHOST_API_DIR overrides the installed copy, so tests run the repository files without reinstalling.
-// Security: an override changes the allowlist the host reads. Honour it only on test machines (see docs).
+// Test builds only (PH_TEST_HOOKS): PLUGINHOST_API_DIR overrides the installed copy, so tests run the repository
+// files without reinstalling. The override changes the allowlist the host reads, so release builds never honour it.
 std::string jsDirectory()
 {
-    const char* override = std::getenv("PLUGINHOST_API_DIR");
-    if (override && *override)
+#ifdef PH_TEST_HOOKS
+    if (const char* override = std::getenv("PLUGINHOST_API_DIR"))
     {
-        std::string dir(override);
-        if (dir.back() != '\\')
-            dir += '\\';
-        return dir;
+        if (*override)
+        {
+            std::string dir(override);
+            if (dir.back() != kPathSep)
+                dir += kPathSep;
+            return dir;
+        }
     }
+#endif
     const std::string dir = moduleDirectory();
-    return dir.empty() ? std::string() : dir + "js\\";
+    return dir.empty() ? std::string() : dir + "js" + kPathSep;
 }
 
 const AllowlistFile& allowlistFile()

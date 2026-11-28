@@ -26,7 +26,7 @@ ProtocolAdapter& ProtocolAdapter::instance()
 std::string ProtocolAdapter::runtimeScriptPath()
 {
     const std::string dir = moduleDirectory();
-    return dir.empty() ? std::string() : dir + "content\\runtime.js";
+    return dir.empty() ? std::string() : dir + "content" + kPathSep + "runtime.js";
 }
 
 namespace
@@ -41,7 +41,7 @@ const PluginConfig* configOf(const std::string& pluginId)
     {
         PluginConfig cfg;
         std::string err;
-        const bool ok = loadPluginConfig(pluginsRoot() + "\\" + pluginId, cfg, err);
+        const bool ok = loadPluginConfig(joinPath(pluginsRoot(), pluginId), cfg, err);
         if (!ok)
             logEvent("protocol", "config_error", pluginId + "|" + err);
         it = cache.emplace(pluginId, std::make_pair(ok, cfg)).first;

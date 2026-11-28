@@ -5,7 +5,7 @@
 // It implements XInvocation, so pyuno calls it as runner.run(source, scopeJson). run() evaluates source in the
 // engine under the pluginId "__test__" and returns the result as JSON text. There is no permission check for
 // this id, so the service exists only when the environment variable PLUGINHOST_TEST_SERVICE is "1". Otherwise
-// createInstance returns nothing. Do not ship with the variable honoured without a decision (see docs/TEST_RUNNER.md).
+// createInstance returns nothing. Built only with PH_TEST_HOOKS (see docs/TEST_RUNNER.md).
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/script/XInvocation.hpp>

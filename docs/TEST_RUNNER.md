@@ -33,7 +33,7 @@ allowlist. Options:
    read them. Recommended.
 2. Keep them in all builds and document them as developer switches. Not recommended.
 
-Until this is decided, both stay honoured in every build, and this file is the reminder.
+Resolved 2026-11-28 (see docs/DECISION_LOG.md): both switches exist only in builds with `-DPH_TEST_HOOKS=ON`. Release builds ignore them.
 
 ## Not verified
 

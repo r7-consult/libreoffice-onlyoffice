@@ -125,7 +125,7 @@ bool choosePlugin(PluginConfig& out)
     {
         if (forced && *forced)
         {
-            const std::string folder = cfg.installDir.substr(cfg.installDir.find_last_of('\\') + 1);
+            const std::string folder = baseName(cfg.installDir);
             if (folder != forced)
                 continue;
         }
@@ -137,7 +137,7 @@ bool choosePlugin(PluginConfig& out)
 
 std::string folderName(const std::string& installDir)
 {
-    return installDir.substr(installDir.find_last_of('\\') + 1);
+    return baseName(installDir);
 }
 
 // Attaches the context menu interceptor to the document of the frame that owns this panel.

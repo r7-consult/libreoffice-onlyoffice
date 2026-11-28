@@ -168,3 +168,9 @@ to administrators who switch the default back to B.
    request set keeps the grant.
 6. **Grant store location: ANSWERED, host-owned file.** This deviates from `PLAN_NEXT.md`, which must be updated.
 7. Prompt wording and localisation are still open; to be written with the UI owner.
+
+## Decisions (round 2, 2026-11-28)
+
+- No administrator pre-approval in this version. Installation and use must stay easy. The first-use prompt is the only
+  approval path (see `docs/DECISION_LOG.md`, item 2).
+- Prompt language: English strings in one resource table now. A Russian translation is added before the first pilot user.

@@ -43,7 +43,7 @@ FACTORY_BY_AREA = {
     "word": "private:factory/swriter",
     "slide": "private:factory/simpress",
 }
-DEFAULT_LO_PROGRAM = r"C:\Program Files\LibreOffice\program"
+DEFAULT_LO_PROGRAM = r"C:\Program Files\LibreOffice\program" if os.name == "nt" else "/usr/lib/libreoffice/program"
 DEFAULT_PORT = 2083
 CONNECT_TIMEOUT_S = 60
 
@@ -101,7 +101,7 @@ def expected_value(test_id):
 
 def start_office(lo_program, port):
     """Starts soffice headless with a socket listener, unless one already listens on the port."""
-    soffice = os.path.join(lo_program, "soffice.exe")
+    soffice = os.path.join(lo_program, "soffice.exe" if os.name == "nt" else "soffice")
     if not os.path.exists(soffice):
         exit_cannot_run("soffice.exe not found in " + lo_program + " (set LO_PROGRAM)")
     accept = "--accept=socket,host=localhost,port=%d;urp;StarOffice.ComponentContext" % port
@@ -183,7 +183,7 @@ def main(argv):
     runner = smgr.createInstanceWithContext(SERVICE, ctx)
     if runner is None:
         office.terminate()
-        exit_cannot_run("service " + SERVICE + " is not registered (F5 C++ part not built)")
+        exit_cannot_run("service " + SERVICE + " is not registered: build with -DPH_TEST_HOOKS=ON (see docs/TEST_RUNNER.md)")
     desktop = smgr.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
 
     results = []

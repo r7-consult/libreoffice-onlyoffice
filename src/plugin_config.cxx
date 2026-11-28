@@ -1,14 +1,12 @@
 #include "plugin_config.hxx"
 
 #include "json_mini.hxx"
+#include "paths.hxx"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 namespace pluginhost
 {
@@ -29,7 +27,7 @@ bool readFile(const std::string& path, std::string& out)
 bool loadPluginConfig(const std::string& installDir, PluginConfig& out, std::string& error)
 {
     std::string text;
-    const std::string path = installDir + "\\config.json";
+    const std::string path = joinPath(installDir, "config.json");
     if (!readFile(path, text))
     {
         error = "cannot read " + path;
@@ -87,30 +85,24 @@ bool loadPluginConfig(const std::string& installDir, PluginConfig& out, std::str
 std::vector<PluginConfig> scanPlugins(const std::string& root)
 {
     std::vector<PluginConfig> result;
-#ifdef _WIN32
-    WIN32_FIND_DATAA fd{};
-    HANDLE h = FindFirstFileA((root + "\\*").c_str(), &fd);
-    if (h == INVALID_HANDLE_VALUE)
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    if (!fs::is_directory(root, ec))
         return result;
     std::vector<std::string> folders;
-    do
+    for (const fs::directory_entry& entry : fs::directory_iterator(root, ec))
     {
-        const std::string name = fd.cFileName;
-        if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && name != "." && name != "..")
-            folders.push_back(name);
-    } while (FindNextFileA(h, &fd));
-    FindClose(h);
+        if (entry.is_directory(ec))
+            folders.push_back(entry.path().filename().string());
+    }
     std::sort(folders.begin(), folders.end());
     for (const std::string& f : folders)
     {
         PluginConfig cfg;
         std::string err;
-        if (loadPluginConfig(root + "\\" + f, cfg, err))
+        if (loadPluginConfig(joinPath(root, f), cfg, err))
             result.push_back(cfg);
     }
-#else
-    (void)root;
-#endif
     return result;
 }
 }

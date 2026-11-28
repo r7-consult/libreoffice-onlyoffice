@@ -4,17 +4,30 @@
 
 namespace pluginhost
 {
-// Directory that contains pluginhost.dll (the unpacked extension root), with a trailing separator.
-// On non-Windows builds this returns an empty string until stage 10 is implemented.
+// Separator used in paths the host builds: '\' on Windows, '/' elsewhere.
+#ifdef _WIN32
+constexpr char kPathSep = '\\';
+#else
+constexpr char kPathSep = '/';
+#endif
+
+// Joins a folder and a name with exactly one separator. An empty folder returns the name.
+std::string joinPath(const std::string& dir, const std::string& name);
+
+// Last component of a path (the folder or file name).
+std::string baseName(const std::string& path);
+
+// Directory that contains the pluginhost library (the unpacked extension root), with a trailing separator.
+// Empty when it cannot be found.
 std::string moduleDirectory();
 
-// Root of installed plugin packages: %LOCALAPPDATA%\PluginHost\plugins
-// (or PLUGINHOST_PLUGINS_DIR when set, which the tests use).
+// Root of installed plugin packages: %LOCALAPPDATA%\PluginHost\plugins on Windows,
+// $XDG_DATA_HOME/PluginHost/plugins (or ~/.local/share) on Linux. PLUGINHOST_PLUGINS_DIR overrides it (tests).
 std::string pluginsRoot();
 
-// Per-plugin browser data folder: <pluginsRoot>\..\data\<pluginId>
+// Per-plugin browser data folder: <user data>/PluginHost/data/<pluginId>
 std::string pluginDataDir(const std::string& pluginId);
 
-// Converts a Windows path to a file:/// URL.
+// Converts a local path to a file URL.
 std::string fileUrl(const std::string& path);
 }

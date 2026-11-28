@@ -180,3 +180,9 @@ change code to hide it.
    Document Builder is AGPL-3.0 (`ONLYOFFICE/DocumentBuilder`), so expectations generated with it are treated as
    AGPL-derived. Running it to make expectations is allowed; shipping its binaries is not in scope. Open points for
    counsel are in `docs/LICENSING.md`. Desktop Editors runs are not covered by this answer.
+
+## Decisions (round 2, 2026-11-28)
+
+- Pilot members: the ten shim methods in `docs/UNO_MAPPING.md` (`docs/DECISION_LOG.md`, item 13).
+- Classification of a member that has no sdkjs declaration or that is unclear: UNCLASSIFIED, which the host treats as edit
+  (`docs/API_CLASSIFICATION_RULES.md`, revision 2026-11-28).

@@ -22,10 +22,15 @@ namespace
 const char kServiceName[] = "org.example.pluginhost.TestRunner";
 const char kPluginId[] = "__test__";
 
+// Test builds only (PH_TEST_HOOKS). Release builds never create the service.
 bool testServiceEnabled()
 {
+#ifdef PH_TEST_HOOKS
     const char* v = std::getenv("PLUGINHOST_TEST_SERVICE");
     return v && std::strcmp(v, "1") == 0;
+#else
+    return false;
+#endif
 }
 }
 

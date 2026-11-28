@@ -1480,7 +1480,7 @@ M1478,method,GetDisplayedText,word,1,yes,,read,Examples/Word/ApiHyperlink/Method
 M1479,method,GetDistanceFromText,word,1,yes,(),read,Examples/Word/ApiDropCap/Methods/GetDistanceFromText.js
 M1480,method,GetDropCap,word,1,yes,(),read,Examples/Word/ApiParagraph/Methods/GetDropCap.js
 M1481,method,GetEffect,slide,1,yes,(index),read,Examples/Slide/ApiAnimationSequence/Methods/GetEffect.js
-M1482,method,GetEndPage,word,1,yes,,edit,Examples/Word/ApiRange/Methods/GetEndPage.js
+M1482,method,GetEndPage,word,1,yes,,read,Examples/Word/ApiRange/Methods/GetEndPage.js
 M1483,method,GetEntireColumn,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetEntireColumn.js
 M1484,method,GetEntireRow,cell,1,yes,(),read,Examples/Cell/ApiRange/Methods/GetEntireRow.js
 M1485,method,GetErrorMessage,cell,1,yes,(),read,Examples/Cell/ApiValidation/Methods/GetErrorMessage.js
@@ -1554,7 +1554,7 @@ M1552,method,GetOnFocus,pdf,1,yes,(),read,Examples/Pdf/ApiActionCollection/Metho
 M1553,method,GetOption,pdf,1,yes,(index),read,Examples/Pdf/ApiBaseListField/Methods/GetOption.js
 M1554,method,GetOptions,pdf,1,yes,(),read,Examples/Pdf/ApiBaseListField/Methods/GetOptions.js
 M1555,method,GetPageBreakBefore,word,1,yes,(),read,Examples/Word/ApiParaPr/Methods/GetPageBreakBefore.js
-M1556,method,GetPageCount,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/GetPageCount.js
+M1556,method,GetPageCount,word,1,yes,(),read,Examples/Word/ApiDocument/Methods/GetPageCount.js
 M1557,method,GetPageFields,cell,1,yes,(field),read,Examples/Cell/ApiPivotTable/Methods/GetPageFields.js
 M1558,method,GetPageHeight,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetPageHeight.js
 M1559,method,GetPageWidth,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetPageWidth.js
@@ -1606,7 +1606,7 @@ M1604,method,GetSlidesCount,slide,1,yes,(),read,Examples/Slide/ApiPresentation/M
 M1605,method,GetSortOnValue,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiSortField/Methods/GetSortOnValue.js
 M1606,method,GetSourceName,cell,1,yes,(),read,Examples/Cell/ApiPivotField/Methods/GetSourceName.js
 M1607,method,GetSourceType,cell,1,yes,,UNCLASSIFIED,Examples/Cell/ApiListObject/Methods/GetSourceType.js
-M1608,method,GetStartPage,word,1,yes,,edit,Examples/Word/ApiRange/Methods/GetStartPage.js
+M1608,method,GetStartPage,word,1,yes,,read,Examples/Word/ApiRange/Methods/GetStartPage.js
 M1609,method,GetStartPageNumber,word,1,yes,(),read,Examples/Word/ApiSection/Methods/GetStartPageNumber.js
 M1610,method,GetStatistics,word,1,yes,(),edit,Examples/Word/ApiDocument/Methods/GetStatistics.js
 M1611,method,GetStrikethrough,cell,1,yes,(),read,Examples/Cell/ApiFont/Methods/GetStrikethrough.js
@@ -2000,7 +2000,7 @@ M1998,method,SetUniqueName,pdf,1,yes,(name),edit,Examples/Pdf/ApiBaseAnnotation/
 M1999,method,SetUpperHeadingLevel,word,1,yes,,UNCLASSIFIED,Examples/Word/ApiTableOfContents/Methods/SetUpperHeadingLevel.js
 M2000,method,SetVAlign,word,1,yes,(sType),edit,Examples/Word/ApiTable/Methods/SetVAlign.js
 M2001,method,ShowAllData,cell,1,yes,(),read,Examples/Cell/ApiAutoFilter/Methods/ShowAllData.js
-M2002,method,ShowComment,word,1,yes,(commentId),edit,Examples/Word/ApiDocument/Methods/ShowComment.js
+M2002,method,ShowComment,word,1,yes,(commentId),UNCLASSIFIED,Examples/Word/ApiDocument/Methods/ShowComment.js
 M2003,method,ShowDetails,cell,1,yes,"(rowLine, colLine)",edit,Examples/Cell/ApiPivotTable/Methods/ShowDetails.js
 M2004,method,SlidesToJSON,slide,1,yes,"(nStart, nEnd, bWriteLayout, bWriteMaster, bWriteAllMasLayouts, bWriteTableStyles)",read,Examples/Slide/ApiPresentation/Methods/SlidesToJSON.js
 M2005,method,T,cell,1,yes,(arg1),read,Examples/Cell/ApiWorksheetFunction/Methods/T.js
