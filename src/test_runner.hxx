@@ -11,9 +11,14 @@
 #include <com/sun/star/script/XInvocation.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <rtl/ustring.hxx>
 
 namespace pluginhost
 {
+// Outside LibreOffice's own build (LIBO_INTERNAL_ONLY) there is no global OUString: rtl/ustring.hxx declares only
+// rtl::OUString. This file and test_runner.cxx use the short name.
+using ::rtl::OUString;
+
 class TestRunner : public cppu::WeakImplHelper<css::script::XInvocation, css::lang::XServiceInfo>
 {
 public:

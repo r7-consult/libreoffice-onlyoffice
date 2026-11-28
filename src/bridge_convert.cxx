@@ -23,6 +23,8 @@ using css::uno::TypeClass;
 using css::uno::XInterface;
 using css::reflection::XIdlArray;
 using css::reflection::XIdlClass;
+// The TypeClass_* enumerators live in css::uno. A using-declaration of the type TypeClass does not bring them in.
+using namespace css::uno;
 
 namespace
 {
@@ -34,11 +36,10 @@ long long integerFrom(const JsonValue& v, double lo, double hi)
     return static_cast<long long>(v.number);
 }
 
+// One shared, locale-independent formatter (json_mini.cxx): NaN and infinity become null.
 std::string formatDouble(double d)
 {
-    char buf[64];
-    std::snprintf(buf, sizeof buf, "%.17g", d);
-    return buf;
+    return formatJsonNumber(d);
 }
 }
 
@@ -75,7 +76,22 @@ Any BridgeSession::toAny(const JsonValue& v, const Type& type)
         case TypeClass_STRING:
             if (!v.isString())
                 throw std::runtime_error("bridge: argument must be a string");
-            return Any(rtl::OUString::fromUtf8(v.str));
+            return Any(utf8ToOUString(v.str));
+        case TypeClass_ANY:
+            // Used for sequence<any> elements (setDataArray) and "any" properties: the JSON kind picks the UNO type.
+            switch (v.kind)
+            {
+                case JsonValue::Kind::Null:
+                    return Any();
+                case JsonValue::Kind::Bool:
+                    return Any(v.boolean);
+                case JsonValue::Kind::Number:
+                    return Any(v.number);
+                case JsonValue::Kind::String:
+                    return Any(utf8ToOUString(v.str));
+                default:
+                    throw std::runtime_error("bridge: an any value must be null, a boolean, a number or a string");
+            }
         case TypeClass_ENUM:
         {
             const sal_Int32 value = static_cast<sal_Int32>(integerFrom(v, -2147483648.0, 2147483647.0));
@@ -89,7 +105,15 @@ Any BridgeSession::toAny(const JsonValue& v, const Type& type)
             if (!v.isObject() || !v.get("$h"))
                 throw std::runtime_error("bridge: interface argument must be a handle");
             ref = resolve(*v.get("$h"));
-            return Any(&ref, type);
+            if (!ref.is())
+                return Any(&ref, type);
+            // Any(&ref, type) would label the stored XInterface pointer with the target interface type, which is only
+            // right when the object's XInterface sub-object is also its face for that type. queryInterface returns an
+            // Any that holds the right pointer.
+            const Any queried = ref->queryInterface(type);
+            if (!queried.hasValue())
+                throw std::runtime_error("bridge: the object does not implement the interface the method expects");
+            return queried;
         }
         case TypeClass_SEQUENCE:
         {
@@ -97,6 +121,8 @@ Any BridgeSession::toAny(const JsonValue& v, const Type& type)
                 throw std::runtime_error("bridge: argument must be an array");
             // Same calls as the Basic bridge (basic/source/classes/sbunoobj.cxx): forName, createObject, realloc, set.
             const Reference<XIdlClass> seqClass = m_reflection->forName(type.getTypeName());
+            if (!seqClass.is())
+                throw std::runtime_error("bridge: unknown sequence type");
             const Reference<XIdlClass> elemClass = seqClass->getComponentType();
             const Type elemType(elemClass->getTypeClass(), elemClass->getName());
             const Reference<XIdlArray> arr = seqClass->getArray();
@@ -108,7 +134,8 @@ Any BridgeSession::toAny(const JsonValue& v, const Type& type)
             return seq;
         }
         default:
-            throw std::runtime_error("bridge: parameter type not supported yet: " +
+            // std::string(...) first: a string literal plus a const char* would add two pointers.
+            throw std::runtime_error(std::string("bridge: parameter type not supported yet: ") +
                                      rtl::OUStringToOString(type.getTypeName(), RTL_TEXTENCODING_UTF8).getStr());
     }
 }
@@ -157,6 +184,8 @@ std::string BridgeSession::toJson(const Any& value)
         case TypeClass_SEQUENCE:
         {
             const Reference<XIdlClass> seqClass = m_reflection->forName(value.getValueType().getTypeName());
+            if (!seqClass.is())
+                throw std::runtime_error("bridge: unknown sequence type in a result");
             const Reference<XIdlArray> arr = seqClass->getArray();
             const sal_Int32 n = arr->getLen(value);
             std::string out = "[";

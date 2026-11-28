@@ -11,11 +11,15 @@
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <osl/mutex.hxx>
+#include <rtl/ustring.hxx>
 
 #include <string>
 
 namespace pluginhost
 {
+// SDK builds (no LIBO_INTERNAL_ONLY) have no global OUString: only rtl::OUString exists (rtl/ustring.hxx).
+using ::rtl::OUString;
+
 // A sidebar panel with one native child window (systemchildwindow).
 // The window hosts the plugin browser owned by HostService (stage 2-3).
 class PluginPanel : private cppu::BaseMutex,

@@ -12,9 +12,13 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <rtl/ustring.hxx>
 
 namespace pluginhost
 {
+// SDK builds (no LIBO_INTERNAL_ONLY) have no global OUString: only rtl::OUString exists (rtl/ustring.hxx).
+using ::rtl::OUString;
+
 class MenuDispatch : public cppu::WeakImplHelper<css::frame::XDispatchProvider, css::frame::XDispatch,
                                                   css::lang::XInitialization, css::lang::XServiceInfo>
 {

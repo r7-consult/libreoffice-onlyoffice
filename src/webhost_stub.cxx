@@ -1,9 +1,10 @@
-// Non-Windows placeholder (stage 10). Returns no browser, so the panel logs
-// "webhost|unavailable" and the plugin is not shown.
+// macOS placeholder. Returns no browser, so the panel logs "webhost|unavailable"
+// and the plugin is not shown. Not built on Linux: Linux uses WebKitGTK 4.1 in
+// src/webhost_linux_webkitgtk.cxx (compiled on non-Windows; see CMakeLists.txt).
 //
-// Planned implementations (not written, see docs/TEST_MATRIX_LINUX_MACOS.md):
-//   Linux (X11 / XWayland): CEF in windowed mode attached to the XID of systemchildwindow.
+// Planned macOS implementation (not written, see docs/TEST_MATRIX_LINUX_MACOS.md):
 //   macOS: WKWebView attached to the NSView* of systemchildwindow.
+// CEF remains the fallback for Linux (docs/DECISION_LOG.md item 14), not written.
 
 #ifndef _WIN32
 

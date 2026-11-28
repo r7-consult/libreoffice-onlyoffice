@@ -172,7 +172,9 @@ std::string BridgeSession::dispatch(const std::string& op, const std::string& ar
 
 Reference<XInterface> BridgeSession::resolve(const JsonValue& handle) const
 {
-    if (handle.kind != JsonValue::Kind::Number || std::floor(handle.number) != handle.number)
+    // The range check comes first: converting a double outside the int64 range is undefined behaviour.
+    if (handle.kind != JsonValue::Kind::Number || !(handle.number >= 0 && handle.number < 9007199254740992.0) ||
+        std::floor(handle.number) != handle.number)
         throw std::runtime_error("bridge: invalid or released handle");
     const auto it = m_handles.find(static_cast<std::int64_t>(handle.number));
     if (it == m_handles.end())
@@ -190,6 +192,8 @@ Reference<XInterface> BridgeSession::rootObject() const
 
 std::string BridgeSession::registerHandle(const Reference<XInterface>& obj)
 {
+    if (m_handles.size() >= m_policy.maxHandles)
+        throw std::runtime_error("bridge: too many live handles (release some)");
     const std::int64_t id = m_next++;
     m_handles[id] = obj;
     return "{\"$h\":" + std::to_string(id) + "}";
@@ -203,10 +207,12 @@ std::string BridgeSession::opGet(const std::vector<JsonValue>& args)
         throw std::runtime_error("bridge: document.read permission required");
     if (args[1].kind != JsonValue::Kind::String || !isPropertyName(args[1].str))
         throw std::runtime_error("bridge: property name not allowed");
+    if (m_policy.props.find(args[1].str) == m_policy.props.end())
+        throw std::runtime_error("bridge: property not in the allowlist: " + args[1].str);
     const Reference<css::beans::XPropertySet> set(resolve(args[0]), css::uno::UNO_QUERY);
     if (!set.is())
         throw std::runtime_error("bridge: object is not a property set");
-    return toJson(set->getPropertyValue(rtl::OUString::fromUtf8(args[1].str)));
+    return toJson(set->getPropertyValue(utf8ToOUString(args[1].str)));
 }
 
 void BridgeSession::opSet(const std::vector<JsonValue>& args)
@@ -217,11 +223,17 @@ void BridgeSession::opSet(const std::vector<JsonValue>& args)
         throw std::runtime_error("bridge: document.edit permission required");
     if (args[1].kind != JsonValue::Kind::String || !isPropertyName(args[1].str))
         throw std::runtime_error("bridge: property name not allowed");
+    const auto propRule = m_policy.props.find(args[1].str);
+    if (propRule == m_policy.props.end() || propRule->second != "edit")
+        throw std::runtime_error("bridge: property is not writable: " + args[1].str);
     const Reference<css::beans::XPropertySet> set(resolve(args[0]), css::uno::UNO_QUERY);
     if (!set.is())
         throw std::runtime_error("bridge: object is not a property set");
-    const rtl::OUString name = rtl::OUString::fromUtf8(args[1].str);
-    const css::beans::Property info = set->getPropertySetInfo()->getPropertyByName(name);
+    const rtl::OUString name = utf8ToOUString(args[1].str);
+    const Reference<css::beans::XPropertySetInfo> setInfo = set->getPropertySetInfo();
+    if (!setInfo.is())
+        throw std::runtime_error("bridge: object has no property information");
+    const css::beans::Property info = setInfo->getPropertyByName(name);
     set->setPropertyValue(name, toAny(args[2], info.Type));
 }
 
@@ -248,11 +260,18 @@ std::string BridgeSession::opCall(const std::vector<JsonValue>& args)
 
     // A JSON null receiver means the session root (see rootObject).
     const Reference<XInterface> obj = args[0].kind == JsonValue::Kind::Null ? rootObject() : resolve(args[0]);
-    const Reference<XIdlClass> cls = m_reflection->getType(Any(obj));
+    if (!obj.is())
+        throw std::runtime_error("bridge: null receiver");
+    const rtl::OUString wantedName = utf8ToOUString(method);
+    const rtl::OUString wantedIface = utf8ToOUString(iface);
+    // The class comes from the interface name, not from getType(Any(obj)): an Any that holds a Reference<XInterface>
+    // reflects XInterface (see stoc/source/corereflection/crefl.cxx, getType), which has no other methods.
+    // XIdlMethod::invoke queries obj for the declaring interface itself (IdlInterfaceMethodImpl::invoke, mapToUno).
+    const Reference<XIdlClass> cls = m_reflection->forName(wantedIface);
+    if (!cls.is() || cls->getTypeClass() != css::uno::TypeClass_INTERFACE)
+        throw std::runtime_error("bridge: unknown interface: " + iface);
     const Sequence<Reference<XIdlMethod>> methods = cls->getMethods();
     Reference<XIdlMethod> target;
-    const rtl::OUString wantedName = rtl::OUString::fromUtf8(method);
-    const rtl::OUString wantedIface = rtl::OUString::fromUtf8(iface);
     for (const Reference<XIdlMethod>& m : methods)
     {
         if (m->getName() == wantedName && m->getDeclaringClass()->getName() == wantedIface)

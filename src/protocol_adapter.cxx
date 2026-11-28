@@ -9,6 +9,9 @@
 #include "paths.hxx"
 #include "plugin_config.hxx"
 
+#include <com/sun/star/uno/Exception.hpp>
+#include <rtl/ustring.hxx>
+
 #include <cstdlib>
 #include <map>
 #include <stdexcept>
@@ -54,6 +57,9 @@ bool hasPermission(const std::string& pluginId, const std::string& permission)
     const PluginConfig* cfg = configOf(pluginId);
     if (!cfg)
         return false;
+    // ADR-002, option A (user decision): no hostPermissions key means every permission. A declared list narrows it.
+    if (!cfg->permissionsDeclared)
+        return true;
     for (const std::string& p : cfg->permissions)
         if (p == permission)
             return true;
@@ -62,6 +68,27 @@ bool hasPermission(const std::string& pluginId, const std::string& permission)
 }
 
 void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::string& json)
+{
+    try
+    {
+        dispatchMessage(pluginId, json);
+    }
+    catch (const std::exception& e)
+    {
+        logEvent("protocol", "error", pluginId + "|" + e.what());
+    }
+    catch (const css::uno::Exception& e)
+    {
+        logEvent("protocol", "error",
+                 pluginId + "|UNO: " + rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr());
+    }
+    catch (...)
+    {
+        logEvent("protocol", "error", pluginId + "|unknown exception");
+    }
+}
+
+void ProtocolAdapter::dispatchMessage(const std::string& pluginId, const std::string& json)
 {
     JsonValue msg;
     if (!parseJson(json, msg) || !msg.isObject())
@@ -103,7 +130,7 @@ void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::stri
                 if (a.isString())
                     out += "\"" + jsonEscape(a.str) + "\"";
                 else if (a.kind == JsonValue::Kind::Number)
-                    out += std::to_string(a.number);
+                    out += formatJsonNumber(a.number);
                 else if (a.kind == JsonValue::Kind::Bool)
                     out += a.boolean ? "true" : "false";
                 else
@@ -112,7 +139,12 @@ void ProtocolAdapter::onPageMessage(const std::string& pluginId, const std::stri
             return out + "]";
         }());
     else if (type == "callCommand")
-        handleCallCommand(pluginId, id, msg.getString("source"), msg.getString("scope"));
+    {
+        // isCalc defaults to true (ONLYOFFICE); only an explicit false skips the recalculation.
+        const JsonValue* calc = msg.get("isCalc");
+        const bool recalc = !(calc && calc->kind == JsonValue::Kind::Bool && !calc->boolean);
+        handleCallCommand(pluginId, id, msg.getString("source"), msg.getString("scope"), recalc);
+    }
     else if (type == "contextMenu")
     {
         std::vector<std::pair<std::string, std::string>> items;
@@ -148,8 +180,12 @@ void ProtocolAdapter::handleReady(const std::string& pluginId)
         version = cfg->version;
     }
     // testMode lets the test plugin run its scripted checks (set by PLUGINHOST_TEST_MODE=1).
+    // Test builds only (PH_TEST_HOOKS): a release build must not change behaviour from an environment variable.
+    bool isTest = false;
+#ifdef PH_TEST_HOOKS
     const char* testMode = std::getenv("PLUGINHOST_TEST_MODE");
-    const bool isTest = testMode && std::string(testMode) == "1";
+    isTest = testMode && std::string(testMode) == "1";
+#endif
     sendRaw(pluginId, "{\"type\":\"initialize\",\"guid\":\"" + jsonEscape(guid) + "\",\"name\":\"" +
                           jsonEscape(name) + "\",\"version\":\"" + jsonEscape(version) +
                           "\",\"testMode\":" + (isTest ? "true" : "false") + "}");
@@ -170,16 +206,42 @@ void ProtocolAdapter::handleExecuteMethod(const std::string& pluginId, long long
     {
         sendResult(pluginId, "method_result", id, "null", e.what());
     }
+    catch (const css::uno::Exception& e)
+    {
+        // A UNO exception is not a std::exception. Without this catch it would unwind through C code and end the process.
+        sendResult(pluginId, "method_result", id, "null",
+                   std::string("UNO error: ") + rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr());
+    }
+    catch (...)
+    {
+        sendResult(pluginId, "method_result", id, "null", "internal error");
+    }
 }
 
 void ProtocolAdapter::handleCallCommand(const std::string& pluginId, long long id, const std::string& source,
-                                        const std::string& scopeJson)
+                                        const std::string& scopeJson, bool recalc)
 {
-    const CommandOutcome outcome = CommandEngine::instance().run(pluginId, source, scopeJson);
-    if (outcome.ok)
-        sendResult(pluginId, "command_result", id, outcome.resultJson, std::string());
-    else
-        sendResult(pluginId, "command_result", id, "null", outcome.error);
+    try
+    {
+        const CommandOutcome outcome = CommandEngine::instance().run(pluginId, source, scopeJson, recalc);
+        if (outcome.ok)
+            sendResult(pluginId, "command_result", id, outcome.resultJson, std::string());
+        else
+            sendResult(pluginId, "command_result", id, "null", outcome.error);
+    }
+    catch (const std::exception& e)
+    {
+        sendResult(pluginId, "command_result", id, "null", e.what());
+    }
+    catch (const css::uno::Exception& e)
+    {
+        sendResult(pluginId, "command_result", id, "null",
+                   std::string("UNO error: ") + rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr());
+    }
+    catch (...)
+    {
+        sendResult(pluginId, "command_result", id, "null", "internal error");
+    }
 }
 
 void ProtocolAdapter::sendResult(const std::string& pluginId, const char* type, long long id,

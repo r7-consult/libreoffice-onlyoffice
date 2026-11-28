@@ -76,9 +76,12 @@ std::string moduleDirectory()
 
 std::string pluginsRoot()
 {
+#ifdef PH_TEST_HOOKS
+    // Test builds only: the tests install plugins into a scratch folder.
     if (const char* override = std::getenv("PLUGINHOST_PLUGINS_DIR"))
         if (*override)
             return override;
+#endif
     return joinPath(joinPath(userDataBase(), "PluginHost"), "plugins");
 }
 

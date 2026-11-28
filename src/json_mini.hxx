@@ -34,4 +34,7 @@ bool parseJson(const std::string& text, JsonValue& out);
 
 // Escapes a string for inclusion between double quotes in JSON output.
 std::string jsonEscape(const std::string& s);
+
+// A number as JSON text: locale-independent, up to 17 significant digits, "null" for NaN and infinity.
+std::string formatJsonNumber(double value);
 }

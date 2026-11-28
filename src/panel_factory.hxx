@@ -5,9 +5,13 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <osl/mutex.hxx>
+#include <rtl/ustring.hxx>
 
 namespace pluginhost
 {
+// SDK builds (no LIBO_INTERNAL_ONLY) have no global OUString: only rtl::OUString exists (rtl/ustring.hxx).
+using ::rtl::OUString;
+
 // Creates PluginPanel instances for resource URLs of the form
 // private:resource/toolpanel/org.example.pluginhost/<PanelId>
 class PanelFactory : public cppu::WeakImplHelper<css::ui::XUIElementFactory, css::lang::XServiceInfo>

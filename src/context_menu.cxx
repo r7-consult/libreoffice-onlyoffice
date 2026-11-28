@@ -1,5 +1,6 @@
 #include "context_menu.hxx"
 
+#include "bridge_native.hxx" // utf8ToOUString (SDK-safe std::string -> OUString)
 #include "log.hxx"
 #include "host_service.hxx"
 
@@ -75,9 +76,9 @@ public:
                             factory->createInstance("com.sun.star.ui.ActionTrigger"), UNO_QUERY);
                         if (!trigger.is())
                             continue;
-                        trigger->setPropertyValue("Text", Any(rtl::OUString::fromUtf8(item.second)));
+                        trigger->setPropertyValue("Text", Any(utf8ToOUString(item.second)));
                         trigger->setPropertyValue("CommandURL",
-                            Any(rtl::OUString::fromUtf8("vnd.pluginhost:" + kv.first + ":" + item.first)));
+                            Any(utf8ToOUString("vnd.pluginhost:" + kv.first + ":" + item.first)));
                         container->insertByIndex(pos++, Any(trigger));
                         action = css::ui::ContextMenuInterceptorAction_EXECUTE_MODIFIED;
                     }

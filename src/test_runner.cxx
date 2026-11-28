@@ -1,8 +1,11 @@
 #include "test_runner.hxx"
 
+#include "bridge_native.hxx" // utf8ToOUString
 #include "command_engine.hxx"
+#include "host_service.hxx"
 
 #include <com/sun/star/beans/UnknownPropertyException.hpp>
+#include <com/sun/star/beans/XIntrospectionAccess.hpp>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -37,6 +40,8 @@ bool testServiceEnabled()
 TestRunner::TestRunner(const Reference<XComponentContext>& ctx)
     : m_xContext(ctx)
 {
+    // Without a panel nobody else sets the context, and the engine's bridge and active-document lookup need it.
+    HostService::instance().setContext(ctx);
 }
 
 Reference<css::beans::XIntrospectionAccess> SAL_CALL TestRunner::getIntrospection()
@@ -65,8 +70,8 @@ Any SAL_CALL TestRunner::invoke(const OUString& aFunctionName, const Sequence<An
         kPluginId, rtl::OUStringToOString(source, RTL_TEXTENCODING_UTF8).getStr(),
         rtl::OUStringToOString(scope, RTL_TEXTENCODING_UTF8).getStr());
     if (!out.ok)
-        throw css::lang::IllegalArgumentException(OUString("TestRunner.run: ") + OUString::fromUtf8(out.error), self, 0);
-    return Any(OUString::fromUtf8(out.resultJson));
+        throw css::lang::IllegalArgumentException(OUString("TestRunner.run: ") + utf8ToOUString(out.error), self, 0);
+    return Any(utf8ToOUString(out.resultJson));
 }
 
 void SAL_CALL TestRunner::setValue(const OUString& aPropertyName, const Any&)
@@ -113,7 +118,10 @@ OUString TestRunner::getImplementationName_static()
 
 Sequence<OUString> TestRunner::getSupportedServiceNames_static()
 {
-    return Sequence<OUString>{ OUString(kServiceName) };
+    // No brace initialiser: Sequence has an initializer_list constructor only in LIBO_INTERNAL_ONLY builds.
+    Sequence<OUString> names(1);
+    names.getArray()[0] = OUString(kServiceName);
+    return names;
 }
 
 Reference<XInterface> SAL_CALL TestRunner::Create(const Reference<XComponentContext>& ctx)

@@ -203,7 +203,7 @@ WebHostWebKit::WebHostWebKit(void* xid, const std::string& userDataDir)
     if (!webkit_user_content_manager_register_script_message_handler(m_ucm, "pluginhost"))
         logEvent("webhost", "error", "script message handler 'pluginhost' was not registered");
     g_signal_connect(m_ucm, "script-message-received::pluginhost", G_CALLBACK(&WebHostWebKit::onScriptMessage), this);
-    WebKitUserScript* shim = webkit_user_script_new(kPageShim, WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES,
+    WebKitUserScript* shim = webkit_user_script_new(kPageShim, WEBKIT_USER_CONTENT_INJECT_TOP_FRAME,
                                                     WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START, nullptr, nullptr);
     webkit_user_content_manager_add_script(m_ucm, shim);
     webkit_user_script_unref(shim);
@@ -399,7 +399,7 @@ void WebHostWebKit::addDocumentScript(const std::string& scriptPath)
     }
     std::stringstream buf;
     buf << in.rdbuf();
-    WebKitUserScript* script = webkit_user_script_new(buf.str().c_str(), WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES,
+    WebKitUserScript* script = webkit_user_script_new(buf.str().c_str(), WEBKIT_USER_CONTENT_INJECT_TOP_FRAME,
                                                       WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START, nullptr, nullptr);
     webkit_user_content_manager_add_script(m_ucm, script);
     webkit_user_script_unref(script);

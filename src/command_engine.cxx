@@ -41,6 +41,8 @@ struct Engine
     bool watchdogFired = false;
     // Factory from extension/js/bridge_boot.js: makeBridge(policy) returns the bridge for one command.
     JSValue makeBridge = JS_UNDEFINED;
+    // The bridge object of the command that is running (our own reference). BridgeDisposer ends it after the command.
+    JSValue currentBridge = JS_UNDEFINED;
 };
 
 std::map<std::string, Engine>& engines()
@@ -101,6 +103,15 @@ JSValue jsPhCall(JSContext* ctx, JSValueConst /*thisVal*/, int argc, JSValueCons
     {
         error = e.what();
     }
+    catch (const css::uno::Exception& e)
+    {
+        // UNO exceptions do not derive from std::exception. Letting one escape would unwind through QuickJS's C frames.
+        error = std::string("UNO error: ") + rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr();
+    }
+    catch (...)
+    {
+        error = "internal error";
+    }
     JS_FreeCString(ctx, name);
     JS_FreeCString(ctx, args);
     if (!error.empty())
@@ -140,7 +151,9 @@ JSValue jsPhBridge(JSContext* ctx, JSValueConst /*thisVal*/, int argc, JSValueCo
         }
         catch (const css::uno::Exception& e)
         {
-            error = "bridge: UNO error: " + rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr();
+            // "text" + const char* would add two pointers, so the left operand must be a std::string.
+            error = std::string("bridge: UNO error: ") +
+                    rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr();
         }
         catch (...)
         {
@@ -310,8 +323,14 @@ std::unique_ptr<BridgeSession> installBridge(Engine& e, const std::string& plugi
 
     const AllowlistFile& list = allowlistFile();
     BridgePolicy policy;
-    policy.canRead = pluginHasPermission(pluginId, "document.read");
-    policy.canEdit = pluginHasPermission(pluginId, "document.edit");
+#ifdef PH_TEST_HOOKS
+    // The TestRunner runs commands as "__test__", which has no plugin config. Test builds grant it everything.
+    const bool testPlugin = pluginId == "__test__";
+#else
+    const bool testPlugin = false;
+#endif
+    policy.canRead = testPlugin || pluginHasPermission(pluginId, "document.read");
+    policy.canEdit = testPlugin || pluginHasPermission(pluginId, "document.edit");
     policy.allow = list.allow;
 
     // The JS policy carries the same flags and the allowlist text. The host check in C++ is the one that is enforced.
@@ -349,11 +368,43 @@ std::unique_ptr<BridgeSession> installBridge(Engine& e, const std::string& plugi
 
     JSValue global = JS_GetGlobalObject(e.ctx);
     JSValue asc = JS_GetPropertyStr(e.ctx, global, "Asc");
-    JS_SetPropertyStr(e.ctx, asc, "bridge", bridge); // takes ownership of bridge
+    JS_SetPropertyStr(e.ctx, asc, "bridge", JS_DupValue(e.ctx, bridge)); // the property owns one reference
     JS_FreeValue(e.ctx, asc);
     JS_FreeValue(e.ctx, global);
+    e.currentBridge = bridge; // our own reference, released by BridgeDisposer
     return session;
 }
+
+// Ends the command's bridge: dispose() releases its handles and makes any reference a plugin kept unusable, so an old
+// Asc.bridge cannot reach the session of a later command. Declared after BridgeScope in run(), so it runs first
+// (dispose calls native release, which needs the active session).
+class BridgeDisposer
+{
+public:
+    explicit BridgeDisposer(Engine& e)
+        : m_e(e)
+    {
+    }
+    ~BridgeDisposer()
+    {
+        if (JS_IsUndefined(m_e.currentBridge))
+            return;
+        m_e.deadline = std::chrono::steady_clock::time_point::max(); // the command's watchdog must not cut this short
+        JSValue fn = JS_GetPropertyStr(m_e.ctx, m_e.currentBridge, "dispose");
+        JSValue r = JS_Call(m_e.ctx, fn, m_e.currentBridge, 0, nullptr);
+        if (JS_IsException(r))
+            JS_FreeValue(m_e.ctx, JS_GetException(m_e.ctx));
+        JS_FreeValue(m_e.ctx, r);
+        JS_FreeValue(m_e.ctx, fn);
+        JS_FreeValue(m_e.ctx, m_e.currentBridge);
+        m_e.currentBridge = JS_UNDEFINED;
+    }
+    BridgeDisposer(const BridgeDisposer&) = delete;
+    BridgeDisposer& operator=(const BridgeDisposer&) = delete;
+
+private:
+    Engine& m_e;
+};
 
 // RAII: controllers stay locked and the undo context stays open for the whole command.
 class CommandScope
@@ -376,10 +427,14 @@ CommandEngine& CommandEngine::instance()
     return s;
 }
 
-CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string& source, const std::string& scopeJson)
+CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string& source, const std::string& scopeJson,
+                                  bool recalc)
 {
     CommandOutcome out;
     Engine& e = engineFor(pluginId);
+    // QuickJS measures stack depth from the stack position seen in JS_NewRuntime (first command). This call can come
+    // from a different depth, and the limit is only 256 KB, so refresh the reference point.
+    JS_UpdateStackTop(e.rt);
     e.deadline = std::chrono::steady_clock::time_point::max(); // stale deadline from the last run must not fire here
 
     // Asc.scope: parsed as JSON by the engine itself (no string splicing into code).
@@ -401,6 +456,7 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
     // Asc.bridge for this command. The session is declared before the scope, so the scope clears the pointer first.
     std::unique_ptr<BridgeSession> bridgeSession = installBridge(e, pluginId);
     BridgeScope bridgeScope(bridgeSession.get());
+    BridgeDisposer bridgeDisposer(e); // destroyed first: it needs the scope's active session
 
     e.watchdogFired = false;
     e.deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(m_timeoutMs);
@@ -440,7 +496,8 @@ CommandOutcome CommandEngine::run(const std::string& pluginId, const std::string
             out.resultJson = "null";
         JS_FreeValue(e.ctx, v);
         endUndoContext(false);
-        recalculateActiveDocument();
+        if (recalc)
+            recalculateActiveDocument();
     }
     out.ok = true;
     logEvent("command", "ok", pluginId);

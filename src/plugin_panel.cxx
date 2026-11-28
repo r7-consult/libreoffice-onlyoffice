@@ -55,7 +55,9 @@ Reference<XWindow> createChildWindow(const Reference<XComponentContext>& ctx, co
     if (!xParentPeer.is())
         return {};
 
-    Reference<XToolkit> xToolkit = css::awt::Toolkit::create(ctx);
+    // Toolkit::create returns Reference<XToolkit2>. The implicit up-cast Reference<XToolkit2> -> Reference<XToolkit> exists
+    // only in internal builds (Reference.h, LIBO_INTERNAL_ONLY), so query explicitly.
+    Reference<XToolkit> xToolkit(css::awt::Toolkit::create(ctx), css::uno::UNO_QUERY_THROW);
     WindowDescriptor aDesc;
     aDesc.Type = css::awt::WindowClass_SIMPLE;
     aDesc.WindowServiceName = "systemchildwindow";
@@ -244,7 +246,8 @@ LayoutSize SAL_CALL PluginPanel::getHeightForWidth(sal_Int32)
 {
     // DeckLayouter requires 0 <= Minimum <= Preferred <= Maximum (sfx2/source/sidebar/DeckLayouter.cxx).
     // A large Maximum lets the deck give the plugin all spare height.
-    return LayoutSize(300, 600, 100000);
+    // LayoutSize member order in LayoutSize.idl is Minimum, Maximum, Preferred.
+    return LayoutSize(300, 100000, 600);
 }
 
 sal_Int32 SAL_CALL PluginPanel::getMinimalWidth()

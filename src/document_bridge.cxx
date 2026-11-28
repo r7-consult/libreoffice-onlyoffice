@@ -1,5 +1,6 @@
 #include "document_bridge.hxx"
 
+#include "bridge_native.hxx" // utf8ToOUString (SDK-safe std::string -> OUString)
 #include "host_service.hxx"
 #include "json_mini.hxx"
 #include "log.hxx"
@@ -11,6 +12,7 @@
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/text/XTextViewCursor.hpp>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
+#include <com/sun/star/uno/Exception.hpp>
 #include <com/sun/star/uno/Reference.hxx>
 #include <rtl/ustring.hxx>
 
@@ -57,7 +59,10 @@ std::string argString(const JsonValue& args, size_t index)
 }
 }
 
+// Function-try-block: a css::uno::Exception does not derive from std::exception, so it is converted here to a
+// std::runtime_error that the caller (reached from C code) can handle.
 std::string callDocumentMethod(const std::string& name, const std::string& argsJson)
+try
 {
     JsonValue args;
     if (!parseJson(argsJson, args))
@@ -73,7 +78,7 @@ std::string callDocumentMethod(const std::string& name, const std::string& argsJ
         const std::string text = argString(args, 0);
         Reference<css::text::XTextViewCursor> cursor = activeWriterCursor();
         // setString replaces the selection, or inserts at the caret when nothing is selected.
-        cursor->setString(rtl::OUString::fromUtf8(text));
+        cursor->setString(utf8ToOUString(text));
         return "true";
     }
     if (name == "LogTest")
@@ -83,5 +88,10 @@ std::string callDocumentMethod(const std::string& name, const std::string& argsJ
         return "true";
     }
     throw std::runtime_error("method not supported: " + name);
+}
+catch (const css::uno::Exception& e)
+{
+    throw std::runtime_error(std::string("UNO error: ")
+                             + ::rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr());
 }
 }

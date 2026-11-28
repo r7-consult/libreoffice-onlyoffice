@@ -6,8 +6,9 @@
 // Permissions and the allowlist are set by the host when the session is created. Plugin JavaScript cannot change
 // them, and the JS bridge can only narrow them further.
 //
-// Scope of this version: parameters and results of scalar, string, enum, interface and sequence types (nested
-// sequences included). Structs, Any and out-parameters are refused with an error.
+// Scope of this version: parameters and results of scalar, string, enum, interface, any and sequence types (nested
+// sequences included). Structs and out-parameters are refused with an error. Property get and set are refused unless
+// the name is in BridgePolicy::props.
 //
 // Draft: not compiled. Every UNO name was checked against udkapi/ (see the comments in bridge_native.cxx).
 // Must run on the LibreOffice main thread (UNO calls are not thread-safe here).
@@ -19,6 +20,7 @@
 #include <com/sun/star/uno/Type.hxx>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/uno/XInterface.hpp>
+#include <rtl/string.hxx>
 #include <rtl/ustring.hxx>
 
 #include <cstddef>
@@ -29,6 +31,13 @@
 
 namespace pluginhost
 {
+// UTF-8 std::string -> OUString. Outside LibreOffice's own build (LIBO_INTERNAL_ONLY) OUString::fromUtf8 takes an
+// OString, not a std::string or string_view, so a plain fromUtf8(std::string) does not compile in an SDK build.
+inline rtl::OUString utf8ToOUString(const std::string& s)
+{
+    return rtl::OUString::fromUtf8(rtl::OString(s.data(), static_cast<sal_Int32>(s.size())));
+}
+
 struct BridgePolicy
 {
     bool canRead = false;   // document.read
@@ -36,7 +45,11 @@ struct BridgePolicy
     // "Interface.method" -> "read" | "edit". Interface names are full UNO names, for example
     // "com.sun.star.sheet.XSpreadsheet". Filled from extension/js/bridge_allowlist.json.
     std::map<std::string, std::string> allow;
+    // Property name -> "read" | "edit". Empty by default: get and set are refused. Properties bypass the method
+    // allowlist (for example a Calc document's IsUndoEnabled), so none is reachable until one is listed here.
+    std::map<std::string, std::string> props;
     std::size_t maxArgBytes = 4 * 1024 * 1024;
+    std::size_t maxHandles = 100000; // live handles per session; a loop cannot grow the table without limit
 };
 
 // Loads {"Interface": {"method": "read"|"edit"}} from a JSON file. Returns false on any error. The caller then keeps an

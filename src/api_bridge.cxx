@@ -10,6 +10,7 @@
 //
 // Draft: not compiled. Verify the UNO calls against the LibreOffice SDK headers.
 
+#include "bridge_native.hxx" // utf8ToOUString (SDK-safe std::string -> OUString)
 #include "json_mini.hxx"
 #include "host_service.hxx"
 
@@ -38,6 +39,7 @@
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/util/XModifiable.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
+#include <com/sun/star/uno/Exception.hpp>
 #include <rtl/ustring.hxx>
 #include <sstream>
 #include <stdexcept>
@@ -71,7 +73,7 @@ Reference<css::sheet::XSpreadsheet> sheetByName(const std::string& name)
 {
     Reference<css::sheet::XSpreadsheetDocument> doc(activeModel(), UNO_QUERY_THROW);
     Reference<css::sheet::XSpreadsheets> sheets = doc->getSheets();
-    const rtl::OUString ou = rtl::OUString::fromUtf8(name);
+    const rtl::OUString ou = utf8ToOUString(name);
     if (!sheets->hasByName(ou))
         throw std::runtime_error("no sheet named " + name);
     return Reference<css::sheet::XSpreadsheet>(sheets->getByName(ou), UNO_QUERY_THROW);
@@ -80,7 +82,7 @@ Reference<css::sheet::XSpreadsheet> sheetByName(const std::string& name)
 Reference<css::table::XCellRange> rangeOf(const std::string& sheetName, const std::string& addr)
 {
     Reference<css::sheet::XSpreadsheet> sheet = sheetByName(sheetName);
-    return Reference<css::table::XCellRange>(sheet->getCellRangeByName(rtl::OUString::fromUtf8(addr)), UNO_QUERY_THROW);
+    return Reference<css::table::XCellRange>(sheet->getCellRangeByName(utf8ToOUString(addr)), UNO_QUERY_THROW);
 }
 
 std::string quoteJson(const std::string& s)
@@ -95,7 +97,7 @@ Any anyFromJson(const JsonValue& v)
     {
     case JsonValue::Kind::Number: return Any(v.number);
     case JsonValue::Kind::Bool: return Any(v.boolean);
-    case JsonValue::Kind::String: return Any(rtl::OUString::fromUtf8(v.str));
+    case JsonValue::Kind::String: return Any(utf8ToOUString(v.str));
     default: return Any();
     }
 }
@@ -139,7 +141,11 @@ std::vector<Reference<css::text::XTextRange>> writerParagraphs()
 }
 }
 
+// Function-try-block: one top-level handler for every UNO call below. A css::uno::Exception does not derive from
+// std::exception, so it is turned into a std::runtime_error carrying the UNO message. The caller is reached from C
+// code (QuickJS native function) and must see an ordinary C++ exception.
 std::string nativeCall(const std::string& name, const std::string& argsJson)
+try
 {
     JsonValue args;
     if (!parseJson(argsJson, args) || !args.isArray())
@@ -220,11 +226,18 @@ std::string nativeCall(const std::string& name, const std::string& argsJson)
         Reference<css::text::XText> body = writerBody();
         Reference<css::text::XTextCursor> cursor = body->createTextCursor();
         cursor->gotoEnd(false);
-        body->insertString(cursor, rtl::OUString::fromUtf8(str(0)), false);
+        // insertString takes an XTextRange. The implicit Reference<XTextCursor> -> Reference<XTextRange> up-cast exists
+        // only in internal builds, so query explicitly.
+        body->insertString(Reference<css::text::XTextRange>(cursor, UNO_QUERY_THROW), utf8ToOUString(str(0)), false);
         return "true";
     }
 
     throw std::runtime_error("unknown native operation: " + name);
+}
+catch (const css::uno::Exception& e)
+{
+    throw std::runtime_error(std::string("UNO error: ")
+                             + ::rtl::OUStringToOString(e.Message, RTL_TEXTENCODING_UTF8).getStr());
 }
 
 // Undo helpers used by CommandEngine. One command = one undo context with a unique title,
@@ -243,7 +256,7 @@ void beginUndoContext()
     {
         Reference<css::document::XUndoManagerSupplier> supplier(activeModel(), UNO_QUERY);
         if (supplier.is())
-            supplier->getUndoManager()->enterUndoContext(rtl::OUString::fromUtf8(g_commandTitle));
+            supplier->getUndoManager()->enterUndoContext(utf8ToOUString(g_commandTitle));
     }
     catch (...)
     {
@@ -264,7 +277,7 @@ void endUndoContext(bool rollback)
         Reference<css::document::XUndoManager> um = supplier->getUndoManager();
         um->leaveUndoContext(); // an empty context is dropped by LibreOffice
         if (rollback && um->isUndoPossible()
-            && um->getCurrentUndoActionTitle() == rtl::OUString::fromUtf8(g_commandTitle))
+            && um->getCurrentUndoActionTitle() == utf8ToOUString(g_commandTitle))
             um->undo();
     }
     catch (...)
@@ -294,7 +307,9 @@ void recalculateActiveDocument()
     {
         Reference<css::sheet::XCalculatable> calc(activeModel(), UNO_QUERY);
         if (calc.is())
-            calc->calculateAll();
+            // calculate() recalculates only dirty cells (XCalculatable.idl). calculateAll() would recalculate every
+            // cell of the document after each plugin command, which is needlessly slow on large documents.
+            calc->calculate();
     }
     catch (...)
     {

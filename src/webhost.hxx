@@ -1,8 +1,8 @@
 #pragma once
 
 // Platform-neutral browser host used by PluginPanel.
-// Implementations: webhost_win.cxx (WebView2). Linux and macOS are stubs
-// (stage 10) and are not compiled on Windows.
+// Implementations: webhost_win.cxx (WebView2, Windows) and webhost_linux_webkitgtk.cxx
+// (WebKitGTK 4.1, non-Windows). webhost_stub.cxx is the macOS placeholder and is not built on Linux.
 
 #include <functional>
 #include <string>

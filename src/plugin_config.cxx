@@ -59,9 +59,12 @@ bool loadPluginConfig(const std::string& installDir, PluginConfig& out, std::str
             out.isSystem = isSystem->boolean;
 
     if (const JsonValue* perms = root.get("hostPermissions"))
+    {
+        out.permissionsDeclared = true;
         for (const JsonValue& p : perms->array)
             if (p.isString())
                 out.permissions.push_back(p.str);
+    }
 
     // variations[].url is the entry page; the prototype uses the first one.
     if (const JsonValue* variations = root.get("variations"))

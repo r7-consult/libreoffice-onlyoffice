@@ -25,9 +25,14 @@ public:
 private:
     ProtocolAdapter() = default;
 
+    // The real dispatch. onPageMessage wraps it so that no exception (std or UNO) reaches the caller, which is C
+    // code (a WebKit signal handler or a COM callback) and cannot unwind.
+    void dispatchMessage(const std::string& pluginId, const std::string& json);
     void handleReady(const std::string& pluginId);
     void handleExecuteMethod(const std::string& pluginId, long long id, const std::string& name, const std::string& argsJson);
-    void handleCallCommand(const std::string& pluginId, long long id, const std::string& source, const std::string& scopeJson);
+    // recalc: the page's isCalc flag. False skips the recalculation after the command.
+    void handleCallCommand(const std::string& pluginId, long long id, const std::string& source, const std::string& scopeJson,
+                           bool recalc);
 
     // Sends a complete JSON object to the page. resultJson must already be valid JSON.
     void sendResult(const std::string& pluginId, const char* type, long long id, const std::string& resultJson, const std::string& error);

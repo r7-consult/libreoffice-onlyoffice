@@ -14,7 +14,9 @@ using css::uno::Sequence;
 
 namespace
 {
-const char* const kScheme = "vnd.pluginhost:";
+// A char array, not a char pointer: in SDK builds OUString::startsWith accepts a string literal only as a const
+// char array (ConstCharArrayDetector), not as a const char*.
+const char kScheme[] = "vnd.pluginhost:";
 }
 
 MenuDispatch::MenuDispatch(const Reference<css::uno::XComponentContext>& ctx)
@@ -79,7 +81,10 @@ OUString MenuDispatch::getImplementationName_static()
 
 Sequence<OUString> MenuDispatch::getSupportedServiceNames_static()
 {
-    return Sequence<OUString>{ OUString("com.sun.star.frame.ProtocolHandler") };
+    // No brace initialisation: the initializer_list constructor of Sequence exists only in internal builds.
+    Sequence<OUString> names(1);
+    names.getArray()[0] = "com.sun.star.frame.ProtocolHandler";
+    return names;
 }
 
 Reference<css::uno::XInterface> SAL_CALL MenuDispatch::Create(const Reference<css::uno::XComponentContext>& ctx)

@@ -24,7 +24,9 @@ using css::ui::XUIElement;
 
 namespace
 {
-const char* const kUrlPrefix = "private:resource/toolpanel/org.example.pluginhost/";
+// A char array, not a char pointer: in SDK builds OUString::startsWith accepts a string literal only as a const
+// char array (ConstCharArrayDetector), not as a const char*.
+const char kUrlPrefix[] = "private:resource/toolpanel/org.example.pluginhost/";
 }
 
 PanelFactory::PanelFactory(const Reference<XComponentContext>& ctx)
@@ -39,7 +41,7 @@ Reference<XUIElement> SAL_CALL PanelFactory::createUIElement(
     osl::MutexGuard guard(m_aMutex);
 
     if (!rResourceURL.startsWith(kUrlPrefix))
-        throw NoSuchElementException(rResourceURL, *this);
+        throw NoSuchElementException(rResourceURL, static_cast<cppu::OWeakObject*>(this));
 
     Reference<XWindow> xParentWindow;
     Reference<css::frame::XFrame> xFrame; // frame of the document that shows this sidebar
@@ -53,7 +55,8 @@ Reference<XUIElement> SAL_CALL PanelFactory::createUIElement(
     if (!xParentWindow.is())
     {
         logEvent("factory", "error", "no ParentWindow in creation arguments");
-        throw IllegalArgumentException("No parent window provided for the plugin host panel.", *this, 2);
+        throw IllegalArgumentException("No parent window provided for the plugin host panel.",
+                                       static_cast<cppu::OWeakObject*>(this), 2);
     }
 
     logEvent("factory", "createUIElement", rResourceURL.toUtf8().getStr());
@@ -82,7 +85,10 @@ OUString PanelFactory::getImplementationName_static()
 
 Sequence<OUString> PanelFactory::getSupportedServiceNames_static()
 {
-    return Sequence<OUString>{ OUString("org.example.pluginhost.PanelFactory") };
+    // No brace initialisation: the initializer_list constructor of Sequence exists only in internal builds.
+    Sequence<OUString> names(1);
+    names.getArray()[0] = "org.example.pluginhost.PanelFactory";
+    return names;
 }
 
 Reference<XInterface> SAL_CALL PanelFactory::Create(const Reference<XComponentContext>& ctx)

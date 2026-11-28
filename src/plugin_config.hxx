@@ -16,8 +16,10 @@ struct PluginConfig
     bool isVisual = true;
     bool isSystem = false;
     // Host extension (not in ONLYOFFICE configs): "hostPermissions": ["document.read", "document.edit", "menu"].
-    // Missing or empty means the plugin may do nothing in the document. Prototype policy, see REVIEW_AND_PLAN.md.
+    // Policy (ADR-002, option A, user decision): when the key is missing the plugin gets every permission; when it is
+    // present the list narrows that. A declared list can never add to the default, so a plugin cannot grant itself more.
     std::vector<std::string> permissions;
+    bool permissionsDeclared = false; // true when config.json has a hostPermissions key
 };
 
 // Reads installDir\config.json. Returns false and fills error on failure.

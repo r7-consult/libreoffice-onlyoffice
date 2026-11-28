@@ -29,5 +29,5 @@ struct ContextMenuTiming
 };
 ContextMenuTiming lastContextMenuTiming();
 
-// TODO(stage 6 follow-up): click handling. Items use CommandURL "vnd.pluginhost:<pluginId>:<itemId>".
-// Routing that URL back to the page needs an XDispatchProvider; it is not implemented in this draft.
+// Click handling is in src/menu_dispatch.cxx. Items use CommandURL "vnd.pluginhost:<pluginId>:<itemId>".
+}

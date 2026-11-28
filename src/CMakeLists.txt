@@ -31,6 +31,9 @@ option(PH_TEST_HOOKS "Test builds: honour PLUGINHOST_API_DIR and PLUGINHOST_TEST
 # --- QuickJS-ng (static) ----------------------------------------------------
 # Use upstream's own CMake: it carries the MSVC flags QuickJS needs (/experimental:c11atomics,
 # _GNU_SOURCE, warning suppressions). A hand-written source list drifted already (0.18.0 has no cutils.c).
+# pluginhost is a shared library and qjs is linked into it as a static library: on Linux that needs position-independent
+# code. The variable must be set before add_subdirectory so that the qjs target inherits it.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(QJS_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 set(QJS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -88,7 +91,9 @@ if(WIN32)
   target_compile_definitions(pluginhost PRIVATE WIN32 WNT CPPU_ENV=mscx WIN32_LEAN_AND_MEAN NOMINMAX)
   target_compile_options(pluginhost PRIVATE /EHsc /Zc:__cplusplus /utf-8)
 else()
-  target_compile_definitions(pluginhost PRIVATE UNX CPPU_ENV=gcc3)
+  # Same as sdk/settings/settings.mk on Linux. LINUX is needed: osl/endian.h stops with "Target platform not specified"
+  # without it.
+  target_compile_definitions(pluginhost PRIVATE UNX LINUX GCC CPPU_ENV=gcc3)
 endif()
 
 target_link_directories(pluginhost PRIVATE "${LO_SDK}/lib" "${PH_WEBVIEW2_DIR}/x64")
@@ -104,5 +109,17 @@ endif()
 set_target_properties(pluginhost PROPERTIES
   PREFIX ""
   OUTPUT_NAME "pluginhost"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"   # Windows: the .dll
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"   # Linux: the .so
 )
+
+if(NOT WIN32)
+  # LibreOffice loads this module with RTLD_GLOBAL: export only component_getFactory (marked SAL_DLLPUBLIC_EXPORT), so
+  # our QuickJS and helper symbols cannot clash with other libraries in the soffice process. --exclude-libs also hides
+  # the symbols of the static qjs library.
+  set_target_properties(pluginhost PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON)
+  target_link_options(pluginhost PRIVATE -Wl,--exclude-libs,ALL)
+endif()

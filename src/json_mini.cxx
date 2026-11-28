@@ -1,6 +1,10 @@
 #include "json_mini.hxx"
 
+#include <cmath>
 #include <cstdlib>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 
 namespace pluginhost
 {
@@ -260,8 +264,16 @@ private:
             ++m_pos;
         if (m_pos == start)
             return false;
+        // strtod follows the process locale (GTK sets the user's: a decimal comma would read "1.5" as 1), so parse
+        // with the classic locale.
+        std::istringstream in(m_s.substr(start, m_pos - start));
+        in.imbue(std::locale::classic());
+        double value = 0.0;
+        in >> value;
+        if (in.fail())
+            return false;
         out.kind = JsonValue::Kind::Number;
-        out.number = std::strtod(m_s.substr(start, m_pos - start).c_str(), nullptr);
+        out.number = value;
         return true;
     }
 
@@ -279,6 +291,17 @@ bool parseJson(const std::string& text, JsonValue& out)
         return false;
     out = std::move(tmp);
     return true;
+}
+
+std::string formatJsonNumber(double value)
+{
+    // NaN and infinity have no JSON form. The classic locale keeps the decimal point a point.
+    if (!std::isfinite(value))
+        return "null";
+    std::ostringstream out;
+    out.imbue(std::locale::classic());
+    out << std::setprecision(17) << value;
+    return out.str();
 }
 
 std::string jsonEscape(const std::string& s)
