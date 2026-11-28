@@ -1,6 +1,7 @@
 # ADR-003: Rules for acceptable differences (MAPPED-LIMITED)
 
-- Status: **Proposed** (decision D1, part 2, of `PLAN_FULL_API.md`). Becomes Accepted when the user signs off.
+- Status: **Accepted by the user on 2026-11-28** (decision D1, part 2, of `PLAN_FULL_API.md`), except the
+  Document Builder licence question, which is open (see "Open questions").
 - Date: 2026-11-28
 - Used by: factory cards (`PLAN_FULL_API.md` section 4, rule 4), card checker F9, `docs/API_COVERAGE.csv`.
 
@@ -169,9 +170,12 @@ change code to hide it.
 
 ## Open questions (user decisions)
 
-1. Tolerances in MLR-1, MLR-2 and MLR-13 are proposals; confirm or tighten them.
-2. Is MLR-3 (document defaults) acceptable for the product, given that new content may look different from
-   ONLYOFFICE (fonts, sizes)? The alternative is to set ONLYOFFICE defaults explicitly on created content,
-   which changes how documents look to LibreOffice users.
-3. Expectations depend on ONLYOFFICE Document Builder (F6). Its licence terms for this use were not checked here;
-   until they are, the rules can be applied only to expectations recorded another way (Desktop Editors runs).
+**User decisions, 2026-11-28:**
+
+1. **Tolerances in MLR-1, MLR-2 and MLR-13: ANSWERED, kept as proposed.** Tighten them later only when
+   real test runs give measured values.
+2. **MLR-3 (document defaults): ANSWERED, accepted.** New content uses LibreOffice's default fonts and sizes.
+   Each affected test is recorded as MAPPED-LIMITED with MLR-3.
+3. **Document Builder licence (F6): OPEN.** The user will check the licence terms and report back. Until then,
+   no expectation is generated from Document Builder. Expectations recorded another way (Desktop Editors runs)
+   are not covered by this answer and need their own decision.

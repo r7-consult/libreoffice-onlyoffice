@@ -1,7 +1,7 @@
 # ADR-002: Permission policy for plugins without `hostPermissions`
 
-- Status: **Proposed** (decision D1, part 1, of `PLAN_FULL_API.md`). Becomes Accepted when the user signs off
-  the items under "Open questions".
+- Status: **Accepted by the user on 2026-11-28** for the defaults listed under "User decisions" in the Decision
+  section. Open items that the user has not answered are still listed under "Open questions".
 - Date: 2026-11-28
 - Supersedes: the prototype rule in `src/plugin_config.hxx` ("missing or empty means the plugin may do nothing").
 
@@ -32,6 +32,23 @@
    plugin's data directory. `pluginDataDir()` is the WebView2 user data folder (browser profile).
 
 ## Decision
+
+**User decisions, 2026-11-28 (these override the text below where they differ):**
+
+- **Default for plugins without `hostPermissions` is option A**: they get `document.read`, `document.edit` and `menu`
+  without a prompt. Network access is not part of A; it is a separate permission (see the open questions).
+- **"Allow read only" is offered**, per executeMethod name, using the read|edit column of `API_INVENTORY.csv`.
+  Names classified `edit` (for example `PasteText`) are hidden under "read only" once the column is verified.
+- **Ask again only when more is requested**: a larger request set or a new permission. Under A this means a
+  plugin that declares more than the three existing permissions, or a new permission name.
+- **Storage is host-owned**, in the host profile, as item 3 below describes.
+- **Network access is a separate permission** (a fourth name, decided by a later ADR before it is implemented).
+- **Denylist and default-deny without a user are unchanged.** A does not weaken them.
+
+Consequence the user accepted: a plugin without a declaration can edit the document on its first use with no prompt.
+
+Where the text below says "Option B" and "ask once", it applies to plugins that declare `hostPermissions` and
+to administrators who switch the default back to B.
 
 **Option B, with C used only to narrow and explain the request.** In detail:
 
@@ -142,15 +159,12 @@
 
 ## Open questions (user decisions)
 
-1. **Accept B as the default** for plugins without `hostPermissions`, or prefer A as the out-of-the-box default
-   with B available as an option? This ADR recommends B; the user decides the product default.
-2. **Administrator policy**: should the shipped configuration allow pre-granting by GUID and disabling the
-   prompt? Which plugins, if any, ship pre-granted (for example a built-in marketplace plugin)?
-3. **Network access**: should outbound network from plugin pages become a fourth permission
-   (`network`), or stay ungated as in ONLYOFFICE? Not decided here.
-4. **"Allow read only" option**: show it (needs the read|edit classification first) or offer only Allow / Deny.
-5. **Re-prompt trigger**: is "request set grew or install source changed" enough, or should every new version
-   ask again?
-6. **Grant store location**: this ADR deviates from `PLAN_NEXT.md` (grant in the plugin's data dir) and puts
-   it in a host-owned file. Confirm.
-7. Prompt wording and localisation are product copy; to be written with the UI owner.
+1. **Default for plugins without `hostPermissions`: ANSWERED, option A** (see "User decisions" above).
+2. **Administrator policy**: still open. Should the shipped configuration allow pre-granting by GUID and disabling
+   the prompt? Which plugins, if any, ship pre-granted? Proposed answer: admin keys exist but ship empty.
+3. **Network access: ANSWERED, a separate permission**, named later by its own ADR. Not implemented yet.
+4. **"Allow read only": ANSWERED, offered per method** (see "User decisions" above).
+5. **Re-prompt trigger: ANSWERED, only when more is requested.** A version update with the same or smaller
+   request set keeps the grant.
+6. **Grant store location: ANSWERED, host-owned file.** This deviates from `PLAN_NEXT.md`, which must be updated.
+7. Prompt wording and localisation are still open; to be written with the UI owner.

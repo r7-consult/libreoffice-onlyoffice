@@ -95,7 +95,9 @@ Not knowable in advance. Rules:
    - A: missing `hostPermissions` means all permissions (compatible; trusts every plugin).
    - B: ask the user once per plugin on first use, and remember the answer in the plugin's data dir.
    - C: derive permissions from the ONLYOFFICE config (`isSystem`, `isViewer`, `EditorsSupport`).
-   Recommendation: B, with C deciding which permissions are requested. Record the choice in an ADR.
+   **Decided 2026-11-28 (ADR-002):** A is the default, so plugins without `hostPermissions` get all three
+   permissions on first use. Read-only grants are offered per method. Grants are stored in a host-owned file in
+   the host profile, not in the plugin data dir as this item previously said. Network is a separate permission.
 4. Grow the `Api` shim and the `executeMethod` table by measured need. Only add what the 3 plugins call.
 5. Dynamic context menu items (changing per selection): implement only if one of the 3 plugins needs it.
 
