@@ -24,7 +24,7 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 |---|---|---|
 | F3 generic bridge, C++ native primitive | Written, not compiled: `src/bridge_native.cxx`, `src/bridge_convert.cxx`, `src/bridge_native.hxx`. Supports get, set, call and release for scalar, string, enum, interface and sequence values. Refuses structs, Any and out-parameters. Null receiver in call means the document root. Allowlist `extension/js/bridge_allowlist.json` now holds the 15 UNO methods behind the first ten shim methods (see `docs/UNO_MAPPING.md`); `tests/test_allowlist.js` checks them against the IDL tree. Engine: `Asc.bridge` per command (`installBridge`, `extension/js/bridge_boot.js`), `Api` shim unchanged. Compile and fix on the build machine | Sonnet, build machine |
 | F4 conversion layer | Test run (performance budgets) | Sonnet, build machine |
-| F5 headless runner `tests/run_member.py` | Running LibreOffice headless | Build machine |
+| F5 headless runner `tests/run_member.py` | Written, not run. Needs the C++ `TestRunner` UNO service (not written: IDL or XInvocation design open) and LibreOffice on the build machine. Exit 2 when it cannot run. `PLUGINHOST_API_DIR` override read by the engine (`jsDirectory()`) | Build machine, then the TestRunner service |
 | F6 expectations from Document Builder | Running Document Builder (licence now answered: inherited AGPL-3.0, see `docs/LICENSING.md`) | A machine that can run Document Builder, then Sonnet |
 | F8 recipes | Each snippet must be tested | Sonnet, after F5 |
 | D1 sign-off (ADR-002, ADR-003 are Proposed) | Open questions listed in the ADRs, and the Document Builder licence | The user |

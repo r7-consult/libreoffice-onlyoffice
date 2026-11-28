@@ -9,6 +9,7 @@
 #include <quickjs.h>
 
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -160,11 +161,28 @@ struct AllowlistFile
     std::string json = "{}";
 };
 
+// Directory with api_shim.js, bridge.js, bridge_boot.js and bridge_allowlist.json, with a trailing separator.
+// PLUGINHOST_API_DIR overrides the installed copy, so tests run the repository files without reinstalling.
+// Security: an override changes the allowlist the host reads. Honour it only on test machines (see docs).
+std::string jsDirectory()
+{
+    const char* override = std::getenv("PLUGINHOST_API_DIR");
+    if (override && *override)
+    {
+        std::string dir(override);
+        if (dir.back() != '\\')
+            dir += '\\';
+        return dir;
+    }
+    const std::string dir = moduleDirectory();
+    return dir.empty() ? std::string() : dir + "js\\";
+}
+
 const AllowlistFile& allowlistFile()
 {
     static const AllowlistFile cached = [] {
         AllowlistFile f;
-        const std::string path = moduleDirectory() + "js\\bridge_allowlist.json";
+        const std::string path = jsDirectory() + "bridge_allowlist.json";
         std::ifstream in(path, std::ios::binary);
         std::stringstream buf;
         buf << in.rdbuf();
@@ -185,10 +203,10 @@ const AllowlistFile& allowlistFile()
 
 std::string readJs(const char* name)
 {
-    const std::string dir = moduleDirectory();
+    const std::string dir = jsDirectory();
     if (dir.empty())
         return std::string();
-    std::ifstream in(dir + "js\\" + name, std::ios::binary);
+    std::ifstream in(dir + name, std::ios::binary);
     std::stringstream buf;
     buf << in.rdbuf();
     return buf.str();
