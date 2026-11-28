@@ -78,9 +78,9 @@ public:
 
 private:
     std::string opGet(const std::vector<JsonValue>& args);
-    std::string opSet(const std::vector<JsonValue>& args);
+    void opSet(const std::vector<JsonValue>& args);
     std::string opCall(const std::vector<JsonValue>& args);
-    std::string opRelease(const std::vector<JsonValue>& args);
+    void opRelease(const std::vector<JsonValue>& args);
 
     css::uno::Reference<css::uno::XInterface> resolve(const JsonValue& handle) const;
     // Null receiver in a call: the session root (handle 1). Used by executeMethod-style calls. Only call uses it.

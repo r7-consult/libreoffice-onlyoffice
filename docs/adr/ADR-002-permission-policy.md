@@ -175,4 +175,4 @@ to administrators who switch the default back to B.
   `document.read`, `document.edit` and `menu` (see `docs/DECISION_LOG.md`, item 2).
 - The prompt wording and the Russian strings are deferred until a prompt is built.
 - Reconciled on 2026-11-28 by the assistant: the earlier text proposed a first-use prompt that the user did not choose.
-  Pending the user's confirmation.
+  Confirmed by the user on 2026-11-28: option A, no prompt.
