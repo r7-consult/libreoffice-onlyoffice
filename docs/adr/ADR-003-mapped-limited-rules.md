@@ -1,7 +1,7 @@
 # ADR-003: Rules for acceptable differences (MAPPED-LIMITED)
 
 - Status: **Accepted by the user on 2026-11-28** (decision D1, part 2, of `PLAN_FULL_API.md`), except the
-  Document Builder licence question, which is open (see "Open questions").
+  Document Builder licence question, now answered (see "Open questions").
 - Date: 2026-11-28
 - Used by: factory cards (`PLAN_FULL_API.md` section 4, rule 4), card checker F9, `docs/API_COVERAGE.csv`.
 
@@ -176,6 +176,7 @@ change code to hide it.
    real test runs give measured values.
 2. **MLR-3 (document defaults): ANSWERED, accepted.** New content uses LibreOffice's default fonts and sizes.
    Each affected test is recorded as MAPPED-LIMITED with MLR-3.
-3. **Document Builder licence (F6): OPEN.** The user will check the licence terms and report back. Until then,
-   no expectation is generated from Document Builder. Expectations recorded another way (Desktop Editors runs)
-   are not covered by this answer and need their own decision.
+3. **Document Builder licence (F6): ANSWERED 2026-11-28.** The project inherits the licence of its sources.
+   Document Builder is AGPL-3.0 (`ONLYOFFICE/DocumentBuilder`), so expectations generated with it are treated as
+   AGPL-derived. Running it to make expectations is allowed; shipping its binaries is not in scope. Open points for
+   counsel are in `docs/LICENSING.md`. Desktop Editors runs are not covered by this answer.

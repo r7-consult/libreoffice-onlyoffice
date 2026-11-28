@@ -25,7 +25,7 @@ Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` 
 | F3 generic bridge (C++ and JS) | Compile | Sonnet, build machine |
 | F4 conversion layer | Test run (performance budgets) | Sonnet, build machine |
 | F5 headless runner `tests/run_member.py` | Running LibreOffice headless | Build machine |
-| F6 expectations from Document Builder | Running Document Builder; licence check | Opus decision, then Sonnet on a machine that can run it |
+| F6 expectations from Document Builder | Running Document Builder (licence now answered: inherited AGPL-3.0, see `docs/LICENSING.md`) | A machine that can run Document Builder, then Sonnet |
 | F8 recipes | Each snippet must be tested | Sonnet, after F5 |
 | D1 sign-off (ADR-002, ADR-003 are Proposed) | Open questions listed in the ADRs, and the Document Builder licence | The user |
 | read\|edit for the 262 UNCLASSIFIED rows | Needs a judgement pass or a manual check | Sonnet, then spot-check; blocks the allowlist in F3 |
