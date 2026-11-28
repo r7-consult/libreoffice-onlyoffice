@@ -10,8 +10,8 @@ checks every entry against the IDL files in the LibreOffice tree (`LO_SRC`, defa
 | `Api.GetActiveSheet()` | root (model) `XModel.getCurrentController` → controller `XSpreadsheetView.getActiveSheet` | read, read | Works once handles and object results are wired |
 | `ApiWorksheet.GetName()` | sheet `XNamed.getName` | read | Works |
 | `ApiWorksheet.GetRange(addr)` | sheet `XCellRange.getCellRangeByName(addr)` | read | Works |
-| `ApiRange.GetValue()` | range `XCellRangeData.getDataArray` | read | **Blocked**: returns `sequence<sequence<any>>` |
-| `ApiRange.SetValue(v)` | range `XCellRangeData.setDataArray(rows)` | edit | **Blocked**: takes `sequence<sequence<any>>` |
+| `ApiRange.GetValue()` | range `XCellRangeData.getDataArray` | read | Needs sequence results (written in C++, not compiled) |
+| `ApiRange.SetValue(v)` | range `XCellRangeData.setDataArray(rows)` | edit | Needs sequence arguments (written in C++, not compiled) |
 | `Api.GetDocument()` | root (model) itself | read | Works (no call) |
 | `ApiDocument.GetElementsCount()` | text `XEnumerationAccess.createEnumeration`, then `XEnumeration.hasMoreElements` and `nextElement` in a loop | read | Works, but a loop of bridge calls |
 | `ApiDocument.GetElement(i)` | same enumeration, stop at index `i` | read | Works, same loop |
@@ -42,8 +42,8 @@ above because the shim does not call it directly yet; it is needed in the chain 
 
 ## What is still missing
 
-- Sequence parameters and results (`getDataArray`, `setDataArray`). Until `bridge_convert.cxx` handles sequences,
-  the two cell calls fail with "parameter type not supported yet". Sequence support is the next F3 step.
+- Sequence support is in `bridge_convert.cxx` (same calls as the Basic bridge), but it is not compiled. The build
+  machine must confirm `getDataArray` and `setDataArray` on a real sheet.
 - A null handle for global calls (`executeMethod`) is not supported yet.
 - Each `ApiDocument.GetElement` call makes a loop of bridge calls. Measure this before it is accepted (budget in
   `PLAN_FULL_API.md` section 2.3).

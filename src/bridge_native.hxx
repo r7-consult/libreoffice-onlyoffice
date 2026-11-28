@@ -6,8 +6,8 @@
 // Permissions and the allowlist are set by the host when the session is created. Plugin JavaScript cannot change
 // them, and the JS bridge can only narrow them further.
 //
-// Scope of this version: parameters and results of scalar, string, enum and interface types. Sequences, structs,
-// Any and out-parameters are refused with an error. Sequence support is the next step of F3.
+// Scope of this version: parameters and results of scalar, string, enum, interface and sequence types (nested
+// sequences included). Structs, Any and out-parameters are refused with an error.
 //
 // Draft: not compiled. Every UNO name was checked against udkapi/ (see the comments in bridge_native.cxx).
 // Must run on the LibreOffice main thread (UNO calls are not thread-safe here).

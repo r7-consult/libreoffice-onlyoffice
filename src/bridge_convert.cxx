@@ -5,6 +5,9 @@
 
 #include "bridge_native.hxx"
 
+#include <com/sun/star/reflection/XIdlArray.hpp>
+#include <com/sun/star/reflection/XIdlClass.hpp>
+#include <com/sun/star/reflection/XIdlReflection.hpp>
 #include <com/sun/star/uno/TypeClass.hpp>
 
 #include <cmath>
@@ -18,6 +21,8 @@ using css::uno::Reference;
 using css::uno::Type;
 using css::uno::TypeClass;
 using css::uno::XInterface;
+using css::reflection::XIdlArray;
+using css::reflection::XIdlClass;
 
 namespace
 {
@@ -86,6 +91,22 @@ Any BridgeSession::toAny(const JsonValue& v, const Type& type)
             ref = resolve(*v.get("$h"));
             return Any(&ref, type);
         }
+        case TypeClass_SEQUENCE:
+        {
+            if (v.kind != JsonValue::Kind::Array)
+                throw std::runtime_error("bridge: argument must be an array");
+            // Same calls as the Basic bridge (basic/source/classes/sbunoobj.cxx): forName, createObject, realloc, set.
+            const Reference<XIdlClass> seqClass = m_reflection->forName(type.getTypeName());
+            const Reference<XIdlClass> elemClass = seqClass->getComponentType();
+            const Type elemType(elemClass->getTypeClass(), elemClass->getName());
+            const Reference<XIdlArray> arr = seqClass->getArray();
+            Any seq;
+            seqClass->createObject(seq);
+            arr->realloc(seq, static_cast<sal_Int32>(v.array.size()));
+            for (std::size_t i = 0; i < v.array.size(); ++i)
+                arr->set(seq, static_cast<sal_Int32>(i), toAny(v.array[i], elemType));
+            return seq;
+        }
         default:
             throw std::runtime_error("bridge: parameter type not supported yet: " +
                                      rtl::OUStringToOString(type.getTypeName(), RTL_TEXTENCODING_UTF8).getStr());
@@ -132,6 +153,20 @@ std::string BridgeSession::toJson(const Any& value)
             if (!ref.is())
                 return "null";
             return registerHandle(ref);
+        }
+        case TypeClass_SEQUENCE:
+        {
+            const Reference<XIdlClass> seqClass = m_reflection->forName(value.getValueType().getTypeName());
+            const Reference<XIdlArray> arr = seqClass->getArray();
+            const sal_Int32 n = arr->getLen(value);
+            std::string out = "[";
+            for (sal_Int32 i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                    out += ",";
+                out += toJson(arr->get(value, i));
+            }
+            return out + "]";
         }
         default:
             throw std::runtime_error("bridge: result type not supported yet");
