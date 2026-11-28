@@ -107,6 +107,9 @@ def main(argv):
     results.append((not denied_hits, "no denied names in edited files" if not denied_hits
                     else "denied names: " + "; ".join(denied_hits)))
 
+    waiver_ok, waiver_msg = check_waivers(os.path.splitext(os.path.basename(card))[0], members)
+    results.append((waiver_ok, waiver_msg))
+
     static_ok = all(ok for ok, _ in results)
     if not static_ok:
         return report(results, blocked=False)
@@ -121,6 +124,50 @@ def main(argv):
     tail = (proc.stdout + proc.stderr).strip().splitlines()[-1:] or [""]
     results.append((proc.returncode == 0, f"test command exit {proc.returncode}: {tail[0]}"))
     return report(results, blocked=False)
+
+
+MLR_HEADING = re.compile(r"^#### (MLR-\d+) ", re.MULTILINE)
+WAIVER_FILE = os.path.join(ROOT, "tests", "mlr_waivers.csv")
+WAIVER_COLUMNS = ["card", "member", "rule", "reason"]
+
+
+def known_mlr_rules():
+    """Rule IDs exactly as ADR-003 defines them. The checker reads them, so the two cannot drift apart."""
+    adr = os.path.join(ROOT, "docs", "adr", "ADR-003-mapped-limited-rules.md")
+    if not os.path.isfile(adr):
+        return set()
+    with open(adr, encoding="utf-8") as fh:
+        return set(MLR_HEADING.findall(fh.read()))
+
+
+def check_waivers(card_name, members):
+    """Waivers (tests/mlr_waivers.csv, written by a human or Sonnet, never by a card) must cite a real rule and a reason.
+
+    Returns (ok, message). A missing waiver file means no waivers, which is valid.
+    """
+    if not os.path.isfile(WAIVER_FILE):
+        return True, "no waivers recorded"
+    import csv
+    with open(WAIVER_FILE, newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        if reader.fieldnames is None or [c.strip() for c in reader.fieldnames] != WAIVER_COLUMNS:
+            return False, "tests/mlr_waivers.csv header must be: " + ",".join(WAIVER_COLUMNS)
+        rows = list(reader)
+    rules = known_mlr_rules()
+    if not rules:
+        return False, "docs/adr/ADR-003-mapped-limited-rules.md has no MLR rules"
+    bad = []
+    mine = [r for r in rows if r["card"].strip() == card_name]
+    for r in mine:
+        if r["rule"].strip() not in rules:
+            bad.append(f"{r['member']}: unknown rule {r['rule']}")
+        if not r["reason"].strip():
+            bad.append(f"{r['member']}: empty reason")
+        if r["member"].strip() not in members:
+            bad.append(f"{r['member']}: not a member of this card")
+    if bad:
+        return False, "waivers invalid: " + "; ".join(bad)
+    return True, f"waivers for this card: {len(mine)} valid"
 
 
 def run_cmd_target(cmd):

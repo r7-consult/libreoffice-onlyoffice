@@ -13,6 +13,9 @@ or ONLYOFFICE build was run, and no UNO call was executed.
 | F7 templates and generator | Five member kinds, five test kinds, `new_card.py` with refusals. Generated class and test files parse with `node --check` (checked in a sandbox copy) | `templates/`, `scripts/new_card.py` |
 | F9 card checker | Static checks: card fields, member limit, protected paths, tests unchanged vs HEAD, line limit, denied names. Tested on 4 failing cards and 1 clean card; the clean card returns BLOCKED because the runner is missing | `scripts/check_card.py` |
 
+| Waivers (ADR-003) | `check_card.py` validates `tests/mlr_waivers.csv`: rule IDs are read from ADR-003, reason required, member must be on the card. Tested with valid and invalid waivers | `scripts/check_card.py` |
+| Coverage file | `docs/API_COVERAGE.csv` created with all 2,114 rows at TODO, with the `mlr` column. Script refuses to overwrite it | `scripts/init_coverage.py`, `docs/API_COVERAGE.csv` |
+
 Existing tests still pass: `tests/test_runtime.js` and `tests/test_api_shim.js` (both PASS).
 
 ## Not done, and why
